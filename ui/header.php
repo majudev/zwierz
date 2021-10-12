@@ -78,6 +78,9 @@ require_once(dirname(__FILE__)."/../config.php");
         </li>
         <?php } ?>
         <?php } ?>
+        <li class="nav-item">
+          <a id="link_profile" class="nav-link <?php if(substr($_SERVER["REQUEST_URI"], 0, strlen($config["base_url"]."/info")) === $config["base_url"]."/info") echo "active"; ?>" aria-current="page" href="<?php echo $config["base_url"]; ?>/info">Pomoc i kontakt</a>
+        </li>
       </ul>
       <ul class="navbar-nav mb-2 mb-md-0">
         <li class="nav-item">

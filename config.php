@@ -3,6 +3,7 @@ $config = array();
 
 $config["page_name"] = "Zwierz";
 $config["version"] = "0.1-beta";
+$config["maindev"] = "majudev nobody@example.com";
 
 $config["base_url"] = "/zwierz";
 

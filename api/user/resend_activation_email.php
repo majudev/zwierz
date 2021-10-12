@@ -3,11 +3,12 @@ require_once(dirname(__FILE__)."/../../db.php");
 require_once(dirname(__FILE__)."/../../util.php");
 $referer_uri = isset($_SERVER["HTTP_REFERER"]) ? parse_url($_SERVER["HTTP_REFERER"]) : false;
 
-if(isset($_POST["email"]) && isset($_POST["captcha"]) && validate($_POST["email"], $_POST["captcha"])){
-	session_start();
-	if($_POST["captcha"] == $_SESSION["captcha"]){
-		unset($_SESSION["captcha"]);
-		$sql = "SELECT activationkey FROM users WHERE `email`='".mysqli_real_escape_string($db, $_POST["email"])."'";
+session_start();
+
+if(isset($_POST["email"]) && ((isset($_POST["captcha"]) && validate($_POST["email"], $_POST["captcha"]) || $_SESSION["admin"] == 1))){
+	if($_POST["captcha"] == $_SESSION["captcha"] || $_SESSION["admin"] == 1){
+		if(isset($_SESSION["captcha"])) unset($_SESSION["captcha"]);
+		$sql = "SELECT activationkey FROM users WHERE `email`='".mysqli_real_escape_string($db, $_POST["email"])."' AND `active` = FALSE";
 		$result = mysqli_query($db, $sql);
 		if($result && mysqli_num_rows($result) > 0){ //search if user already registered
 			$user = mysqli_fetch_assoc($result);
@@ -24,7 +25,7 @@ if(isset($_POST["email"]) && isset($_POST["captcha"]) && validate($_POST["email"
 				header("Location: ".$config["base_url"]."/user/register.php?error=".urlencode("Nie masz tu konta. Możesz założyć je teraz"));
 				die();
 			}else{
-				die("CAPTCHA FAIL");
+				die("NO ACCOUNT OR ACTIVE");
 			}
 		}
 	}else{
