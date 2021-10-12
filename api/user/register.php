@@ -7,7 +7,7 @@ if(isset($_POST["email"]) && isset($_POST["password"]) && isset($_POST["captcha"
 	session_start();
 	if($_POST["captcha"] == $_SESSION["captcha"]){
 		unset($_SESSION["captcha"]);
-		$sql = "SELECT active FROM users WHERE `email`='".$_POST["email"]."'";
+		$sql = "SELECT active FROM users WHERE `email`='".mysqli_real_escape_string($db, $_POST["email"])."'";
 		$result = mysqli_query($db, $sql);
 		if($result && mysqli_num_rows($result) > 0){ //search if user already registered
 			if($referer_uri !== false && $referer_uri["path"] === $config["base_url"]."/user/register.php"){
@@ -18,7 +18,7 @@ if(isset($_POST["email"]) && isset($_POST["password"]) && isset($_POST["captcha"
 			}
 		}else{
 			$activation_key = generate_random_string(64);
-			$sql = "INSERT INTO users(email, password, activationkey) VALUES ('".$_POST["email"]."', '".hashpassword($_POST["password"])."','".$activation_key."')";
+			$sql = "INSERT INTO users(email, password, activationkey) VALUES ('".mysqli_real_escape_string($db, $_POST["email"])."', '".hashpassword($_POST["password"])."','".$activation_key."')";
 			if(send_mail($_POST["email"], $config["activation_mail"]["subject"], str_replace("%ACTIVATION_LINK%", (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http")."://".$_SERVER["HTTP_HOST"].$config["base_url"]."/api/user/activate.php?ui=yes&confirmation=".$activation_key, $config["activation_mail"]["body"])) && mysqli_query($db, $sql)){ //add user to the database
 				if($referer_uri !== false && $referer_uri["path"] === $config["base_url"]."/user/register.php"){
 					header("Location: ".$config["base_url"]."/user/register.php?success=yes");

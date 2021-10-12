@@ -4,7 +4,7 @@ require_once(dirname(__FILE__)."/../../util.php");
 $referer_uri = isset($_SERVER["HTTP_REFERER"]) ? parse_url($_SERVER["HTTP_REFERER"]) : false;
 
 if(isset($_POST["email"]) && isset($_POST["password"]) && verify_url_safeness($_POST["email"], '.@')){
-	$sql = "SELECT active,name,admin,commitee FROM users WHERE `email`='".$_POST["email"]."' AND `password`='".hashpassword($_POST["password"])."'";
+	$sql = "SELECT active,name,admin,commitee FROM users WHERE `email`='".mysqli_real_escape_string($db, $_POST["email"])."' AND `password`='".hashpassword($_POST["password"])."'";
 	$result = mysqli_query($db, $sql);
 	if($result && mysqli_num_rows($result) == 1){ //do the actual auth
 		$user = mysqli_fetch_assoc($result);

@@ -6,7 +6,7 @@ require_once(dirname(__FILE__)."/../../util.php");
 function activate($db){
   if(!isset($_GET["confirmation"]) || strlen($_GET["confirmation"]) != 64) return false;
   if(!verify_url_safeness($_GET["confirmation"])) return false;
-  $sql = "UPDATE users SET active='1', activationkey='NULL' WHERE `activationkey`='".$_GET["confirmation"]."'";
+  $sql = "UPDATE users SET active='1', activationkey='NULL' WHERE `activationkey`='".mysqli_real_escape_string($db, $_GET["confirmation"])."'";
   return mysqli_query($db, $sql);
 }
 

@@ -7,7 +7,7 @@ if(isset($_POST["email"]) && isset($_POST["captcha"]) && validate($_POST["email"
 	session_start();
 	if($_POST["captcha"] == $_SESSION["captcha"]){
 		unset($_SESSION["captcha"]);
-		$sql = "SELECT activationkey FROM users WHERE `email`='".$_POST["email"]."'";
+		$sql = "SELECT activationkey FROM users WHERE `email`='".mysqli_real_escape_string($db, $_POST["email"])."'";
 		$result = mysqli_query($db, $sql);
 		if($result && mysqli_num_rows($result) > 0){ //search if user already registered
 			$user = mysqli_fetch_assoc($result);

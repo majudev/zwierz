@@ -16,7 +16,7 @@ if(!is_numeric($_GET["id"])){
 	die('{"status":"error","details":"invalid characters in request","code":"bad_request"}');
 }
 
-$sql = "SELECT id FROM appointment_registrations WHERE `appointment_id`='".$_GET["id"]."'";
+$sql = "SELECT id FROM appointment_registrations WHERE `appointment_id`='".mysqli_real_escape_string($db, $_GET["id"])."'";
 $result = mysqli_query($db, $sql);
 $registrations = mysqli_num_rows($result);
 if($registrations > 0){

@@ -72,7 +72,7 @@ die();
                   </tr>
                 </tbody>
               </table>
-              <div class="d-flex justify-content-end flex-row" id="new_appointment_button" style="display: none">
+              <div class="d-flex justify-content-end flex-row" id="new_appointment_button" style="display: none !important">
                 <button type="button" class="btn btn-dark" onclick="enter_add_appointment_mode()">Dodaj nowe spotkanie</button>
               </div>
             </div>
