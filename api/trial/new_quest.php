@@ -17,5 +17,8 @@ if (mysqli_query($db, $sql)){
 	if(mysqli_num_rows($result) > 0){
 		$row = mysqli_fetch_assoc($result);
 		echo '{"status":"ok","id":'.$row["id"].'}';
+		
+		$logbooksql = "INSERT INTO `trials_logbook`(`trialid`, `log`) values('".mysqli_real_escape_string($db, $_SESSION["login"])."', 'Kandydat dodał zadanie \"".mysqli_real_escape_string($db, $_GET["content"])."\".')";
+		mysqli_query($db, $logbooksql);
 	}else echo '{"status":"error","details":"MySQL operation failed: '.mysqli_error($db).'","code":"mysql_fail"}';
 }else echo '{"status":"error","details":"MySQL operation failed: '.mysqli_error($db).'","code":"mysql_fail"}';

@@ -14,5 +14,9 @@ if(!is_numeric($_GET["id"]) || !isset($_GET["login"])){
 }
 
 $sql = "DELETE FROM `appointment_registrations` WHERE `appointment_id`='".mysqli_real_escape_string($db, $_GET["id"])."' AND `login`='".mysqli_real_escape_string($db, $_GET["login"])."'";
-if(mysqli_query($db, $sql)) echo '{"status":"ok"}';
-else echo '{"status":"error","details":"MySQL operation failed: '.mysqli_error($db).'","code":"mysql_fail"}';
+if(mysqli_query($db, $sql)){
+	echo '{"status":"ok"}';
+	
+	$logbooksql = "INSERT INTO `trials_logbook`(`trialid`, `log`) values('".mysqli_real_escape_string($db, $_SESSION["login"])."', 'Kandydat został usunięty ze spotkania. (ID spotkania=\"".mysqli_real_escape_string($db, $_GET["id"])."\")')";
+	mysqli_query($db, $logbooksql);
+}else echo '{"status":"error","details":"MySQL operation failed: '.mysqli_error($db).'","code":"mysql_fail"}';

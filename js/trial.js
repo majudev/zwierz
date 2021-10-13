@@ -104,6 +104,26 @@ $( document ).ready(function() {
 	
 	// Load attachments list
 	refresh_attachments();
+	
+	// Load logbook
+	$.ajax({
+		url: baseurl + "/api/trial/get_trial_logbook.php",
+	})
+	.done(function(data) {
+		var root = JSON.parse(data);
+		if(root.status != "ok") fallback();
+		else{
+			root = root.log;
+			if(root){
+				for(var i = 0; i < root.length; ++i){
+					$("#logbook").append('<tr><td class="nowrap" scope="row">' + root[i]["date"] + '</td><td>' + root[i]["content"] + '</td></tr>');
+				}
+			}else fallback();
+		}
+	})
+	.fail(function() {
+		fallback();
+	});
 });
 
 function enter_trial_edit_mode(){

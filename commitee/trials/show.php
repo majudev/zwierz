@@ -140,8 +140,8 @@ die();
                     <th scope="col" class="longrecord">Operacja</th>
                   </tr>
                 </thead>
-                <tbody>
-                  <tr>
+                <tbody id="logbook">
+                  <!--- <tr>
                     <td class="nowrap" scope="row">12.05.2022 12:59</td>
                     <td>Kandydat dodał zadanie o treści "Będę się mył raz w tygodniu"</td>
                   </tr>
@@ -152,7 +152,7 @@ die();
                   <tr class="table-info">
                     <td class="nowrap" scope="row">12.08.2022 13:30</td>
                     <td>Kapituła sugeruje zmianę zadania dotyczącego mycia się na bardziej ambitne.</td>
-                  </tr>
+                  </tr> --->
                 </tbody>
               </table>
             </div>

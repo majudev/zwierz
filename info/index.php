@@ -56,7 +56,7 @@ require_once(dirname(__FILE__)."/../db.php");?>
               }else echo 'Aktualnie brak!';
               ?>
             </ul><br>
-            Do nich możesz pisać w sprawie swojego konta, np. utraty hasła lub gdy zapomniałeś czy masz już konto, czy nie.
+            Do nich możesz pisać w sprawie swojego konta, np. utraty hasła lub gdy zapomniałeś czy masz już konto w systemie.
           </li>
         </ul>
       </div>

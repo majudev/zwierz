@@ -16,6 +16,11 @@ session_write_close();
 $archived = "TRUE";
 if($_GET["archived"] == "false") $archived = "FALSE";
 $sql = "UPDATE `trials` SET `archived`=".$archived." WHERE `login`='".mysqli_real_escape_string($db, $login)."'";
-if(mysqli_query($db, $sql)) echo '{"status":"ok"}';
+if(mysqli_query($db, $sql)){
+	echo '{"status":"ok"}';
+	$msg = "Próba została przeniesiona do archiwum.";
+	if($archived == "FALSE") $msg = "Próba została wyjęta z archiwum.";
+	$logbooksql = "INSERT INTO `trials_logbook`(`trialid`, `log`) values('".mysqli_real_escape_string($db, $_SESSION["login"])."', '".$msg."')";
+	mysqli_query($db, $logbooksql);
+}
 else echo '{"status":"error","details":"MySQL operation failed: '.mysqli_error($db).'","code":"mysql_fail"}';
-
