@@ -4,3 +4,4 @@ RewriteCond %{HTTPS} off
 # Don't put www. here. If it is already there it will be included, if not
 # the subsequent rule will catch it.
 RewriteRule .* https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+Header add X-Dont-Hack-Us "Please don't hack us. We are just scouts, we have no money nor data to be stolen."
