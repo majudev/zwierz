@@ -17,6 +17,14 @@ $config["db"]["database"] = "zwierz";
 $config["db"]["username"] = "zwierz";
 $config["db"]["password"] = "zwierz123";
 
+$config["mail"] = array();
+$config["mail"]["host"] = "smtp.gmail.com";
+$config["mail"]["security"] = "tls";
+$config["mail"]["user"] = "login@gmail.com";
+$config["mail"]["password"] = "Passw0rd";
+$config["mail"]["port"] = 587;
+$config["mail"]["nicename"] = "Kapituła HO";
+
 $config["activation_mail"] = array();
 $config["activation_mail"]["subject"] = "Potwiedź swoje konto";
 $config["activation_mail"]["body"] = "Potwiedź swoje konto, klikając w <a href=\"%ACTIVATION_LINK%\">link</a>.";

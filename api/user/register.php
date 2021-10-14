@@ -19,7 +19,9 @@ if(isset($_POST["email"]) && isset($_POST["password"]) && isset($_POST["captcha"
 		}else{
 			$activation_key = generate_random_string(64);
 			$sql = "INSERT INTO users(email, password, activationkey) VALUES ('".mysqli_real_escape_string($db, $_POST["email"])."', '".hashpassword($_POST["password"])."','".$activation_key."')";
-			if(send_mail($_POST["email"], $config["activation_mail"]["subject"], str_replace("%ACTIVATION_LINK%", (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http")."://".$_SERVER["HTTP_HOST"].$config["base_url"]."/api/user/activate.php?ui=yes&confirmation=".$activation_key, $config["activation_mail"]["body"])) && mysqli_query($db, $sql)){ //add user to the database
+			//if(send_mail($_POST["email"], $config["activation_mail"]["subject"], str_replace("%ACTIVATION_LINK%", (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http")."://".$_SERVER["HTTP_HOST"].$config["base_url"]."/api/user/activate.php?ui=yes&confirmation=".$activation_key, $config["activation_mail"]["body"])) && mysqli_query($db, $sql)){ //add user to the database
+			$mailresult = send_mail(array($_POST["email"]), NULL, array(), $config["activation_mail"]["subject"], str_replace("%ACTIVATION_LINK%", (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http")."://".$_SERVER["HTTP_HOST"].$config["base_url"]."/api/user/activate.php?ui=yes&confirmation=".$activation_key, $config["activation_mail"]["body"]));
+			if($mailresult === 1 && mysqli_query($db, $sql)){ //add user to the database
 				if($referer_uri !== false && $referer_uri["path"] === $config["base_url"]."/user/register.php"){
 					header("Location: ".$config["base_url"]."/user/register.php?success=yes");
 					die();

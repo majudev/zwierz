@@ -1,4 +1,6 @@
 <?php
+require_once(dirname(__FILE__)."/mailer.php");
+
 function hashpassword($cleartext){
 	return hash('sha512', $cleartext);
 }
@@ -21,8 +23,8 @@ function verify_url_safeness($url, $specialchars = ''){
   return true;
 }
 
-function send_mail($to, $subject, $body){
+/*function send_mail($to, $subject, $body){
 	file_put_contents("/tmp/mail.txt", $subject."\n\n".$body."\n====================================\n\n\n", FILE_APPEND);
 	return true;
-}
+}*/
 ?>
