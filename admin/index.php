@@ -198,12 +198,13 @@ die();
 	
   function edit_commitee_role_commit(id){
     var role = $("#user" + id + "_role_select").val();
+	if(role == '') role = 'NULL';
     $("#user" + id + "_role_select").hide();
     $("#user" + id + "_role_save_btn").hide();
     $.ajax({
       url: baseurl + "/admin/execute.php",
       data: {
-        query: "update users set commitee='" + role + "' where `id`='" + id + "'",
+        query: "update users set commitee=" + role + " where `id`='" + id + "'",
       }
     })
     .done(function(data) {
