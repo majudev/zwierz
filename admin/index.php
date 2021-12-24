@@ -150,10 +150,15 @@ die();
             if(user["active"] == false){
               active = '<button class="btn btn-dark" onclick="activate_account(\'' + user["email"] + '\')">Aktywuj</button><button class="btn btn-dark" onclick="resend_activation_email(\'' + user["email"] + '\')">Wyślij email aktywacyjny</button>';
             }
-            var permissions = "Kandydat";
-            if(user["commitee"] == "member") permissions = "Członek";
-            else if(user["commitee"] == "admin") permissions = "Sekretarz";
+			var baseperm = '<select id="user' + user["id"] + '_role_select" style="display:none"><option value="">Kandydat</option><option value="member">Członek</option><option value="admin">Sekretarz</option></select><span id="user' + user["id"] + '_role_div">';
+            var permissions = baseperm + "Kandydat";
+            if(user["commitee"] == "member") permissions = baseperm + "Członek";
+            else if(user["commitee"] == "admin") permissions = baseperm + "Sekretarz";
             if(user["admin"] == 1) permissions += ", Admin";
+			permissions += '</span><button id="user' + user["id"] + '_role_edit_btn" class="btn btn-dark" onclick="edit_commitee_role(\'' + user["id"] + '\', \'' + user["commitee"] + '\')"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16"><path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708l-3-3zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207l6.5-6.5zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11l.178-.178z"/></svg></button>';
+			permissions += '<button id="user' + user["id"] + '_role_save_btn" class="btn btn-dark" style="display:none" onclick="edit_commitee_role_commit(\'' + user["id"] + '\')"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-lg" viewBox="0 0 16 16"><path d="M13.485 1.431a1.473 1.473 0 0 1 2.104 2.062l-7.84 9.801a1.473 1.473 0 0 1-2.12.04L.431 8.138a1.473 1.473 0 0 1 2.084-2.083l4.111 4.112 6.82-8.69a.486.486 0 0 1 .04-.045z"/></svg></button>';
+			permissions += '<button id="user' + user["id"] + '_admin_btn" class="btn btn-danger" onclick="edit_admin_role_commit(\'' + user["id"] + '\', \'' + user["admin"] + '\')"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-workspace" viewBox="0 0 16 16"><path d="M4 16s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H4Zm4-5.95a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z"/><path d="M2 1a2 2 0 0 0-2 2v9.5A1.5 1.5 0 0 0 1.5 14h.653a5.373 5.373 0 0 1 1.066-2H1V3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v9h-2.219c.554.654.89 1.373 1.066 2h.653a1.5 1.5 0 0 0 1.5-1.5V3a2 2 0 0 0-2-2H2Z"/></svg></button>';
+
             $("#users_table").append('<tr><td class="text-center">' + user["id"] + '</td><td class="nowrap text-center">' + user["name"] + '</td><td class="text-center">' + user["email"] + '</td><td class="nowrap text-center">' + user["phone"] + '</td><td class="text-center">' + user["team"] + '</td><td class="text-center nowrap">' + active + '</td><td class="nowrap"><button class="btn btn-danger" onclick="popup_pwd_reset(' + user["id"] + ', \'' + user["name"] + '\')">Resetuj</button></td><td class="text-center">' + permissions + '</td><td><button class="btn btn-danger" onclick="popup_user_delete(' + user["id"] + ', \'' + user["name"] + '\')"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-square" viewBox="0 0 16 16"><path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg></button></td></tr>');
           }
         }else $("#users_table").append("<tr><td></td><td>Brak użytkowników w bazie.</td></tr>");
@@ -163,6 +168,53 @@ die();
       fallback();
     });
   });
+	
+  function edit_commitee_role(id, role){
+    $("#user" + id + "_role_select").val(role);
+    $("#user" + id + "_role_select").show();
+    $("#user" + id + "_role_div").hide();
+    $("#user" + id + "_role_edit_btn").hide();
+    $("#user" + id + "_role_save_btn").show();
+  }
+	
+  function edit_admin_role_commit(id, admin){
+    $("#user" + id + "_admin_btn").hide();
+    var setadmin = (admin == 1) ? 'false' : 'true';
+    $.ajax({
+      url: baseurl + "/admin/execute.php",
+      data: {
+        query: "update users set admin=" + setadmin + " where `id`='" + id + "'",
+      }
+    })
+    .done(function(data) {
+      var root = JSON.parse(data);
+      if(root.status != "ok") alert("Nie można przypisać roli użytkownika: " + root.details);
+      else location.reload();
+    })
+    .fail(function() {
+      fallback();
+    });
+  }
+	
+  function edit_commitee_role_commit(id){
+    var role = $("#user" + id + "_role_select").val();
+    $("#user" + id + "_role_select").hide();
+    $("#user" + id + "_role_save_btn").hide();
+    $.ajax({
+      url: baseurl + "/admin/execute.php",
+      data: {
+        query: "update users set commitee='" + role + "' where `id`='" + id + "'",
+      }
+    })
+    .done(function(data) {
+      var root = JSON.parse(data);
+      if(root.status != "ok") alert("Nie można przypisać roli użytkownika: " + root.details);
+      else location.reload();
+    })
+    .fail(function() {
+      fallback();
+    });
+  }
   
   function popup_pwd_reset(id, name){
     $("#confirm_password_reset_id").text(id);
