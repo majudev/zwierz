@@ -21,6 +21,7 @@ function send_mail($recipients, $replyto, $ccs, $subject, $body){
         $mail->Password   = $config["mail"]["password"];                               //SMTP password
         $mail->SMTPSecure = $config["mail"]["security"];            //Enable implicit TLS encryption
         $mail->Port       = $config["mail"]["port"];                                    //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
+        $mail->CharSet    = 'UTF-8';
 
         $mail->setFrom($config["mail"]["user"], $config["mail"]["nicename"]);
         foreach($recipients as $recipient){
