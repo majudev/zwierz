@@ -77,6 +77,10 @@ require_once(dirname(__FILE__)."/../config.php");
           <a id="link_admin" class="nav-link <?php if(substr($_SERVER["REQUEST_URI"], 0, strlen($config["base_url"]."/admin")) === $config["base_url"]."/admin") echo "active"; ?>" href="<?php echo $config["base_url"]; ?>/admin">Panel administratora</a>
         </li>
         <?php } ?>
+        <?php } else { ?>
+        <li class="nav-item">
+          <a id="link_admin" class="nav-link <?php if(substr($_SERVER["REQUEST_URI"], 0, strlen($config["base_url"]."/public_appointments")) === $config["base_url"]."/public_appointments") echo "active"; ?>" href="<?php echo $config["base_url"]; ?>/public_appointments">Lista spotkań</a>
+        </li>
         <?php } ?>
         <li class="nav-item">
           <a id="link_profile" class="nav-link <?php if(substr($_SERVER["REQUEST_URI"], 0, strlen($config["base_url"]."/info")) === $config["base_url"]."/info") echo "active"; ?>" aria-current="page" href="<?php echo $config["base_url"]; ?>/info">Pomoc i kontakt</a>
