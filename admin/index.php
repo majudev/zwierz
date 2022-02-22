@@ -198,7 +198,8 @@ die();
 	
   function edit_commitee_role_commit(id){
     var role = $("#user" + id + "_role_select").val();
-	if(role == '') role = 'NULL';
+    if(role == '') role = 'NULL';
+    else role = "'" + role + "'";
     $("#user" + id + "_role_select").hide();
     $("#user" + id + "_role_save_btn").hide();
     $.ajax({
