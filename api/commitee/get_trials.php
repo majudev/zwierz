@@ -9,7 +9,7 @@ if(!isset($_SESSION["commitee"]) || $_SESSION["commitee"] == ""){
 }
 $state = "FALSE";
 if(isset($_GET["archived"])) $state = "TRUE";
-$sql = "SELECT trials.login, users.name FROM trials INNER JOIN users ON trials.login = users.email WHERE `archived` = ".$state;
+$sql = "SELECT trials.login, users.name FROM trials INNER JOIN users ON trials.login = users.email WHERE `commitee` IS NULL AND `archived` = ".$state;
 session_write_close();
 $result = mysqli_query($db, $sql);
 if (mysqli_num_rows($result) > 0){
