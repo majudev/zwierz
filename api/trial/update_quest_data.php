@@ -26,7 +26,7 @@ if(mysqli_num_rows($result) > 0){
 	}else $contentstring = "\"".mysqli_real_escape_string($db, $row["content"])."\" na \"".mysqli_real_escape_string($db, $_GET["content"])."\".";
 }
 
-$sql = "UPDATE `quests` SET `content`='".mysqli_real_escape_string($db, $_GET["content"])."', `finish_date`='".mysqli_real_escape_string($db, $_GET["finish_date"])."' WHERE `login`='".mysqli_real_escape_string($db, $login)."' AND `id`='".mysqli_real_escape_string($db, $_GET["id"])."'";
+$sql = "UPDATE `quests` SET `content`='".mysqli_real_escape_string($db, content_escape($_GET["content"]))."', `finish_date`='".mysqli_real_escape_string($db, $_GET["finish_date"])."' WHERE `login`='".mysqli_real_escape_string($db, $login)."' AND `id`='".mysqli_real_escape_string($db, $_GET["id"])."'";
 if(mysqli_query($db, $sql)){
 	echo '{"status":"ok"}';
 	

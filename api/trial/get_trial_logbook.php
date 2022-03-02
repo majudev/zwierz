@@ -1,5 +1,6 @@
 <?php
 require_once(dirname(__FILE__)."/../../db.php");
+require_once(dirname(__FILE__)."/../../util.php");
 session_start();
 if(!isset($_SESSION["login"])){
 	die('{"status":"error","details":"user not logged in","code":"user_not_logged_in"');
@@ -17,10 +18,10 @@ $result = mysqli_query($db, $sql);
 if (mysqli_num_rows($result) > 0){
 	echo '{"status":"ok","log":[';
 	$row = mysqli_fetch_assoc($result);
-	$log = str_replace("\"", "\\\"", $row["log"]);
+	$log = str_replace("\"", "\\\"", content_escape($row["log"]));
 	echo '{"date":"'.$row["time"].'","content":"'.$log.'"}';
 	while($row = mysqli_fetch_assoc($result)){
-		$log = str_replace("\"", "\\\"", $row["log"]);
+		$log = str_replace("\"", "\\\"", content_escape($row["log"]));
 		echo ',{"date":"'.$row["time"].'","content":"'.$log.'"}';
 	}
 	echo ']}';

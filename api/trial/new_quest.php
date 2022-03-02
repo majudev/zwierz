@@ -10,7 +10,7 @@ session_write_close();
 if(!verify_url_safeness($_GET["finish_date"], ':- ')){
 	die('{"status":"error","details":"invalid characters in request","code":"bad_request"}');
 }
-$sql = "INSERT INTO `quests`(`login`, `content`, `finish_date`) VALUES('".mysqli_real_escape_string($db, $login)."','".mysqli_real_escape_string($db, $_GET["content"])."','".mysqli_real_escape_string($db, $_GET["finish_date"])."')";
+$sql = "INSERT INTO `quests`(`login`, `content`, `finish_date`) VALUES('".mysqli_real_escape_string($db, $login)."','".mysqli_real_escape_string($db, content_escape($_GET["content"]))."','".mysqli_real_escape_string($db, $_GET["finish_date"])."')";
 if (mysqli_query($db, $sql)){
 	$sql = "SELECT id FROM `quests` WHERE `login`='".mysqli_real_escape_string($db, $login)."' AND `content`='".mysqli_real_escape_string($db, $_GET["content"])."' AND `finish_date`='".mysqli_real_escape_string($db, $_GET["finish_date"])."'";
 	$result = mysqli_query($db, $sql);

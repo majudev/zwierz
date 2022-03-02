@@ -23,6 +23,11 @@ function verify_url_safeness($url, $specialchars = ''){
   return true;
 }
 
+function content_escape($string){
+	$regex = "/[^A-Za-z0-9.!?~@#$% \-^&'\"*()_+\/\nąćęłńóśźż]/";
+	return preg_replace($regex,'',$string);
+}
+
 /*function send_mail($to, $subject, $body){
 	file_put_contents("/tmp/mail.txt", $subject."\n\n".$body."\n====================================\n\n\n", FILE_APPEND);
 	return true;
