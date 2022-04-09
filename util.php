@@ -25,7 +25,14 @@ function verify_url_safeness($url, $specialchars = ''){
 
 function content_escape($string){
 	$regex = "/[^A-Za-z0-9.!?~@#$% \-^&'\"*()_+\/\nąćęłńóśźż]/";
-	return preg_replace($regex,'',$string);
+	$content = preg_replace($regex,'',$string);
+	$content = preg_replace("/\"/",'\"',$content);
+	return $content;
+}
+
+function strip_backslashes($string){
+	$content = str_replace('\\', '', $string);
+	return $content;
 }
 
 /*function send_mail($to, $subject, $body){

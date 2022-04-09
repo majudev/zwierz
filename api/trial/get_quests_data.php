@@ -1,5 +1,6 @@
 <?php
 require_once(dirname(__FILE__)."/../../db.php");
+require_once(dirname(__FILE__)."/../../util.php");
 session_start();
 if(!isset($_SESSION["login"])){
 	die('{"status":"error","details":"user not logged in","code":"user_not_logged_in"');
@@ -17,9 +18,13 @@ $result = mysqli_query($db, $sql);
 if (mysqli_num_rows($result) > 0){
 	echo '{"status":"ok","quests":[';
 	$row = mysqli_fetch_assoc($result);
-	echo '{"id":'.$row["id"].',"content":"'.$row["content"].'","finish_date":'.strtotime($row["finish_date"]).'}';
+	$content = content_escape(strip_backslashes($row["content"]));
+	//$content = str_replace("\"", "\\\"", $content);
+	echo '{"id":'.$row["id"].',"content":"'.$content.'","finish_date":'.strtotime($row["finish_date"]).'}';
 	while($row = mysqli_fetch_assoc($result)){
-		echo ',{"id":'.$row["id"].',"content":"'.$row["content"].'","finish_date":'.strtotime($row["finish_date"]).'}';
+		$content = content_escape(strip_backslashes($row["content"]));
+		//$content = str_replace("\"", "\\\"", $content);
+		echo ',{"id":'.$row["id"].',"content":"'.$content.'","finish_date":'.strtotime($row["finish_date"]).'}';
 	}
 	echo ']}';
 } else {
