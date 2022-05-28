@@ -7,7 +7,7 @@ if(!isset($_SESSION["login"])){
 }
 $login = $_SESSION["login"];
 session_write_close();
-if(!isset($_FILES["file"]) || !verify_url_safeness($_POST["title"], 'ąćęłńóśżź -"')){
+if(!isset($_FILES["file"]) || !verify_url_safeness($_POST["title"], '.ąćęłńóśżźĄĆĘŁŃÓŚŻŹ -"')){
 	die('{"status":"error","details":"invalid characters in request","code":"bad_request"}');
 }
 if($_FILES['file']['error'] != UPLOAD_ERR_OK){

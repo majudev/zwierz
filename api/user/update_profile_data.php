@@ -7,7 +7,7 @@ if(!isset($_SESSION["login"])){
 }
 $login = $_SESSION["login"];
 session_write_close();
-//if(!verify_url_safeness($_GET["name"], '.ąćęłńóśżź -') || !verify_url_safeness($_GET["phone"], '- +') || !verify_url_safeness($_GET["team"], ' .,-ąćęłńóśżź') || !verify_url_safeness($_GET["function"], ' .,ąćęłńóśżź') || !verify_url_safeness($_GET["interests"], ' .ąćęłńóśżź-"[,+')){
+//if(!verify_url_safeness($_GET["name"], '.ąćęłńóśżźĄĆĘŁŃÓŚŻŹ -') || !verify_url_safeness($_GET["phone"], '- +') || !verify_url_safeness($_GET["team"], ' .,-ąćęłńóśżźĄĆĘŁŃÓŚŻŹ') || !verify_url_safeness($_GET["function"], ' .,ąćęłńóśżźĄĆĘŁŃÓŚŻŹ') || !verify_url_safeness($_GET["interests"], ' .ąćęłńóśżźĄĆĘŁŃÓŚŻŹ-"[,+')){
 //	die('{"status":"error","details":"invalid characters in request","code":"bad_request"}');
 //}
 $sql = "UPDATE users SET `name`='".mysqli_real_escape_string($db, $_GET["name"])."', `phone`='".mysqli_real_escape_string($db, $_GET["phone"])."', `team`='".mysqli_real_escape_string($db, $_GET["team"])."', `function`='".mysqli_real_escape_string($db, $_GET["function"])."', `interests`='".mysqli_real_escape_string($db, $_GET["interests"])."' WHERE `email`='".mysqli_real_escape_string($db, $login)."'";
