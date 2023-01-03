@@ -12,14 +12,14 @@ if(isset($_GET["id"])){
 	$login = $_GET["id"];
 }
 session_write_close();
-$sql = "SELECT id,name,created_at,extension FROM attachments WHERE `login`='".mysqli_real_escape_string($db, $login)."'";
+$sql = "SELECT id,name,created_at,extension,(1-ISNULL(thumbnail)) as has_thumbnail FROM attachments WHERE `login`='".mysqli_real_escape_string($db, $login)."'";
 $result = mysqli_query($db, $sql);
 if (mysqli_num_rows($result) > 0){
 	echo '{"status":"ok","attachments":[';
 	$row = mysqli_fetch_assoc($result);
-	echo '{"id":'.$row["id"].',"title":"'.$row["name"].'","creation_date":'.strtotime($row["created_at"]).',"extension":"'.$row["extension"].'"}';
+	echo '{"id":'.$row["id"].',"title":"'.$row["name"].'","creation_date":'.strtotime($row["created_at"]).',"extension":"'.$row["extension"].'", "has_thumbnail":'.$row["has_thumbnail"].'}';
 	while($row = mysqli_fetch_assoc($result)){
-		echo ',{"id":'.$row["id"].',"title":"'.$row["name"].'","creation_date":'.strtotime($row["created_at"]).',"extension":"'.$row["extension"].'"}';
+		echo ',{"id":'.$row["id"].',"title":"'.$row["name"].'","creation_date":'.strtotime($row["created_at"]).',"extension":"'.$row["extension"].'", "has_thumbnail":'.$row["has_thumbnail"].'}';
 	}
 	echo ']}';
 } else {

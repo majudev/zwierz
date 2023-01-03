@@ -39,4 +39,23 @@ function strip_backslashes($string){
 	file_put_contents("/tmp/mail.txt", $subject."\n\n".$body."\n====================================\n\n\n", FILE_APPEND);
 	return true;
 }*/
+
+function generateThumbnail($imgPath, $width, $height, $quality = 90)
+{
+    if (is_file($imgPath)) {
+		try{
+			$imagick = new Imagick(realpath($imgPath));
+			$imagick->setImageFormat('jpeg');
+			$imagick->setImageCompression(Imagick::COMPRESSION_JPEG);
+			$imagick->setImageCompressionQuality($quality);
+			$imagick->thumbnailImage($width, $height, false, true);
+			return $imagick;
+		}catch(ImagickException $e){
+			return null;
+		}catch(Exception $e){
+			return null;
+		}
+    }
+    return null;
+}
 ?>

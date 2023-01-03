@@ -7,8 +7,11 @@ if(!isset($_SESSION["login"])){
 }
 $login = $_SESSION["login"];
 session_write_close();
-if(!isset($_FILES["file"]) || !verify_url_safeness($_POST["title"], '.ąćęłńóśżźĄĆĘŁŃÓŚŻŹ -"')){
-	die('{"status":"error","details":"invalid characters in request","code":"bad_request"}');
+if(!isset($_FILES["file"])){
+	die('{"status":"error","details":"no file attached to this request","code":"no_file"}');
+}
+if(!isset($_POST["title"]) || !verify_url_safeness($_POST["title"], '.ąćęłńóśżźĄĆĘŁŃÓŚŻŹ -"')){
+	die('{"status":"error","details":"invalid characters in request or empty request","code":"bad_request"}');
 }
 if($_FILES['file']['error'] != UPLOAD_ERR_OK){
 	die('{"status":"error","details":"error occured while uploading the file: "'.$_FILES['uploadedfile']['error'].',"code":"upload_error"}');
@@ -17,10 +20,16 @@ if(!is_uploaded_file($_FILES['file']['tmp_name'])){
 	die('{"status":"error","details":"error occured while uploading the file: "'.$_FILES['uploadedfile']['error'].',"code":"bad_request"}');
 }
 $file_content = file_get_contents($_FILES['file']['tmp_name']);
+$filename = $_POST["title"];
 $extension = pathinfo($_FILES['file']['name'], PATHINFO_EXTENSION);
-$sql = "INSERT INTO `attachments`(`login`,`name`,`content`,`extension`) VALUES('".mysqli_real_escape_string($db, $login)."','".mysqli_real_escape_string($db, $_POST["title"])."','".mysqli_real_escape_string($db, $file_content)."','".mysqli_real_escape_string($db, $extension)."')";
+if(!isset($filename) || $filename == "") $filename = substr($_FILES["file"]['name'], 0, (-1)*(strlen($extension)+1));
+$thumbnail = generateThumbnail($_FILES['file']['tmp_name'], 300, 300);
+if($thumbnail != null) $thumbnail = "'".mysqli_real_escape_string($db, $thumbnail)."'";
+else $thumbnail = 'NULL';
+
+$sql = "INSERT INTO `attachments`(`login`,`name`,`content`,`extension`,`thumbnail`) VALUES('".mysqli_real_escape_string($db, $login)."','".mysqli_real_escape_string($db, $filename)."','".mysqli_real_escape_string($db, $file_content)."','".mysqli_real_escape_string($db, $extension)."',".$thumbnail.")";
 if(mysqli_query($db, $sql)) echo '{"status":"ok"}';
 else die('{"status":"error","details":"MySQL operation failed: '.mysqli_error($db).'","code":"mysql_fail"}');
 
-$logbooksql = "INSERT INTO `trials_logbook`(`trialid`, `log`) values('".mysqli_real_escape_string($db, $_SESSION["login"])."', 'Kandydat wysłał załącznik \"".mysqli_real_escape_string($db, $_POST["title"])."\".')";
+$logbooksql = "INSERT INTO `trials_logbook`(`trialid`, `log`) values('".mysqli_real_escape_string($db, $_SESSION["login"])."', 'Kandydat wysłał załącznik \"".mysqli_real_escape_string($db, $filename)."\".')";
 mysqli_query($db, $logbooksql);

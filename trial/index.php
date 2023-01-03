@@ -235,8 +235,9 @@ die();
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <input type="text" id="attachment_title" />
-        <input type="file" id="attachment_file" />
+        Podaj nazwę załącznika:
+        <input type="text" id="attachment_title" placeholder="np. Raport z próby" />
+        <input type="file" id="attachment_file" /> (Max <?php echo ini_get('upload_max_filesize') < ini_get('post_max_size') ? ini_get('upload_max_filesize') : ini_get('post_max_size'); ?>B)
         <p id="new_attachment_error" class="pt-2 text-danger" style="display:none"></p>
       </div>
       <div class="modal-footer">
