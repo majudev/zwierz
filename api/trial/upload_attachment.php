@@ -6,6 +6,12 @@ if(!isset($_SESSION["login"])){
 	die('{"status":"error","details":"user not logged in","code":"user_not_logged_in"');
 }
 $login = $_SESSION["login"];
+if(isset($_GET["id"])){
+	if(!isset($_SESSION["commitee"]) || $_SESSION["commitee"] != "admin"){
+		die('{"status":"error","details":"user doesn\'t have commitee permissions","code":"user_not_authorized"}');
+	}
+	$login = $_GET["id"];
+}
 session_write_close();
 if(!isset($_FILES["file"])){
 	die('{"status":"error","details":"no file attached to this request","code":"no_file"}');
@@ -31,5 +37,7 @@ $sql = "INSERT INTO `attachments`(`login`,`name`,`content`,`extension`,`thumbnai
 if(mysqli_query($db, $sql)) echo '{"status":"ok"}';
 else die('{"status":"error","details":"MySQL operation failed: '.mysqli_error($db).'","code":"mysql_fail"}');
 
-$logbooksql = "INSERT INTO `trials_logbook`(`trialid`, `log`) values('".mysqli_real_escape_string($db, $_SESSION["login"])."', 'Kandydat wysłał załącznik \"".mysqli_real_escape_string($db, $filename)."\".')";
+$person = 'Kandydat';
+if(isset($_GET["id"])) $person = 'Sekretarz kapituły';
+$logbooksql = "INSERT INTO `trials_logbook`(`trialid`, `log`) values('".mysqli_real_escape_string($db, $_SESSION["login"])."', '".$person." wysłał załącznik \"".mysqli_real_escape_string($db, $filename)."\".')";
 mysqli_query($db, $logbooksql);

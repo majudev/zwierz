@@ -46,7 +46,7 @@ $( document ).ready(function() {
 				
 				if(archived){
 					$("#archive").hide();
-					$("#dearchived").show();
+					$("#dearchive").show();
 				}else{
 					$("#archive").show();
 					$("#dearchive").hide();
@@ -207,6 +207,18 @@ function helper_createquest(n, text, date){
 	$("#quest_table").append('<tr id="quest_entry' + n + '"><td class="nowrap" scope="row">' + n + '</td><td><textarea id="quest_edit_textbox' + n + '" class="longrecord" style="display: none"></textarea><div id="quest_textbox' + n + '" style="display: inline">' + text + '</div><td><select id="quest_edit_date_select' + n + '" style="display: none"></select><div id="quest_date_select' + n + '" class="text-center nowrap" style="display: inline">' + date + '</div></td></tr>');
 }
 
+function size2human(bytes, decimals = 1) {
+    if (!+bytes) return '0';
+
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['', 'K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'];
+
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+}
+
 function refresh_attachments(){
 	// Load attachments data
 	$.ajax({
@@ -220,10 +232,11 @@ function refresh_attachments(){
 			if(root){
 				attachmentid_mappings = {};
 				attachmentext_mappings = {};
-				var max = $("#attachments_div").children("div").length;
+				/*var max = $("#attachments_div").children("div").length;
 				for(var i = 1; i < max; ++i){
 					$("#attachment" + i).remove();
-				}
+				}*/
+				$("#attachments_div").empty();
 				for(var i = 0; i < root.length; ++i){
 					var n = $("#attachments_div").children("div").length;
 					var img = '<svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#55595c"></rect><text x="50%" y="50%" fill="#eceeef" dy=".3em">Thumbnail</text></svg>';
@@ -240,9 +253,13 @@ function refresh_attachments(){
 					else
 					img = '<svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" preserveAspectRatio="xMidYMid slice" focusable="false"><rect width="100%" height="100%" fill="#eceeef"></rect><g><svg x="0" y="25%" width="auto" height="50%" viewBox="0 0 24 24"> <path fill="currentColor" d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" /></svg></g></svg>';
 					
-					$("#attachments_div").append('<div class="col" id="attachment' + n + '"><div class="card shadow-sm attachment" onclick="click_attachment(' + n + ')">' + img + '<div class="card-body"><p class="card-text">' + root[i].title + '.' + root[i].extension + '</p><div class="d-flex justify-content-between align-items-center"><small class="text-muted">' + unix2time(root[i].creation_date) + '</small></div></div></div></div>');
+					$("#attachments_div").append('<div class="col" id="attachment' + n + '"><div class="card shadow-sm attachment" onclick="click_attachment(' + n + ')">' + img + '<div class="card-body"><p class="card-text">' + root[i].title + '.' + root[i].extension + ' (' + size2human(root[i].size) + 'B)</p><div class="d-flex justify-content-between align-items-center"><small class="text-muted">' + unix2time(root[i].creation_date) + '</small></div></div></div></div>');
 					attachmentid_mappings["attachment" + n] = root[i].id;
 					attachmentext_mappings["attachment" + n] = root[i].extension;
+				}
+				
+				if($("#archive").is(':visible') && commitee == "admin"){
+				   $("#attachments_div").append('<div class="col"  id="attachment_new"><div class="card attachment" data-bs-toggle="modal" data-bs-target="#new_attachment"><svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" preserveAspectRatio="xMidYMid slice" focusable="false"><rect width="100%" height="100%" fill="#55595c"></rect><text x="50%" y="80%" fill="#eceeef" dy=".3em">Dodaj nowy załącznik</text><g><svg fill="#eceeef" x="0" y="15%" xmlns="http://www.w3.org/2000/svg" width="auto" height="50%" fill="currentColor" class="bi bi-file-earmark-plus" viewBox="0 0 16 16"><path d="M8 6.5a.5.5 0 0 1 .5.5v1.5H10a.5.5 0 0 1 0 1H8.5V11a.5.5 0 0 1-1 0V9.5H6a.5.5 0 0 1 0-1h1.5V7a.5.5 0 0 1 .5-.5z"/><path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5L14 4.5zm-3 0A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5h-2z"/></svg></g></svg></div></div>');
 				}
 			}else fallback();
 		}
@@ -265,6 +282,40 @@ function click_attachment(n){
 		//} else {
 			download_attachment();
 		//}
+	}
+}
+
+function add_new_attachment(){
+	var fd = new FormData();
+	var files = $('#new_attachment_file')[0].files;	
+
+	if(files.length > 0){
+		fd.append('title', $('#new_attachment_title').val());
+		fd.append('file', files[0]);
+		
+		$('#new_attachment_file').val("");
+		$('#new_attachment_title').val("");
+
+		$.ajax({
+			url: baseurl + '/api/trial/upload_attachment.php?id=' + trialid,
+			type: 'post',
+			data: fd,
+			contentType: false,
+			processData: false
+		})
+		.done(function(data) {
+			var root = JSON.parse(data);
+			if(root.status == "ok"){
+				refresh_attachments();
+				$("#new_attachment").modal("hide");
+			}else fallback();
+		})
+		.fail(function() {
+			fallback();
+		});
+	}else{
+		$("#new_attachment_error").text("Proszę wybrać załącznik!");
+		$("#new_attachment_error").show();
 	}
 }
 

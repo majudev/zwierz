@@ -176,6 +176,26 @@ die();
     </div>
   </div>
 </div>
+<div class="modal fade" id="new_attachment" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Dodaj nowy załącznik</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Podaj nazwę załącznika:
+        <input type="text" id="new_attachment_title" placeholder="np. Raport z próby" />
+        <input type="file" id="new_attachment_file" /> (Max <?php echo ini_get('upload_max_filesize') < ini_get('post_max_size') ? ini_get('upload_max_filesize') : ini_get('post_max_size'); ?>B)
+        <p id="new_attachment_error" class="pt-2 text-danger" style="display:none"></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Anuluj</button>
+        <button type="button" class="btn btn-dark" onclick="add_new_attachment()">Dodaj</button>
+      </div>
+    </div>
+  </div>
+</div>
 <script
 			  src="https://code.jquery.com/jquery-3.6.0.min.js"
 			  integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="

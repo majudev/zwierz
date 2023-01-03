@@ -460,6 +460,18 @@ function save_quest(n){
 	}
 }
 
+function size2human(bytes, decimals = 1) {
+    if (!+bytes) return '0';
+
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['', 'K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'];
+
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+}
+
 function refresh_attachments(){
 	// Load attachments data
 	$.ajax({
@@ -493,7 +505,7 @@ function refresh_attachments(){
 					else
 					img = '<svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" preserveAspectRatio="xMidYMid slice" focusable="false"><rect width="100%" height="100%" fill="#eceeef"></rect><g><svg x="0" y="25%" width="auto" height="50%" viewBox="0 0 24 24"> <path fill="currentColor" d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" /></svg></g></svg>';
 					
-					$("#attachment_new").before('<div class="col" id="attachment' + n + '"><div class="card shadow-sm attachment" onclick="click_attachment(' + n + ')">' + img + '<div class="card-body"><p class="card-text">' + root[i].title + '.' + root[i].extension + '</p><div class="d-flex justify-content-between align-items-center"><small class="text-muted">' + unix2time(root[i].creation_date) + '</small><div class="btn-group"><button type="button" class="btn btn-sm btn-danger" onclick="delete_attachment(' + n + ')">Usuń</button></div></div></div></div></div>');
+					$("#attachment_new").before('<div class="col" id="attachment' + n + '"><div class="card shadow-sm attachment" onclick="click_attachment(' + n + ')">' + img + '<div class="card-body"><p class="card-text">' + root[i].title + '.' + root[i].extension + ' (' + size2human(root[i].size) + 'B)</p><div class="d-flex justify-content-between align-items-center"><small class="text-muted">' + unix2time(root[i].creation_date) + '</small><div class="btn-group"><button type="button" class="btn btn-sm btn-danger" onclick="delete_attachment(' + n + ')">Usuń</button></div></div></div></div></div>');
 					attachmentid_mappings["attachment" + n] = root[i].id;
 					attachmentext_mappings["attachment" + n] = root[i].extension;
 				}
@@ -534,7 +546,6 @@ function add_new_attachment(){
 			fallback();
 		});
 	}else{
-		console.log("hi");
 		$("#new_attachment_error").text("Proszę wybrać załącznik!");
 		$("#new_attachment_error").show();
 	}
