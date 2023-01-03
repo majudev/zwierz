@@ -1,6 +1,7 @@
 <?php if (basename(__FILE__) == basename($_SERVER["SCRIPT_FILENAME"])) die(); ?>
 <?php
 require_once(dirname(__FILE__)."/../config.php");
+session_start();
 ?>
 <!doctype html>
 <html lang="en">
@@ -46,7 +47,7 @@ require_once(dirname(__FILE__)."/../config.php");
     <div class="collapse navbar-collapse" id="navbarCollapse">
       <ul class="navbar-nav me-auto mb-2 mb-md-0">
         <?php
-        session_start();
+        //session_start(); => session started at the beginning of the file
         if(isset($_SESSION["timeout"]) && ($_SESSION["timeout"] < time())){
           session_unset();
           session_destroy();

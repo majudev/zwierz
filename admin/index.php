@@ -5,7 +5,7 @@ if(!isset($_SESSION["admin"]) || $_SESSION["admin"] != 1){
 }
 ?>
 <?php require_once(dirname(__FILE__)."/../ui/header.php"); ?>
-<?php session_start();
+<?php //session_start(); => started at the beginning of the file
 if(!isset($_SESSION["login"])){ ?>
 <main class="container">
   <div class="bg-light p-5 rounded">
