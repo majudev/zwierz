@@ -17,11 +17,21 @@ if(isset($_POST["email"]) && isset($_POST["password"]) && verify_url_safeness($_
 			}
 		}
 		
+		$sql = "SELECT `users`.`email` as login, `users`.`name` as name FROM `trials` INNER JOIN `users` ON `trials`.`login` = `users`.`email` WHERE `trials`.`archived` = FALSE AND `trials`.`mentor_email`='".mysqli_real_escape_string($db, $_POST["email"])."'";
+		$result = mysqli_query($db, $sql);
+		$mentees = array();
+		if($result && mysqli_num_rows($result) > 0){
+			while($row = mysqli_fetch_assoc($result)){
+				$mentees[$row["name"]] = $row["login"];
+			}
+		}
+		
 		session_start();
 		$_SESSION["login"] = $_POST["email"];
 		$_SESSION["name"] = $user["name"];
 		$_SESSION["admin"] = $user["admin"];
 		$_SESSION["commitee"] = $user["commitee"];
+		if(!empty($mentees)) $_SESSION["mentees"] = $mentees;
 		$_SESSION["timeout"] = time() + (isset($_POST["remember-me"]) ? $config["session_timeout_long"] : $config["session_timeout_standard"]);
 		session_write_close();
 		if($referer_uri !== false && $referer_uri["path"] === $config["base_url"]."/user/login.php"){

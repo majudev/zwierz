@@ -10,7 +10,11 @@ if(!isset($_SESSION["login"])){
 $login = $_SESSION["login"];
 if(isset($_GET["trialid"])){
 	if(!isset($_SESSION["commitee"]) || $_SESSION["commitee"] == ""){
-		die('{"status":"error","details":"user doesn\'t have commitee permissions","code":"user_not_authorized"}');
+		$sql = "SELECT COUNT(*) as results FROM trials WHERE `trials`.`archived` = FALSE AND `trials`.`login` = '".mysqli_real_escape_string($db, $_GET["id"])."' AND `trials`.`mentor_email` = '".mysqli_real_escape_string($db, $_SESSION["login"])."'";
+		$result = mysqli_query($db, $sql);
+		if(!$result || mysqli_num_rows($result) <= 0 || mysqli_fetch_assoc($result)["results"] == 0){
+			die('{"status":"error","details":"user doesn\'t have permissions","code":"user_not_authorized"}');
+		}
 	}
 	$login = $_GET["trialid"];
 }

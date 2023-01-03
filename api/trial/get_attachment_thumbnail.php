@@ -14,7 +14,11 @@ if(!is_numeric($_GET["id"])){
 }
 $sql = "SELECT thumbnail FROM attachments WHERE `id`='".mysqli_real_escape_string($db, $_GET["id"])."'";
 if(!isset($_SESSION["commitee"]) || $_SESSION["commitee"] == ""){
-	$sql .= " AND `login`='".mysqli_real_escape_string($db, $login)."'";
+	$sql2 = "SELECT COUNT(*) as results FROM trials WHERE `trials`.`archived` = FALSE AND `trials`.`login` = '".mysqli_real_escape_string($db, $_GET["id"])."' AND `trials`.`mentor_email` = '".mysqli_real_escape_string($db, $_SESSION["login"])."'";
+	$result2 = mysqli_query($db, $sql2);
+	if(!$result2 || mysqli_num_rows($result2) <= 0 || mysqli_fetch_assoc($result2)["results"] == 0){
+		$sql .= " AND `login`='".mysqli_real_escape_string($db, $login)."'";
+	}
 }
 $result = mysqli_query($db, $sql);
 if($result && mysqli_num_rows($result) > 0){

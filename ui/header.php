@@ -73,6 +73,17 @@ session_start();
           <a id="link_commitee_appointments" class="nav-link <?php if(substr($_SERVER["REQUEST_URI"], 0, strlen($config["base_url"]."/commitee/appointments")) === $config["base_url"]."/commitee/appointments") echo "active"; ?>" href="<?php echo $config["base_url"]; ?>/commitee/appointments">Spotkania</a>
         </li>
         <?php } ?>
+        <?php if(isset($_SESSION["mentees"]) && !empty($_SESSION["mentees"])){ ?>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Podopieczni</a>
+          <ul class="dropdown-menu">
+            <?php foreach($_SESSION["mentees"] as $name => $login){ ?>
+            <li><a class="dropdown-item" href="<?php echo $config["base_url"]; ?>/mentor/show.php?id=<?php echo urlencode($login); ?>"><?php echo $name; ?></a></li>
+            <?php } ?>
+          </ul>
+          <!--- <a id="dropdown_mentees" class="nav-link <?php if(substr($_SERVER["REQUEST_URI"], 0, strlen($config["base_url"]."/mentor")) === $config["base_url"]."/mentor") echo "active"; ?>" href="<?php echo $config["base_url"]; ?>/admin">Podopieczni</a> --->
+        </li>
+        <?php } ?>
         <?php if(isset($_SESSION["admin"]) && $_SESSION["admin"]){ ?>
         <li class="nav-item">
           <a id="link_admin" class="nav-link <?php if(substr($_SERVER["REQUEST_URI"], 0, strlen($config["base_url"]."/admin")) === $config["base_url"]."/admin") echo "active"; ?>" href="<?php echo $config["base_url"]; ?>/admin">Panel administratora</a>
