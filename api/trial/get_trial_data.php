@@ -22,13 +22,13 @@ if (mysqli_num_rows($result) > 0){
 	$row = mysqli_fetch_assoc($result);
 	echo '{"status":"ok","trial":{"exists":true';
 	if(isset($row["open_date"])){
-		echo ',"open_date":'.$row["open_date"].'';
+		echo ',"open_date":'.strtotime($row["open_date"]).'';
 	}
 	if(isset($row["projected_date"])){
 		echo ',"projected_date":'.strtotime($row["projected_date"]).'';
 	}
 	if(isset($row["closed_date"])){
-		echo ',"closed_date":'.$row["closed_date"].'';
+		echo ',"closed_date":'.strtotime($row["closed_date"]).'';
 	}
 	if(isset($row["open_document"])){
 		echo ',"open_document":"'.$row["open_document"].'"';

@@ -96,10 +96,20 @@ die();
             <b>Planowane zamknięcie stopnia:</b>
             <div id="projected_date_entry" style="display: none"></div>
           </li>
-          <li class="list-group-item" id="trial_archive" style="display: none">
+          <li class="list-group-item" id="trial_open_div" style="display:none">
+            <b>Próbę otwarto:</b>
+            <div id="open_date_entry" style="display: inline"></div>
+          </li>
+          <li class="list-group-item" id="trial_closed_div" style="display:none">
+            <b>Próbę zamknięto:</b>
+            <div id="closed_date_entry" style="display: inline"></div>
+          </li>
+          <li class="list-group-item" id="trial_actions" style="display: none">
             <div class="d-flex flex-row-reverse">
-              <button class="btn btn-danger" onclick="archive(true)" id="archive">Archiwizuj próbę</button>
-              <button class="btn btn-danger" onclick="archive(false)" id="dearchive">Dearchiwizuj próbę</button>
+              <button class="btn btn-danger" onclick="archive(true)" id="archive">Archiwizuj próbę </button> 
+              <button class="btn btn-danger" onclick="archive(false)" id="dearchive">Dearchiwizuj próbę </button> 
+              <button class="btn btn-dark" id="trigger_open_trial_modal">Otwórz próbę </button> 
+              <button class="btn btn-dark" id="trigger_close_trial_modal">Zamknij próbę </button> 
             </div>
           </li>
         </ul>
@@ -192,6 +202,46 @@ die();
       <div class="modal-footer">
         <button type="button" class="btn btn-light" data-bs-dismiss="modal">Anuluj</button>
         <button type="button" class="btn btn-dark" onclick="add_new_attachment()">Dodaj</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="open_trial_modal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Otwórz próbę</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Podaj datę otwarcia stopnia:
+        <input type="date" id="open_trial_date" /><br>
+        <input type="checkbox" id="unopen_trial_checkbox" />
+        <label for="unopen_trial_checkbox">Anuluj otwarcie stopnia</label>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Anuluj</button>
+        <button type="button" class="btn btn-dark" id="open_trial_modal_done">Otwórz</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="close_trial_modal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Zamknij próbę</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Podaj datę zamknięcia stopnia:
+        <input type="date" id="close_trial_date" /><br>
+        <input type="checkbox" id="unclose_trial_checkbox" />
+        <label for="unopen_trial_checkbox">Anuluj zamknięcie stopnia</label>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Anuluj</button>
+        <button type="button" class="btn btn-dark" id="close_trial_modal_done">Zamknij</button>
       </div>
     </div>
   </div>

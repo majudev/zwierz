@@ -107,6 +107,14 @@ die();
             <b>Planowane zamknięcie stopnia:</b>
             <div id="projected_date_entry" style="display: none"></div>
           </li>
+          <li class="list-group-item" id="trial_open_div" style="display:none">
+            <b>Próbę otwarto:</b>
+            <div id="open_date_entry" style="display: inline"></div>
+          </li>
+          <li class="list-group-item" id="trial_closed_div" style="display:none">
+            <b>Próbę zamknięto:</b>
+            <div id="closed_date_entry" style="display: inline"></div>
+          </li>
         </ul>
       </div>
     </div>

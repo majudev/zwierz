@@ -52,7 +52,13 @@ function refresh_trials(){
 				$("#trials_active").children(".trial-entry").remove();
 				for(var i = 0; i < root.length; ++i){
 					var n = $("#trials_active").children("li").length;
-					$("#trials_active").append('<li class="list-group-item trial-entry"><table><td class="longrecord"><p class="text-vert-center">' + root[i].name + '</p></td><td><button class="btn btn-dark nowrap" onclick="show_trial(' + n + ')">Wyświetl</button></td></table></li>');
+					var state_text = ' (czeka na otwarcie)';
+					if(root[i].is_open) state_text = ' (otwarta)';
+					if(root[i].is_closed) state_text = ' (zamknięta)';
+					/*var state_button = '<button class="btn btn-dark nowrap" onclick="open_trial(' + n + ')">Otwórz</button>';
+					if(root[i].is_open) state_button = '<button class="btn btn-dark nowrap" onclick="close_trial(' + n + ')">Zamknij</button>';
+					if(root[i].is_closed) state_button = '<button class="btn btn-dark nowrap" onclick="archive_trial(' + n + ')">Archiwizuj</button>';*/
+					$("#trials_active").append('<li class="list-group-item trial-entry"><table><td class="longrecord"><p class="text-vert-center">' + root[i].name + state_text + '</p></td><td><button class="btn btn-dark nowrap" onclick="show_trial(' + n + ')">Wyświetl</button></td></table></li>');
 					trialid_mappings["trial" + n] = root[i].id;
 				}
 			}else fallback();
@@ -77,7 +83,10 @@ function refresh_archived(){
 				$("#trials_archived").children(".trial-entry").remove();
 				for(var i = 0; i < root.length; ++i){
 					var n = $("#trials_archived").children("li").length;
-					$("#trials_archived").append('<li class="list-group-item trial-entry"><table><td class="longrecord"><p class="text-vert-center">' + root[i].name + '</p></td><td><button class="btn btn-dark nowrap" onclick="show_archived(' + n + ')">Wyświetl</button></td></table></li>');
+					var state_text = ' (czeka na otwarcie)';
+					if(root[i].is_open) state_text = ' (otwarta)';
+					if(root[i].is_closed) state_text = ' (zamknięta)';
+					$("#trials_archived").append('<li class="list-group-item trial-entry"><table><td class="longrecord"><p class="text-vert-center">' + root[i].name + state_text + '</p></td><td><button class="btn btn-dark nowrap" onclick="show_archived(' + n + ')">Wyświetl</button></td></table></li>');
 					archivedid_mappings["trial" + n] = root[i].id;
 				}
 			}else fallback();

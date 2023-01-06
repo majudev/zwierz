@@ -9,7 +9,7 @@ if(!isset($_SESSION["commitee"]) || $_SESSION["commitee"] == ""){
 }
 $state = "FALSE";
 if(isset($_GET["archived"])) $state = "TRUE";
-$sql = "SELECT trials.login, users.name FROM trials INNER JOIN users ON trials.login = users.email WHERE `commitee` IS NULL AND `archived` = ".$state;
+$sql = "SELECT trials.login, users.name, 1-ISNULL(trials.open_date) as is_open, 1-ISNULL(trials.closed_date) as is_closed FROM trials INNER JOIN users ON trials.login = users.email WHERE `commitee` IS NULL AND `archived` = ".$state;
 session_write_close();
 $result = mysqli_query($db, $sql);
 if (mysqli_num_rows($result) > 0){
@@ -19,7 +19,7 @@ if (mysqli_num_rows($result) > 0){
 		if($prefix === false) $prefix = ',';
 		else echo $prefix;
 		
-		echo '{"id":"'.$row["login"].'","name":"'.$row["name"].'"}';
+		echo '{"id":"'.$row["login"].'","name":"'.$row["name"].'","is_open":'.$row["is_open"].',"is_closed":'.$row["is_closed"].'}';
 	}
 	echo ']}';
 } else {

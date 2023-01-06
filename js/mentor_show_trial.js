@@ -19,6 +19,7 @@ $( document ).ready(function() {
 				mentor_email = root.mentor_email;
 				projected_date = root.projected_date;
 				open_date = root.open_date;
+				closed_date = root.closed_date;
 				archived = root.archived;
 
 				if(mentor_name == null) mentor_name = '';
@@ -43,6 +44,30 @@ $( document ).ready(function() {
 					$("#projected_date_entry").text(m2text(projected_month) + ' ' + projected_year);
 				}
 				$("#projected_date_entry").css("display", "inline");
+				
+				if(open_date != null){
+					var open_time = new Date(open_date * 1000);
+					var open_day = open_time.getDay() + 1;
+					var open_month = open_time.getMonth() + 1;
+					if (open_month < 10) {
+						open_month = `0${open_month}`;
+					}
+					var open_year = open_time.getYear() + 1900;
+					$("#open_date_entry").text(open_day + '.' + open_month + '.' + open_year);
+					$("#trial_open_div").show();
+				}
+				
+				if(closed_date != null){
+					var closed_time = new Date(closed_date * 1000);
+					var closed_day = closed_time.getDay() + 1;
+					var closed_month = closed_time.getMonth() + 1;
+					if (closed_month < 10) {
+						closed_month = `0${closed_month}`;
+					}
+					var closed_year = closed_time.getYear() + 1900;
+					$("#closed_date_entry").text(closed_day + '.' + closed_month + '.' + closed_year);
+					$("#trial_closed_div").show();
+				}
 			}else fallback();
 		}
 	})

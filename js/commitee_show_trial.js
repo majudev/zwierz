@@ -19,6 +19,7 @@ $( document ).ready(function() {
 				mentor_email = root.mentor_email;
 				projected_date = root.projected_date;
 				open_date = root.open_date;
+				closed_date = root.closed_date;
 				archived = root.archived;
 
 				if(mentor_name == null) mentor_name = '';
@@ -44,12 +45,48 @@ $( document ).ready(function() {
 				}
 				$("#projected_date_entry").css("display", "inline");
 				
+				if(open_date != null){
+					var open_time = new Date(open_date * 1000);
+					var open_day = open_time.getDay() + 1;
+					var open_month = open_time.getMonth() + 1;
+					if (open_month < 10) {
+						open_month = `0${open_month}`;
+					}
+					var open_year = open_time.getYear() + 1900;
+					$("#open_date_entry").text(open_day + '.' + open_month + '.' + open_year);
+					$("#trial_open_div").show();
+				}
+				
+				if(closed_date != null){
+					var closed_time = new Date(closed_date * 1000);
+					var closed_day = closed_time.getDay() + 1;
+					var closed_month = closed_time.getMonth() + 1;
+					if (closed_month < 10) {
+						closed_month = `0${closed_month}`;
+					}
+					var closed_year = closed_time.getYear() + 1900;
+					$("#closed_date_entry").text(closed_day + '.' + closed_month + '.' + closed_year);
+					$("#trial_closed_div").show();
+				}
+				
 				if(archived){
 					$("#archive").hide();
 					$("#dearchive").show();
 				}else{
 					$("#archive").show();
 					$("#dearchive").hide();
+				}
+				
+				$("#trigger_open_trial_modal").show();
+				$("#trigger_close_trial_modal").hide();
+				if(open_date != undefined && open_date != null){
+					$("#trigger_open_trial_modal").text("Edytuj otwarcie");
+					$("#trigger_close_trial_modal").show();
+				}
+				if(closed_date != undefined && closed_date != null){
+					$("#trigger_open_trial_modal").hide();
+					$("#trigger_close_trial_modal").show();
+					$("#trigger_close_trial_modal").text("Edytuj zamknięcie");
 				}
 			}else fallback();
 		}
@@ -151,11 +188,72 @@ $( document ).ready(function() {
 		fallback();
 	});
 	
-	if(commitee == "admin") $("#trial_archive").show();
+	if(commitee == "admin") $("#trial_actions").show();
 	
 	$('#download_trial_pdf').click(function(e){
 		e.preventDefault();  //stop the browser from following
     	window.location.href = baseurl + "/api/trial/download_pdf.php?id=" + encodeURIComponent(trialid);
+	});
+	
+	$('#trigger_open_trial_modal').click(function(e){
+		var dp_now = new Date();
+
+		var dp_day = ("0" + dp_now.getDate()).slice(-2);
+		var dp_month = ("0" + (dp_now.getMonth() + 1)).slice(-2);
+
+		var dp_today = dp_now.getFullYear()+"-"+(dp_month)+"-"+(dp_day) ;
+
+		$('#open_trial_date').val(dp_today);
+		$('#open_trial_date').prop('disabled', false);
+		$('#unopen_trial_checkbox').prop('checked', false);
+		$('#open_trial_modal').modal('show');
+	});
+	
+	$('#trigger_close_trial_modal').click(function(e){
+		var dp_now = new Date();
+
+		var dp_day = ("0" + dp_now.getDate()).slice(-2);
+		var dp_month = ("0" + (dp_now.getMonth() + 1)).slice(-2);
+
+		var dp_today = dp_now.getFullYear()+"-"+(dp_month)+"-"+(dp_day) ;
+
+		$('#close_trial_date').val(dp_today);
+		$('#close_trial_date').prop('disabled', false);
+		$('#unclose_trial_checkbox').prop('checked', false);
+		$('#close_trial_modal').modal('show');
+	});
+	
+	$('#unopen_trial_checkbox').change(function(e){
+		if(this.checked){
+			$('#open_trial_date').val('NULL');
+			$('#open_trial_date').prop('disabled', true);
+		}else{
+			var dp_now = new Date();
+
+			var dp_day = ("0" + dp_now.getDate()).slice(-2);
+			var dp_month = ("0" + (dp_now.getMonth() + 1)).slice(-2);
+
+			var dp_today = dp_now.getFullYear()+"-"+(dp_month)+"-"+(dp_day) ;
+			
+			$('#open_trial_date').val(dp_today);
+			$('#open_trial_date').prop('disabled', false);
+		}
+	});
+	$('#unclose_trial_checkbox').change(function(e){
+		if(this.checked){
+			$('#close_trial_date').val('NULL');
+			$('#close_trial_date').prop('disabled', true);
+		}else{
+			var dp_now = new Date();
+
+			var dp_day = ("0" + dp_now.getDate()).slice(-2);
+			var dp_month = ("0" + (dp_now.getMonth() + 1)).slice(-2);
+
+			var dp_today = dp_now.getFullYear()+"-"+(dp_month)+"-"+(dp_day) ;
+			
+			$('#close_trial_date').val(dp_today);
+			$('#close_trial_date').prop('disabled', false);
+		}
 	});
 });
 
@@ -354,6 +452,40 @@ function archive(state){
 		fallback();
 	});
 }
+
+$('#open_trial_modal_done').click(function(){
+	$('#open_trial_modal_done').prop('disabled', true);
+	var date = $('#open_trial_date').val();
+	if(date == '') date = 'NULL';
+	$.ajax({
+		url: baseurl + "/api/commitee/open_trial.php?id=" + encodeURIComponent(trialid) + "&date=" + encodeURIComponent(date),
+	})
+	.done(function(data) {
+		var root = JSON.parse(data);
+		if(root.status != "ok") fallback();
+		else location.reload();
+	})
+	.fail(function() {
+		fallback();
+	});
+});
+
+$('#close_trial_modal_done').click(function(){
+	$('#close_trial_modal_done').prop('disabled', true);
+	var date = $('#close_trial_date').val();
+	if(date == '') date = 'NULL';
+	$.ajax({
+		url: baseurl + "/api/commitee/close_trial.php?id=" + encodeURIComponent(trialid) + "&date=" + encodeURIComponent(date),
+	})
+	.done(function(data) {
+		var root = JSON.parse(data);
+		if(root.status != "ok") fallback();
+		else location.reload();
+	})
+	.fail(function() {
+		fallback();
+	});
+});
 
 
 
