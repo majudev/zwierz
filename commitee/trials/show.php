@@ -28,7 +28,7 @@ die();
   <div class="row">
     <div class="col-lg-8 col-sm-12">
       <div class="p-3">
-        <ul class="list-group">
+        <ul class="list-group" id="questsdiv">
           <li class="list-group-item list-group-item-info d-flex justify-content-center bg-dark text-center text-white">
             <h4 class="mb-1 mt-1">Zadania</h4>
           </li>
@@ -47,7 +47,7 @@ die();
                 </tbody>
               </table>
               <div class="d-flex justify-content-end flex-row">
-                <button type="button" class="btn btn-dark" id="download_trial_pdf" disabled>Pobierz PDF próby</button>
+                <button type="button" class="btn btn-dark" id="download_trial_pdf">Pobierz PDF próby</button>
               </div>
             </div>
           </li>
@@ -56,7 +56,7 @@ die();
     </div>
     <div class="col-lg-4 col-sm-12">
       <div class="p-3">
-        <ul class="list-group">
+        <ul class="list-group" id="infodiv">
           <li class="list-group-item list-group-item-info d-flex justify-content-center bg-dark text-center text-white">
             <h4 class="mb-1 mt-1">Informacje o próbie</h4>
           </li>

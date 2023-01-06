@@ -58,7 +58,7 @@ die();
                 </tbody>
               </table>
               <div class="d-flex justify-content-end flex-row">
-                <button type="button" class="btn btn-dark" id="download_trial_pdf" disabled>Pobierz PDF próby</button>
+                <button type="button" class="btn btn-dark" id="download_trial_pdf">Pobierz PDF próby</button>
               </div>
             </div>
           </li>

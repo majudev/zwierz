@@ -122,6 +122,11 @@ $( document ).ready(function() {
 		alert("Błąd - strona zostanie załadowana ponownie");
 		fallback();
 	});
+	
+	$('#download_trial_pdf').click(function(e){
+		e.preventDefault();  //stop the browser from following
+    	window.location.href = baseurl + "/api/trial/download_pdf.php?id=" + encodeURIComponent(trialid);
+	});
 });
 
 function timestamp2my(timestamp){

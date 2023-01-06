@@ -76,7 +76,7 @@ die();
               <div class="d-flex justify-content-end flex-row">
                 <button type="button" class="btn btn-dark" id="quest_new" onclick="enter_add_quest_mode()">Dodaj nowe</button>
                 <div class="p-2"></div>
-                <button type="button" class="btn btn-dark" id="download_trial_pdf" disabled>Pobierz PDF próby</button>
+                <button type="button" class="btn btn-dark" id="download_trial_pdf">Pobierz PDF próby</button>
               </div>
             </div>
           </li>
