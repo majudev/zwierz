@@ -1,9 +1,9 @@
-<?php require_once(dirname(__FILE__)."/../../config.php");
+<?php
+session_start();
+require_once(dirname(__FILE__)."/../../config.php");
 require_once(dirname(__FILE__)."/../../db.php");
 require_once(dirname(__FILE__)."/../../util.php");
 $referer_uri = isset($_SERVER["HTTP_REFERER"]) ? parse_url($_SERVER["HTTP_REFERER"]) : false;
-
-session_start();
 
 if(isset($_POST["email"]) && ((isset($_POST["captcha"]) && validate($_POST["email"], $_POST["captcha"]) || $_SESSION["admin"] == 1))){
 	if($_POST["captcha"] == $_SESSION["captcha"] || $_SESSION["admin"] == 1){

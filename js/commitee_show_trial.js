@@ -304,9 +304,16 @@ function text2m(month){
 }
 
 function helper_createquest(n, text, date){
-	for(var i = 0; i < 10; ++i){
+	text = text
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;")
+      .replace(/\n/g, "<br>");
+	/*for(var i = 0; i < 10; ++i){
 		text = text.replace('\n', '<br>');
-	}
+	}*/
 	$("#quest_table").append('<tr id="quest_entry' + n + '"><td class="nowrap" scope="row">' + n + '</td><td><textarea id="quest_edit_textbox' + n + '" class="longrecord" style="display: none"></textarea><div id="quest_textbox' + n + '" style="display: inline">' + text + '</div><td><select id="quest_edit_date_select' + n + '" style="display: none"></select><div id="quest_date_select' + n + '" class="text-center nowrap" style="display: inline">' + date + '</div></td></tr>');
 }
 

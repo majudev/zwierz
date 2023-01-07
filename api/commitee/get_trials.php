@@ -1,6 +1,6 @@
 <?php
-require_once(dirname(__FILE__)."/../../db.php");
 session_start();
+require_once(dirname(__FILE__)."/../../db.php");
 if(!isset($_SESSION["login"])){
 	die('{"status":"error","details":"user not logged in","code":"user_not_logged_in"}');
 }

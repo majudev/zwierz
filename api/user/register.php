@@ -1,10 +1,11 @@
-<?php require_once(dirname(__FILE__)."/../../config.php");
+<?php
+session_start();
+require_once(dirname(__FILE__)."/../../config.php");
 require_once(dirname(__FILE__)."/../../db.php");
 require_once(dirname(__FILE__)."/../../util.php");
 $referer_uri = isset($_SERVER["HTTP_REFERER"]) ? parse_url($_SERVER["HTTP_REFERER"]) : false;
 
 if(isset($_POST["email"]) && isset($_POST["password"]) && isset($_POST["captcha"]) && validate($_POST["email"], $_POST["password"], $_POST["captcha"])){
-	session_start();
 	if($_POST["captcha"] == $_SESSION["captcha"]){
 		unset($_SESSION["captcha"]);
 		$sql = "SELECT active FROM users WHERE `email`='".mysqli_real_escape_string($db, $_POST["email"])."'";
