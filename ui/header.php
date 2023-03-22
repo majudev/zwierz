@@ -105,7 +105,7 @@ session_start();
           <?php } else { ?>
           <a class="nav-link active" aria-current="page" href="<?php echo $config["base_url"]; ?>/user/login.php">Zaloguj się</a>
           <?php } ?>
-          <?php session_write_close(); ?>
+          <?php /*session_write_close();*/ ?>
         </li>
       </ul>
       <!--- <form class="d-flex">

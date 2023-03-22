@@ -1,4 +1,6 @@
-<?php require_once(dirname(__FILE__)."/../ui/header.php");
+<?php
+session_start();
+require_once(dirname(__FILE__)."/../ui/header.php");
 $numbers = array(
   "zero", "jeden", "dwa", "trzy", "cztery", "pięć", "sześć", "siedem", "osiem", "dziewięć",
   "dziesięć", "jedenaście", "dwanaście"
@@ -14,9 +16,7 @@ $answer = 0;
 if($r2 == 0) $answer = $r1 + $r3;
 else if($r2 == 1) $answer = $r1 - $r3;
 else if($r2 == 2) $answer = $r1 * $r3;
-session_start();
 if(!isset($_GET["success"])) $_SESSION["captcha"] = $answer;
-session_write_close();
 ?>
 <main>
   <div class="d-flex flex-column mb-3 justify-content-center align-items-center">
