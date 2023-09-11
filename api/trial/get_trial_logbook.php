@@ -19,7 +19,7 @@ if (mysqli_num_rows($result) > 0){
 	echo '{"status":"ok","log":[';
 	$row = mysqli_fetch_assoc($result);
 	//$log = str_replace("\"", "\\\"", $row["log"]);
-	$log = content_escape(strip_backslashes(row['log']));
+	$log = content_escape(strip_backslashes($row['log']));
 	echo '{"date":"'.$row["time"].'","content":"'.$log.'"}';
 	while($row = mysqli_fetch_assoc($result)){
 		//$log = str_replace("\"", "\\\"", $row["log"]);
