@@ -78,8 +78,8 @@ die();
 			  integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
 			  crossorigin="anonymous"></script>
 <script>
-  var baseurl = "<?php echo (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http")."://".$_SERVER["HTTP_HOST"].$config["base_url"]; ?>";
+  var baseurl = "<?php echo "https://".$_SERVER["HTTP_HOST"].$config["base_url"]; ?>";
   //var baseurl = "http://zwierz.majudev.net/zwierz";
 </script>
-<script src="<?php echo (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http")."://".$_SERVER["HTTP_HOST"].$config["base_url"]; ?>/js/commitee_trials.js"></script>
+<script src="<?php echo "https://".$_SERVER["HTTP_HOST"].$config["base_url"]; ?>/js/commitee_trials.js"></script>
 <?php require_once(dirname(__FILE__)."/../../ui/footer.php"); ?>

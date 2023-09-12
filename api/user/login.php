@@ -12,7 +12,7 @@ if(isset($_POST["email"]) && isset($_POST["password"]) && verify_url_safeness($_
 		$user = mysqli_fetch_assoc($result);
 		if(!$user["active"]){
 			if($referer_uri !== false && $referer_uri["path"] === $config["base_url"]."/user/login.php"){
-				header("Location: ".$config["base_url"]."/user/login.php?error=".urlencode("Konto nieaktywne. Czy kliknąłeś w link z maila?<br><a href=\"".(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http")."://".$_SERVER["HTTP_HOST"].$config["base_url"]."/user/resend_activation.php\">Wyślj mi tego maila jeszcze raz, proszę</a>"));
+				header("Location: ".$config["base_url"]."/user/login.php?error=".urlencode("Konto nieaktywne. Czy kliknąłeś w link z maila?<br><a href=\"https://".$_SERVER["HTTP_HOST"].$config["base_url"]."/user/resend_activation.php\">Wyślj mi tego maila jeszcze raz, proszę</a>"));
 				die();
 			}else{
 				die("ACCOUNT INACTIVE");

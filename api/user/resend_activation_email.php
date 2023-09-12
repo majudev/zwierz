@@ -13,7 +13,7 @@ if(isset($_POST["email"]) && ((isset($_POST["captcha"]) && validate($_POST["emai
 		if($result && mysqli_num_rows($result) > 0){ //search if user already registered
 			$user = mysqli_fetch_assoc($result);
 			$activation_key = $user["activationkey"];
-			send_mail($_POST["email"], $config["activation_mail"]["subject"], str_replace("%ACTIVATION_LINK%", (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http")."://".$_SERVER["HTTP_HOST"].$config["base_url"]."/api/user/activate.php?ui=yes&confirmation=".$activation_key, $config["activation_mail"]["body"]));
+			send_mail($_POST["email"], $config["activation_mail"]["subject"], str_replace("%ACTIVATION_LINK%", "https://".$_SERVER["HTTP_HOST"].$config["base_url"]."/api/user/activate.php?ui=yes&confirmation=".$activation_key, $config["activation_mail"]["body"]));
 			if($referer_uri !== false && $referer_uri["path"] === $config["base_url"]."/user/resend_activation.php"){
 				header("Location: ".$config["base_url"]."/user/resend_activation.php?success=yes");
 				die();
