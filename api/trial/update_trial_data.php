@@ -7,9 +7,9 @@ if(!isset($_SESSION["login"])){
 }
 $login = $_SESSION["login"];
 session_write_close();
-if(!verify_url_safeness($_GET["mentor_name"], '.ąćęłńóśżźĄĆĘŁŃÓŚŻŹ -') || !verify_url_safeness($_GET["mentor_phone"], '- +') || !verify_url_safeness($_GET["mentor_email"], '@.-_') || !verify_url_safeness($_GET["projected_date"], ':- ')){
+/*if(!verify_url_safeness($_GET["mentor_name"], '.ąćęłńóśżźĄĆĘŁŃÓŚŻŹ -') || !verify_url_safeness($_GET["mentor_phone"], '- +') || !verify_url_safeness($_GET["mentor_email"], '@.-_') || !verify_url_safeness($_GET["projected_date"], ':- ')){
 	die('{"status":"error","details":"invalid characters in request","code":"bad_request"}');
-}
+}*/
 $sql = "SELECT login FROM trials WHERE `login`='".mysqli_real_escape_string($db, $_SESSION["login"])."'";
 $result = mysqli_query($db, $sql);
 if (mysqli_num_rows($result) > 0){

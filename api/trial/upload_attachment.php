@@ -16,8 +16,8 @@ session_write_close();
 if(!isset($_FILES["file"])){
 	die('{"status":"error","details":"no file attached to this request","code":"no_file"}');
 }
-if(!isset($_POST["title"]) || !verify_url_safeness($_POST["title"], '.ąćęłńóśżźĄĆĘŁŃÓŚŻŹ -"')){
-	die('{"status":"error","details":"invalid characters in request or empty request","code":"bad_request"}');
+if(!isset($_POST["title"])){
+	die('{"status":"error","details":"please provide filename","code":"bad_request"}');
 }
 if($_FILES['file']['error'] != UPLOAD_ERR_OK){
 	die('{"status":"error","details":"error occured while uploading the file: "'.$_FILES['uploadedfile']['error'].',"code":"upload_error"}');

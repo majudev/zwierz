@@ -9,8 +9,8 @@ if(!isset($_SESSION["commitee"]) || $_SESSION["commitee"] == ""){
 	die('{"status":"error","details":"user doesn\'t have commitee permissions","code":"user_not_authorized"}');
 }
 session_write_close();
-if(!isset($_GET["id"]) || !verify_url_safeness($_GET["date"], ':-/ ')){
-	die('{"status":"error","details":"invalid characters in request","code":"bad_request"}');
+if(!isset($_GET["id"])){
+	die('{"status":"error","details":"please provide an id","code":"bad_request"}');
 }
 $login = $_GET["id"];
 

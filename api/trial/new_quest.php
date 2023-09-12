@@ -7,9 +7,9 @@ if(!isset($_SESSION["login"])){
 }
 $login = $_SESSION["login"];
 session_write_close();
-if(!verify_url_safeness($_GET["finish_date"], ':- ')){
+/*if(!verify_url_safeness($_GET["finish_date"], ':- ')){
 	die('{"status":"error","details":"invalid characters in request","code":"bad_request"}');
-}
+}*/
 $content = content_escape($_GET["content"]);
 $sql = "INSERT INTO `quests`(`login`, `content`, `finish_date`) VALUES('".mysqli_real_escape_string($db, $login)."','".mysqli_real_escape_string($db, $content)."','".mysqli_real_escape_string($db, $_GET["finish_date"])."')";
 if (mysqli_query($db, $sql)){

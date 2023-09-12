@@ -7,8 +7,8 @@ if(!isset($_SESSION["login"])){
 }
 $login = $_SESSION["login"];
 session_write_close();
-if(!is_numeric($_GET["id"]) || !verify_url_safeness($_GET["finish_date"], ':- ')){
-	die('{"status":"error","details":"invalid characters in request","code":"bad_request"}');
+if(!is_numeric($_GET["id"])){
+	die('{"status":"error","details":"id has to be an integer","code":"bad_request"}');
 }
 $contentstring = "(ID=".mysqli_real_escape_string($db, $_GET["id"]).").";
 $content = content_escape($_GET["content"]);
