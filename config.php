@@ -5,7 +5,7 @@ $config["page_name"] = "Zwierz";
 $config["version"] = "0.4-beta";
 $config["maindev"] = "majudev nobody@example.com";
 
-$config["base_url"] = "/zwierz";
+$config["base_url"] = "";
 
 $config["session_timeout_long"] = 604800;
 $config["session_timeout_standard"] = 3600;
