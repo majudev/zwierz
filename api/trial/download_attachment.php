@@ -22,6 +22,23 @@ session_write_close();
 if(!is_numeric($_GET["id"])){
 	die('{"status":"error","details":"invalid characters in request","code":"bad_request"}');
 }
+$cachedir = getcwd().'/../../cache';
+if(!is_dir($cachedir)){
+	mkdir($cachedir);
+}
+$filename_content = $cachedir.'/'.$_GET["id"].'.content';
+$filename_mimetype = $cachedir.'/'.$_GET["id"].'.mimetype';
+$filename_filename = $cachedir.'/'.$_GET["id"].'.filename';
+$filename_hits = $cachedir.'/'.$_GET["id"].'.hits';
+if(file_exists($filename_content) && file_exists($filename_mimetype) && file_exists($filename_filename) && file_exists($filename_hits)){
+	$type = file_get_contents($filename_mimetype);
+	$filename = file_get_contents($filename_filename);
+	file_put_contents($filename_hits, intval(file_get_contents($filename_hits)) + 1);
+	header('Content-Type: '.$type);
+	header('Content-Disposition: attachment; filename="'.$filename.'"');
+	echo file_get_contents($filename_content);
+	exit();
+}
 $sql = "SELECT content,name,extension FROM attachments WHERE `id`='".mysqli_real_escape_string($db, $_GET["id"])."' AND `login`='".mysqli_real_escape_string($db, $login)."'";
 $result = mysqli_query($db, $sql);
 if(mysqli_num_rows($result) > 0){
@@ -32,5 +49,39 @@ if(mysqli_num_rows($result) > 0){
 	header('Content-Type: '.$type);
 	$filename = $row["name"].".".$row["extension"];
 	header('Content-Disposition: attachment; filename="'.$filename.'"');
-	echo $row["content"];
+	echo $content;
+
+	$cachesize = 0;
+	$cachehits = array();
+	$cachefiles = scandir($cachedir);
+	foreach($cachefiles as $file) {
+		$path_parts = pathinfo($cachedir.'/'.$file);
+ 		if (!in_array($file, array(".", "..")) && $path_parts["extension"] === "content") {
+			if(!file_exists($cachedir.'/'.$path_parts["filename"].'.mimetype') || !file_exists($cachedir.'/'.$path_parts["filename"].'.filename') || !file_exists($cachedir.'/'.$path_parts["filename"].'.hits')){
+				unlink($cachedir.'/'.$path_parts["filename"].'.content');
+				unlink($cachedir.'/'.$path_parts["filename"].'.mimetype');
+				unlink($cachedir.'/'.$path_parts["filename"].'.filename');
+				unlink($cachedir.'/'.$path_parts["filename"].'.hits');
+				continue;
+			}
+    		$cachesize = $cachesize + filesize($cachedir.'/'.$file);
+			$cachehits[$path_parts["filename"]] = file_get_contents($cachedir.'/'.$path_parts["filename"].'.hits');
+  		}
+	}
+	$cachesize = $cachesize + strlen($content);
+	asort($cachehits);
+	while($cachesize > 104857600){
+		$key = array_keys($cachehits[0]);
+		array_splice($cachehits, 0, 1);
+		$cachesize = $cachesize - filesize($cachedir.'/'.$key.'.content');
+		unlink($cachedir.'/'.$key.'.content');
+		unlink($cachedir.'/'.$key.'.mimetype');
+		unlink($cachedir.'/'.$key.'.filename');
+		unlink($cachedir.'/'.$key.'.hits');
+	}
+
+	file_put_contents($filename_content, $content);
+	file_put_contents($filename_mimetype, $type);
+	file_put_contents($filename_filename, $filename);
+	file_put_contents($filename_hits, 1);
 }else http_response_code(404);
