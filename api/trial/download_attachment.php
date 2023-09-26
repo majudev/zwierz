@@ -75,7 +75,7 @@ if(mysqli_num_rows($result) > 0){
 	}
 	$cachesize = $cachesize + strlen($content);
 	asort($cachehits);
-	while($cachesize > $config["cache"]["attachments_cache_size_MB"] && count($cachehits) > 0){
+	while($cachesize > ($config["cache"]["attachments_cache_size_MB"] * 1024 * 1024) && count($cachehits) > 0){
 		$key = array_keys($cachehits)[0];
 		array_splice($cachehits, 0, 1);
 		$cachesize = $cachesize - filesize($cachedir.'/'.$key.'.content');
