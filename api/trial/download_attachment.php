@@ -33,10 +33,14 @@ $filename_hits = $cachedir.'/'.$_GET["id"].'.hits';
 if(file_exists($filename_content) && file_exists($filename_mimetype) && file_exists($filename_filename) && file_exists($filename_hits)){
 	$type = file_get_contents($filename_mimetype);
 	$filename = file_get_contents($filename_filename);
+	$content = file_get_contents($filename_content);
+
 	file_put_contents($filename_hits, intval(file_get_contents($filename_hits)) + 1);
+
 	header('Content-Type: '.$type);
 	header('Content-Disposition: attachment; filename="'.$filename.'"');
-	echo file_get_contents($filename_content);
+	header('Content-Length: '.strlen($content));
+	echo $content;
 	exit();
 }
 $sql = "SELECT content,name,extension FROM attachments WHERE `id`='".mysqli_real_escape_string($db, $_GET["id"])."' AND `login`='".mysqli_real_escape_string($db, $login)."'";
@@ -49,6 +53,7 @@ if(mysqli_num_rows($result) > 0){
 	header('Content-Type: '.$type);
 	$filename = $row["name"].".".$row["extension"];
 	header('Content-Disposition: attachment; filename="'.$filename.'"');
+	header('Content-Length: '.strlen($content));
 	echo $content;
 
 	$cachesize = 0;
