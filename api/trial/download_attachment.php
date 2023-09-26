@@ -54,7 +54,7 @@ if(mysqli_num_rows($result) > 0){
 	$filename = $row["name"].".".$row["extension"];
 	header('Content-Disposition: attachment; filename="'.$filename.'"');
 	header('Content-Length: '.strlen($content));
-	echo $content;
+	//Echo content at the end
 
 	$cachesize = 0;
 	$cachehits = array();
@@ -89,4 +89,6 @@ if(mysqli_num_rows($result) > 0){
 	file_put_contents($filename_mimetype, $type);
 	file_put_contents($filename_filename, $filename);
 	file_put_contents($filename_hits, 1);
+
+	echo $content;
 }else http_response_code(404);
