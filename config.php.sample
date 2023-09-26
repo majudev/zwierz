@@ -28,3 +28,5 @@ $config["mail"]["nicename"] = "Kapituła HO";
 $config["activation_mail"] = array();
 $config["activation_mail"]["subject"] = "Potwiedź swoje konto";
 $config["activation_mail"]["body"] = "Potwiedź swoje konto, klikając w <a href=\"%ACTIVATION_LINK%\">link</a>.";
+
+$config["cache"]["attachments_cache_size_MB"] = 512;
