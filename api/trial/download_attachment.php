@@ -70,8 +70,8 @@ if(mysqli_num_rows($result) > 0){
 	}
 	$cachesize = $cachesize + strlen($content);
 	asort($cachehits);
-	while($cachesize > 104857600){
-		$key = array_keys($cachehits[0]);
+	while($cachesize > 31457280 && count($cachehits) > 0){
+		$key = array_keys($cachehits)[0];
 		array_splice($cachehits, 0, 1);
 		$cachesize = $cachesize - filesize($cachedir.'/'.$key.'.content');
 		unlink($cachedir.'/'.$key.'.content');
