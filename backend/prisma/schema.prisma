@@ -7,75 +7,192 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model appointment_registrations {
+model AppointmentRegistrations {
   id             Int    @id @default(autoincrement())
-  login          String @db.VarChar(50)
-  appointment_id Int
-  intent         String @db.VarChar(128)
+  trialId        Int
+  trial          Trial @relation(fields: [trialId], references: [id], onUpdate: Cascade, onDelete: Restrict)
+  appointmentId  Int
+  appointment    Appointment @relation(fields: [appointmentId], references: [id], onUpdate: Cascade, onDelete: Restrict)
+  intent         AppointmentRegistrationType
+  customIntent   String?
+  message        String?
 }
 
-model appointments {
+model Appointment {
   id                    Int      @id @default(autoincrement())
-  date                  DateTime @default(now()) @db.Timestamp(0)
-  time                  String   @db.VarChar(128)
-  total_candidates      Int      @db.TinyInt
-  registered_candidates Int      @default(0) @db.TinyInt
+  date                  DateTime
+  description           String   @db.VarChar(128)
+  slots_HO              Int?      @db.TinyInt
+  slots_HR              Int?      @db.TinyInt
+
+  registrations         AppointmentRegistrations[]
+
+  @@index([date])
 }
 
-model attachments {
+model Attachment {
   id         Int      @id @default(autoincrement())
-  login      String   @db.VarChar(50)
+  trialdId   Int
+  trial      Trial    @relation(fields: [trialdId], references: [id])
   name       String   @db.VarChar(50)
-  content    Bytes
-  created_at DateTime @default(now()) @db.Timestamp(0)
+  content    Bytes    @db.Blob
+  created_at DateTime @default(now())
   extension  String?  @db.VarChar(15)
   thumbnail  Bytes?   @db.MediumBlob
+
+  @@index([name])
+  @@index([created_at])
 }
 
-model quests {
+model Quest {
   id          Int      @id @default(autoincrement())
-  login       String   @db.VarChar(50)
+  trialId     Int
+  trial       Trial    @relation(fields: [trialId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   content     String   @db.Text
-  finish_date DateTime @default(now()) @db.Timestamp(0)
+  finish_date DateTime
 }
 
-model teams {
-  name String @id @db.VarChar(64)
+model TrialLogbook {
+  id Int @id @default(autoincrement())
+  trialId Int
+  trial Trial @relation(fields: [trialId], references: [id])
+  
+  type TrialLogbookEntryType
+  author TrialLogbookAuthorType
+
+  note String?
+
+  @@index([type])
+  @@index([author])
 }
 
-model trials {
-  login            String    @id @db.VarChar(50)
-  open_date        DateTime? @db.Timestamp(0)
-  closed_date      DateTime? @db.Timestamp(0)
-  open_document    Int?
-  closing_document Int?
+model Trial {
+  id               Int @id @default(autoincrement())
+  userId           Int
+  user             User      @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Restrict)
+  type             TrialType
+  open_date        DateTime?
+  close_date       DateTime?
   mentor_name      String    @db.VarChar(128)
   mentor_email     String    @db.VarChar(50)
   mentor_phone     String    @db.VarChar(15)
-  projected_date   DateTime  @default(dbgenerated("('0000-00-00 00:00:00')")) @db.Timestamp(0)
+  predicted_closing_date   DateTime?
+
+  quests           Quest[]
+  attachments      Attachment[]
+
   archived         Boolean   @default(false)
+
+  appointments     AppointmentRegistrations[]
+  logbook          TrialLogbook[]
+
+  @@unique([userId, type], name: "trial_unique_contraint")
+  @@index([type])
+  @@index([archived])
 }
 
-model trials_logbook {
-  entry_id Int      @id @default(autoincrement())
-  trialid  String   @db.VarChar(50)
-  time     DateTime @default(now()) @db.Timestamp(0)
-  log      String   @db.Text
-}
-
-model users {
-  id            Int      @id @default(autoincrement()) @db.UnsignedInt
-  email         String   @db.VarChar(50)
+model User {
+  id            Int      @id @default(autoincrement())
+  email         String   @db.VarChar(50) @unique
   password      String   @db.VarChar(128)
-  name          String?  @db.VarChar(128)
-  created       DateTime @default(now()) @db.Timestamp(0)
-  edited        DateTime @default(now()) @db.Timestamp(0)
-  active        Boolean  @default(false)
+  name          String?  @db.VarChar(64)
+  rank          Rank?
+  created       DateTime @default(now())
   activationkey String?  @db.VarChar(64)
-  admin         Boolean  @default(false)
-  commitee      String?  @db.VarChar(32)
+  pwdresetkey   String?  @db.VarChar(64)
+  commitee      CommiteeRole @default(NONE)
   phone         String?  @db.VarChar(15)
-  team          String?  @db.VarChar(64)
-  interests     String?  @db.VarChar(256)
+  teamId        Int?
+  team          Team?    @relation(fields: [teamId], references: [id], onUpdate: Cascade, onDelete: Restrict)
+  interests     UserInterest[]
   function      String?  @db.VarChar(32)
+  
+  sso           SSOManager @default(LOCAL)
+  disabled      Boolean    @default(false)
+  shadow        Boolean    @default(false)
+
+  trials        Trial[]
+
+  //appointments  appointment_registrations[]
+  @@index(fields: [email])
+  @@index(fields: [commitee])
+  @@index(fields: [disabled])
+  @@index(fields: [shadow])
+}
+
+model UserInterest {
+  id Int @id @default(autoincrement())
+  userId Int
+  user User @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  text String
+}
+
+model Team {
+  id            Int      @id @default(autoincrement())
+  name          String   @db.VarChar(64)
+  archived      Boolean  @default(false)
+
+  members       User[]
+}
+
+model SystemSettings {
+  id Int @id
+  key String @unique
+  value String
+
+  @@index([key])
+}
+
+enum Rank {
+  NONE
+  MLODZIK
+  WYWIADOWCA
+  CWIK
+  HO
+  HR
+  PWD_HO
+  PWD_HR
+  PHM_HR
+  HM_HR
+}
+
+enum SSOManager {
+  LOCAL
+  MICROSOFT_MLP
+}
+
+enum TrialType {
+  HO
+  HR
+}
+
+enum AppointmentRegistrationType {
+  OPEN_TRIAL
+  CLOSE_TRIAL
+  EDIT_TRIAL
+  CUSTOM
+}
+
+enum CommiteeRole {
+  NONE
+  MEMBER
+  SCRIBE
+  UBERADMIN
+}
+
+enum TrialLogbookEntryType {
+  ADD_QUEST
+  DELETE_QUEST
+  MODIFY_QUEST
+  ADD_ATTACHMENT
+  DELETE_ATTACHMENT
+  MODIFY_ATTACHMENT
+  UPDATE_OWNER_DETAILS
+  UPDATE_MENTOR_DETAILS
+  NOTE
+}
+
+enum TrialLogbookAuthorType {
+  OWNER
+  COMMITEE
 }
