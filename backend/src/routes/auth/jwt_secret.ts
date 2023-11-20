@@ -5,7 +5,7 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient();
 
 export async function JWT_SECRET() {
-    try{
+    /*try{
         const client = createClient({
             url: process.env.REDIS_URL
         });
@@ -30,11 +30,11 @@ export async function JWT_SECRET() {
     }catch(error){
         console.error('Cannot obtain JWT from database: ', error);
         throw error;
-    }
+    }*/
 }
 
 export async function JWT_EXPIRATION_DAYS() {
-    try{
+    /*try{
         const client = createClient({
             url: process.env.REDIS_URL
         });
@@ -59,5 +59,5 @@ export async function JWT_EXPIRATION_DAYS() {
     }catch(error){
         console.error('Cannot obtain JWT expiration time from database: ', error);
         throw error;
-    }
+    }*/
 }

@@ -5,7 +5,7 @@ import { check_login, fail_missing_params, fail_no_permissions, fail_entity_not_
 
 const router = Router();
 const prisma = new PrismaClient();
-
+/*
 router.post('/new', async (req: Request, res: Response) => {
     if(!check_login(res)) return;
 
@@ -174,14 +174,6 @@ router.patch('/:hostId', async (req: Request, res: Response) => {
         return;
     }
 
-    /*if(updatedObject.extramonPubkey === undefined && (updatedObject.rhpAddress === undefined || updatedObject.rhpPubkey === undefined)) {
-        res.status(400).json({
-            status: "error",
-            message: "please provide rhpAddress and rhpPubkey OR extramonPubkey",
-        });
-        return;
-    }*/
-
     const updatedObject = await prisma.host.update({
         where: {
             id: hostId,
@@ -309,5 +301,6 @@ router.delete('/:hostId', async (req: Request, res: Response) => {
         }
     });
 });
+*/
 
 export default router;

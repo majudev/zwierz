@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 export async function initDB(){
     logger.info('Initializing DB');
 
-    var jwt_secret_found = await prisma.settings.count({
+    /*var jwt_secret_found = await prisma.settings.count({
         where: {
             key: 'JWT_SECRET',
         }
@@ -53,11 +53,7 @@ export async function initDB(){
                 {
                     name: 'CA1 (Beauharnois)',
                     address: 'satellite-ca.sia.watch',
-                },
-                /*{
-                    name: 'EU2 (Strasburg)',
-                    address: 'satellite-fr.sia.watch',
-                },*/
+                }
             ]
         });
     }else logger.debug('' + satellite_count + ' satellites exist in the database, not adding default one');
@@ -70,6 +66,7 @@ export async function initDB(){
             }
         });
     }else logger.debug('' + users_count + ' users exist in the database, not adding default one');
+    */
 }
 
 export default initDB;

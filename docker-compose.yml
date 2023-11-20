@@ -14,19 +14,22 @@ services:
     env_file:
       - backend/.env
     environment:
-      DATABASE_URL: postgresql://master:sakjfsdfasfasersfedfsdfa@postgres:5432/master?schema=public
-      SITE_ORIGIN: https://sia.watch
-      WEBAUTHN_RPID: sia.watch
+      DATABASE_URL: mysql://master:sakjfsdfasfasersfedfsdfa@mysql:3306/master
+      SITE_ORIGIN: https://localhost
+      WEBAUTHN_RPID: localhost
       REDIS_URL: redis://redis:6379
-  postgres:
-    image: postgres
+      LOGIN_SUCCESSFUL_CALLBACK: https://localhost/login
+      OAUTH_GOOGLE_CALLBACK: https://localhost/api/auth/google/callback
+  mysql:
+    image: mysql:8.2
     restart: always
     volumes:
-      - './database:/var/lib/postgresql/data'
+      - './database:/var/lib/mysql'
     environment:
-      POSTGRES_PASSWORD: sakjfsdfasfasersfedfsdfa
-      POSTGRES_USER: master
-      POSTGRES_DATABASE: master
+      MYSQL_PASSWORD: sakjfsdfasfasersfedfsdfa
+      MYSQL_USER: master
+      MYSQL_DATABASE: master
+      MYSQL_ALLOW_EMPTY_PASSWORD: yes
   redis:
     image: redis:alpine
     restart: always
@@ -35,7 +38,7 @@ services:
       --save ""
       --appendonly no
   nginx:
-    build: nginx/master
+    build: nginx
     restart: always
   cloudflared:
     image: cloudflare/cloudflared

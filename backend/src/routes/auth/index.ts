@@ -80,7 +80,7 @@ router.get('/google/callback', async (req: Request, res: Response) => {
 });
 
 async function loginUser(req: Request, res: Response, email: string, name: string){
-    var userObject = await prisma.user.findFirst({
+    /*var userObject = await prisma.user.findFirst({
         select: {
             id: true,
             email: true,
@@ -120,7 +120,7 @@ async function loginUser(req: Request, res: Response, email: string, name: strin
         expires: expirationDate,
     });
 
-    return userObject;
+    return userObject;*/
 }
 
 /// TODO: Delete this endpoint

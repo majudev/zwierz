@@ -1,11 +1,81 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
+}
+
+model appointment_registrations {
+  id             Int    @id @default(autoincrement())
+  login          String @db.VarChar(50)
+  appointment_id Int
+  intent         String @db.VarChar(128)
+}
+
+model appointments {
+  id                    Int      @id @default(autoincrement())
+  date                  DateTime @default(now()) @db.Timestamp(0)
+  time                  String   @db.VarChar(128)
+  total_candidates      Int      @db.TinyInt
+  registered_candidates Int      @default(0) @db.TinyInt
+}
+
+model attachments {
+  id         Int      @id @default(autoincrement())
+  login      String   @db.VarChar(50)
+  name       String   @db.VarChar(50)
+  content    Bytes
+  created_at DateTime @default(now()) @db.Timestamp(0)
+  extension  String?  @db.VarChar(15)
+  thumbnail  Bytes?   @db.MediumBlob
+}
+
+model quests {
+  id          Int      @id @default(autoincrement())
+  login       String   @db.VarChar(50)
+  content     String   @db.Text
+  finish_date DateTime @default(now()) @db.Timestamp(0)
+}
+
+model teams {
+  name String @id @db.VarChar(64)
+}
+
+model trials {
+  login            String    @id @db.VarChar(50)
+  open_date        DateTime? @db.Timestamp(0)
+  closed_date      DateTime? @db.Timestamp(0)
+  open_document    Int?
+  closing_document Int?
+  mentor_name      String    @db.VarChar(128)
+  mentor_email     String    @db.VarChar(50)
+  mentor_phone     String    @db.VarChar(15)
+  projected_date   DateTime  @default(dbgenerated("('0000-00-00 00:00:00')")) @db.Timestamp(0)
+  archived         Boolean   @default(false)
+}
+
+model trials_logbook {
+  entry_id Int      @id @default(autoincrement())
+  trialid  String   @db.VarChar(50)
+  time     DateTime @default(now()) @db.Timestamp(0)
+  log      String   @db.Text
+}
+
+model users {
+  id            Int      @id @default(autoincrement()) @db.UnsignedInt
+  email         String   @db.VarChar(50)
+  password      String   @db.VarChar(128)
+  name          String?  @db.VarChar(128)
+  created       DateTime @default(now()) @db.Timestamp(0)
+  edited        DateTime @default(now()) @db.Timestamp(0)
+  active        Boolean  @default(false)
+  activationkey String?  @db.VarChar(64)
+  admin         Boolean  @default(false)
+  commitee      String?  @db.VarChar(32)
+  phone         String?  @db.VarChar(15)
+  team          String?  @db.VarChar(64)
+  interests     String?  @db.VarChar(256)
+  function      String?  @db.VarChar(32)
 }

@@ -5,7 +5,7 @@ import { check_login, fail_missing_params, fail_no_permissions, fail_entity_not_
 
 const router = Router();
 const prisma = new PrismaClient();
-
+/*
 router.get('/:id', async (req: Request, res: Response) => {
     if(!check_login(res)) return;
 
@@ -232,5 +232,6 @@ router.get('/:id/alerts', async (req: Request, res: Response) => {
         data: alerts
     }).end();
 });
+*/
 
 export default router;
