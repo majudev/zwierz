@@ -106,6 +106,10 @@ model User {
   team          Team?    @relation(fields: [teamId], references: [id], onUpdate: Cascade, onDelete: Restrict)
   interests     UserInterest[]
   function      String?  @db.VarChar(32)
+
+  enableEmailNotifications Boolean @default(true)
+  enableSMSNotifications Boolean @default(false)
+  phoneVerifyKey String?  @db.VarChar(6)
   
   sso           SSOManager @default(LOCAL)
   disabled      Boolean    @default(false)
@@ -135,8 +139,8 @@ model Team {
   members       User[]
 }
 
-model SystemSettings {
-  id Int @id
+model Settings {
+  id Int @id @default(autoincrement())
   key String @unique
   value String
 

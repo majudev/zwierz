@@ -7,6 +7,72 @@ const prisma = new PrismaClient();
 export async function initDB(){
     logger.info('Initializing DB');
 
+    const postal_baseurl_found = await prisma.settings.count({
+        where: {
+            key: {
+                equals: "postal.baseurl"
+            }
+        }
+    }) > 0;
+    if(!postal_baseurl_found){
+        const value = process.env.POSTAL_BASEURL;
+        if(value === undefined || value === null || value === ""){
+            logger.error('Missing POSTAL_BASEURL environmental variable');
+            process.exit(-1);
+        }
+        logger.info('Inserting postal baseurl from .env to database');
+        prisma.settings.create({
+            data: {
+                key: "postal.baseurl",
+                value: value,
+            }
+        });
+    }
+
+    const postal_apitoken_found = await prisma.settings.count({
+        where: {
+            key: {
+                equals: "postal.apitoken"
+            }
+        }
+    }) > 0;
+    if(!postal_apitoken_found){
+        const value = process.env.POSTAL_APITOKEN;
+        if(value === undefined || value === null || value === ""){
+            logger.error('Missing POSTAL_APITOKEN environmental variable');
+            process.exit(-1);
+        }
+        logger.info('Inserting postal api token from .env to database');
+        prisma.settings.create({
+            data: {
+                key: "postal.apitoken",
+                value: value,
+            }
+        });
+    }
+
+    const postal_from_found = await prisma.settings.count({
+        where: {
+            key: {
+                equals: "postal.from"
+            }
+        }
+    }) > 0;
+    if(!postal_from_found){
+        const value = process.env.POSTAL_FROM;
+        if(value === undefined || value === null || value === ""){
+            logger.error('Missing POSTAL_FROM environmental variable');
+            process.exit(-1);
+        }
+        logger.info('Inserting postal FROM from .env to database');
+        prisma.settings.create({
+            data: {
+                key: "postal.from",
+                value: value,
+            }
+        });
+    }
+
     /*var jwt_secret_found = await prisma.settings.count({
         where: {
             key: 'JWT_SECRET',
