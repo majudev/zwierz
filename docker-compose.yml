@@ -21,15 +21,15 @@ services:
       LOGIN_SUCCESSFUL_CALLBACK: https://localhost/login
       OAUTH_GOOGLE_CALLBACK: https://localhost/api/auth/google/callback
   mysql:
-    image: mysql:8.2
+    image: mariadb:11
     restart: always
     volumes:
       - './database:/var/lib/mysql'
     environment:
-      MYSQL_PASSWORD: sakjfsdfasfasersfedfsdfa
-      MYSQL_USER: master
-      MYSQL_DATABASE: master
-      MYSQL_ALLOW_EMPTY_PASSWORD: yes
+      MARIADB_PASSWORD: sakjfsdfasfasersfedfsdfa
+      MARIADB_USER: master
+      MARIADB_DATABASE: master
+      MARIADB_RANDOM_ROOT_PASSWORD: yes
   redis:
     image: redis:alpine
     restart: always
