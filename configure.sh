@@ -1,2 +1,2 @@
 #!/bin/bash
-echo "" > compose-local.yml
+echo "version: '3.4'" > compose-local.yml
