@@ -1,16 +1,92 @@
 import { Router, Request, Response } from 'express';
 import logger from '../../utils/logger';
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from '@prisma/client';
 import { check_login, fail_missing_params, fail_no_permissions, fail_entity_not_found } from '../../utils/http_code_helper';
+import { user_is_commitee_member, user_is_commitee_scribe, user_is_uberadmin } from '../../utils/permissionsHelper';
+import bcrypt from 'bcrypt';
 
 const router = Router();
 const prisma = new PrismaClient();
-/*
+
+/*router.post('/new', async (req: Request, res: Response) => {
+    if(!check_login(res)) return;
+    if(!(await user_is_uberadmin(res.locals.auth_user.userId))){
+        fail_no_permissions(res, "you don't have permissions to register new users");
+        return;
+    }
+
+    if(req.body.email === undefined || !validateEmail(req.body.email)){
+        fail_missing_params(res, ["email"], null);
+    }
+
+    if((req.body.sso === undefined || req.body.sso === 'LOCAL') && req.body.password === undefined){
+        fail_missing_params(res, ["password"], null);
+    }
+
+    const exists = await prisma.user.count({
+        where: {
+            email: req.body.email,
+        }
+    }) > 0;
+
+    if(exists){
+        fail_entity_not_found(res, "user with email " + req.body.email + " already exists");
+        return;
+    }
+
+    const {
+        id: _,
+        roleMappings: ___,
+        pwdresetkey: _______,
+        phoneVerifyKey: ________,
+        created: _________,
+        password: password,
+        ...createQuery
+    } = req.body;
+    if(createQuery.sso === undefined || createQuery.sso === 'LOCAL'){
+        createQuery.password = await bcrypt.hash(password, 14);
+    }
+
+    const user = await prisma.user.create({
+        data: createQuery,
+        select: {
+            id: true,
+            name: true,
+            email: true,
+            uberadmin: true,
+            phone: true,
+
+            roleMappings: {
+                select: {
+                    role: true,
+                    organization: {
+                        select: {
+                            id: true,
+                            name: true,
+                        }
+                    }
+                }
+            },
+
+            enableEmailNotifications: true,
+            enableSMSNotifications: true,
+
+            sso: true,
+            disabled: true,
+        },
+    });
+
+    res.status(200).json({
+        status: "success",
+        data: user
+    }).end();
+});*/
+
 router.get('/:id', async (req: Request, res: Response) => {
     if(!check_login(res)) return;
 
     if(req.params.id === 'all'){
-        if(!res.locals.auth_user.admin){
+        if(!(await user_is_uberadmin(res.locals.auth_user.userId))){
             fail_no_permissions(res, "you don't have permissions to obtain userlist");
             return;
         }
@@ -20,7 +96,35 @@ router.get('/:id', async (req: Request, res: Response) => {
                 id: true,
                 name: true,
                 email: true,
-                admin: true,
+                rank: true,
+                commitee: true,
+                phone: true,
+                team: {
+                    select: {
+                        id: true,
+                        name: true,
+                        archived: true,
+                    }
+                },
+                interests: {
+                    select: {
+                        text: true,
+                    }
+                },
+                function: true,
+
+                enableEmailNotifications: true,
+                enableSMSNotifications: true,
+                
+                sso: true,
+                disabled: true,
+                shadow: true,
+
+                trials: {
+                    select: {
+                        id: true,
+                    }
+                }
             },
         });
 
@@ -38,9 +142,13 @@ router.get('/:id', async (req: Request, res: Response) => {
         return;
     }
 
-    // User can only view his hosts, admin can view everything
-    if(userId != res.locals.auth_user.userId && !res.locals.auth_user.admin){
-        fail_no_permissions(res, "you don't have permissions to view this userId");
+    const uberadmin = await user_is_uberadmin(res.locals.auth_user.userId);
+    const commitee_scribe = await user_is_commitee_scribe(res.locals.auth_user.userId);
+    const commitee_member = await user_is_commitee_member(res.locals.auth_user.userId);
+
+    // User can only view himself, admin can view everything
+    if(userId !== res.locals.auth_user.userId && !uberadmin && !commitee_scribe && !commitee_member){
+        fail_no_permissions(res, "you don't have permissions to view this user");
         return;
     }
 
@@ -52,16 +160,35 @@ router.get('/:id', async (req: Request, res: Response) => {
             id: true,
             name: true,
             email: true,
-            admin: true,
-            alertEmail: true,
-            alertPhoneNumber: true,
-            globallyDisableEmailAlerts: true,
-            globallyDisablePhoneAlerts: true,
-            Hosts: {
+            rank: true,
+            commitee: true,
+            phone: true,
+            team: {
                 select: {
                     id: true,
-                },
+                    name: true,
+                    archived: true,
+                }
             },
+            interests: {
+                select: {
+                    text: true,
+                }
+            },
+            function: true,
+
+            enableEmailNotifications: true,
+            enableSMSNotifications: true,
+            
+            sso: true,
+            disabled: true,
+            shadow: true,
+
+            trials: {
+                select: {
+                    id: true,
+                }
+            }
         },
     });
 
@@ -76,7 +203,7 @@ router.get('/:id', async (req: Request, res: Response) => {
     }).end();
 });
 
-router.patch('/:userId', async (req: Request, res: Response) => {
+/*router.patch('/:userId', async (req: Request, res: Response) => {
     if(!check_login(res)) return;
 
     const userId: number = parseInt(req.params.userId);
@@ -86,8 +213,8 @@ router.patch('/:userId', async (req: Request, res: Response) => {
         return;
     }
 
-    // User can only edit himself, admin can edit everything
-    if(userId != res.locals.auth_user.userId && !res.locals.auth_user.admin){
+    // User can only edit himself, uberadmin can edit everything
+    if(userId != res.locals.auth_user.userId && !(await user_is_uberadmin(res.locals.auth_user.userId))){
         fail_no_permissions(res, "you don't have permissions to edit this userId");
         return;
     }
@@ -105,14 +232,21 @@ router.patch('/:userId', async (req: Request, res: Response) => {
 
     const {
         id: _,
-        admin: __,
-        Hosts: ___,
-        Alerts: ____,
+        uberadmin: __,
+        roleMappings: ___,
         email: _____,
+        sso: ______,
+        pwdresetkey: _______,
+        phoneVerifyKey: ________,
+        created: _________,
+        password: password,
         ...updateQuery
     } = req.body;
-    if(res.locals.auth_user.admin && 'admin' in req.body){
-        updateQuery.admin = req.body.admin;
+    if((await user_is_uberadmin(res.locals.auth_user.userId)) && 'uberadmin' in req.body){
+        updateQuery.uberadmin = req.body.uberadmin;
+    }
+    if(password !== undefined && password !== null){
+        updateQuery.password = await bcrypt.hash(password, 14);
     }
 
     if(updateQuery === undefined || Object.keys(updateQuery).length == 0){
@@ -129,16 +263,26 @@ router.patch('/:userId', async (req: Request, res: Response) => {
             id: true,
             name: true,
             email: true,
-            admin: true,
-            alertEmail: true,
-            alertPhoneNumber: true,
-            globallyDisableEmailAlerts: true,
-            globallyDisablePhoneAlerts: true,
-            Hosts: {
+            uberadmin: true,
+            phone: true,
+
+            roleMappings: {
                 select: {
-                    id: true,
-                },
+                    role: true,
+                    organization: {
+                        select: {
+                            id: true,
+                            name: true,
+                        }
+                    }
+                }
             },
+
+            enableEmailNotifications: true,
+            enableSMSNotifications: true,
+
+            sso: true,
+            disabled: true,
         },
     });
 
@@ -146,92 +290,14 @@ router.patch('/:userId', async (req: Request, res: Response) => {
         status: "success",
         data: updatedObject
     }).end();
-});
+});*/
 
-router.get('/:id/hosts', async (req: Request, res: Response) => {
-    if(!check_login(res)) return;
-
-    const userId: number = parseInt(req.params.id);
-
-    if(Number.isNaN(userId)) {
-        fail_missing_params(res, ["userId"], null);
-        return;
-    }
-
-    // User can only view his hosts, admin can view everything
-    if(userId != res.locals.auth_user.userId && !res.locals.auth_user.admin){
-        fail_no_permissions(res, "you don't have permissions to view this userId");
-        return;
-    }
-
-    const user = await prisma.user.findFirst({
-        where: {
-            id: userId,
-        },
-        select: {
-            id: true,
-            Hosts: {
-                select: {
-                    id: true,
-                    rhpAddress: true,
-                    rhpPubkey: true,
-                    extramonPubkey: true,
-                },
-            },
-        },
-    });
-
-    if(user === null){
-        fail_entity_not_found(res, "user with id " + userId + " not found");
-        return;
-    }
-
-    res.status(200).json({
-        status: "success",
-        data: user.Hosts
-    }).end();
-});
-
-router.get('/:id/alerts', async (req: Request, res: Response) => {
-    if(!check_login(res)) return;
-
-    const userId: number = parseInt(req.params.id);
-
-    if(Number.isNaN(userId)) {
-        fail_missing_params(res, ["userId"], null);
-        return;
-    }
-
-    // User can only view his hosts, admin can view everything
-    if(userId != res.locals.auth_user.userId && !res.locals.auth_user.admin){
-        fail_no_permissions(res, "you don't have permissions to view this userId");
-        return;
-    }
-
-    const alerts = await prisma.alert.findMany({
-        where: {
-            userId: userId,
-        },
-        select: {
-            id: true,
-            timestamp: true,
-            message: true,
-            sentTo: true,
-            read: true,
-            Host: {
-                select: {
-                    id: true,
-                    name: true,
-                }
-            }
-        },
-    });
-
-    res.status(200).json({
-        status: "success",
-        data: alerts
-    }).end();
-});
-*/
+const validateEmail = (email: string) => {
+    return String(email)
+      .toLowerCase()
+      .match(
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      );
+  };
 
 export default router;

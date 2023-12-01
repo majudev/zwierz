@@ -10,7 +10,7 @@ interface UserAuthObject {
 }
 
 const authenticate = async (req: Request, res: Response, next: NextFunction) => {
-	const token = req.cookies.SIAWATCH_COOKIE;
+	const token = req.cookies.ZWIERZ_COOKIE;
 
     if (!token) {
         res.locals.authenticated = false;

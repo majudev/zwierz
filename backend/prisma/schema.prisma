@@ -98,8 +98,8 @@ model User {
   name          String?  @db.VarChar(64)
   rank          Rank?
   created       DateTime @default(now())
-  activationkey String?  @db.VarChar(64)
-  pwdresetkey   String?  @db.VarChar(64)
+  activationkey String?  @db.VarChar(64) @unique
+  pwdresetkey   String?  @db.VarChar(64) @unique
   commitee      CommiteeRole @default(NONE)
   phone         String?  @db.VarChar(15)
   teamId        Int?
@@ -120,6 +120,7 @@ model User {
   //appointments  appointment_registrations[]
   @@index(fields: [email])
   @@index(fields: [commitee])
+  @@index(fields: [sso])
   @@index(fields: [disabled])
   @@index(fields: [shadow])
 }
@@ -163,6 +164,7 @@ enum Rank {
 enum SSOManager {
   LOCAL
   MICROSOFT_MLP
+  GOOGLE_ZHR
 }
 
 enum TrialType {
