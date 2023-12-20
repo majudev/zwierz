@@ -33,7 +33,7 @@ function Navigation({loggedIn, logIn, logOut}: Props) : JSX.Element {
   const query = useQuery();
 
   useEffect(() => {
-    if(!loggedIn && location.pathname !== '/login'){
+    if(!loggedIn && location.pathname !== '/login' && location.pathname !== '/passwordreset' && !location.pathname.match(/^\/passwordreset\/[a-zA-Z0-9]+/)){
       navigate('/login');
     }else if(location.pathname === '/login' && query.get("status") === 'success'){
       logIn();

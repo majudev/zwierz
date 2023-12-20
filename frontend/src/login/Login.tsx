@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 
 interface Props {
   loggedIn: boolean;
@@ -7,13 +7,31 @@ interface Props {
   logIn: () => void;
 }
 
+function useQuery() {
+  const { search } = useLocation();
+
+  return React.useMemo(() => new URLSearchParams(search), [search]);
+}
+
 function Login(props: Props): JSX.Element {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
+  //const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
+  const [activationError, setActivationError] = useState('');
   const [buttonLock, setButtonLock] = useState(false);
   const navigate = useNavigate();
+
+  const query = useQuery();
+
+  useEffect(() => {
+    if(query.get("activate") === 'success'){
+      setActivationError('success');
+    }else if(query.get("activate") === 'error'){
+      setActivationError(query.get("message") as string);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onLoginAttempt = async function(){
     setButtonLock(true);
@@ -27,7 +45,7 @@ function Login(props: Props): JSX.Element {
       body: JSON.stringify({
         email: email,
         password: password,
-        rememberMe: rememberMe,
+        //rememberMe: rememberMe,
       })
     });
     setButtonLock(false);
@@ -52,6 +70,8 @@ function Login(props: Props): JSX.Element {
           <img className="mb-4 login-img" src={process.env.REACT_APP_API_URL + "/static/login-image"} />
           <h1 className="h3 mb-3 fw-normal text-center">Zaloguj się</h1>
           {(error !== '') && <p className="text-danger text-center">Błąd: {error}</p>}
+          {(activationError !== '' && activationError !== 'success') && <p className="text-danger text-center">Błąd aktywacji twojego konta: {activationError}</p>}
+          {(activationError === 'success') && <p className="text-success text-center">Udało się aktywować twoje konto! Możesz się teraz zalogować</p>}
 
           <div className="form-floating">
             <input type="email" className="form-control" id="floatingInput" placeholder="" value={email} onChange={(e) => {setEmail(e.target.value)}} />
@@ -68,6 +88,7 @@ function Login(props: Props): JSX.Element {
           </div>*/}
           <button className="w-100 btn btn-lg btn-primary" disabled={buttonLock} onClick={onLoginAttempt}>Zaloguj się</button>
           <p className="mt-3 text-center">Nie masz konta? <Link to="/register">Zarejestruj się</Link>.</p>
+          <p className="mt-3 text-center">Zapomniałeś hasła? <Link to="/passwordreset">Zresetuj je</Link>.</p>
         </div>
       </div>
     </main>

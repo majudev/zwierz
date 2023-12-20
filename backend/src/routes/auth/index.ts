@@ -8,6 +8,7 @@ import { randomBytes } from 'crypto';
 import bcrypt from 'bcrypt';
 import { check_login, fail_missing_params, fail_no_permissions, fail_entity_not_found, fail_duplicate_entry, fail_internal_error } from '../../utils/http_code_helper.js';
 import { generateCaptchaChallenge } from '../../utils/captcha.js';
+import { verifyEmail, verifyPassword } from '../../utils/validationtools.js';
 import { getSetting } from '../../utils/settings.js';
 import { createClient } from 'redis';
 
@@ -244,6 +245,22 @@ router.post('/register', async (req: Request, res: Response) => {
         }).end();
         return;
     }
+    await redis.del('captcha.' + req.body.captchaId + '.answer');
+    
+    if(!verifyEmail(req.body.email)){
+        res.status(400).json({
+            status: "error",
+            message: "invalid email",
+        });
+        return;
+    }
+    if(!verifyPassword(req.body.password)){
+        res.status(400).json({
+            status: "error",
+            message: "password has to contain: one uppercase letter, one lowercase letter, one special char !@#$%^&*()_+{}\[\]:;<>,.?~\\- and be at least 8 characters long",
+        });
+        return;
+    }
 
     const exists = await prisma.user.count({
         where: {
@@ -382,13 +399,14 @@ router.post('/passwordreset', async (req: Request, res: Response) => {
     await redis.expire('ratelimit.' + ip + '.auth', 2);*/
 
     const captcha = await redis.get('captcha.' + req.body.captchaId + '.answer');
-    if(captcha === null || captcha !== req.body.captchaAnswer){
+    if(captcha === null || captcha != req.body.captchaAnswer){
         res.status(409).json({
             status: "error",
             message: "wrong or expired captcha",
         }).end();
         return;
     }
+    await redis.del('captcha.' + req.body.captchaId + '.answer');
 
     const exists = await prisma.user.count({
         where: {
@@ -440,6 +458,90 @@ router.post('/passwordreset', async (req: Request, res: Response) => {
         },
         data: {
             pwdresetkey: pwdresetkey,
+        },
+    });
+
+	res.status(204).json({
+		status: "success",
+        data: null,
+	});
+});
+
+router.post('/passwordreset/:pwdresetkey', async (req: Request, res: Response) => {
+    const pwdresetkey = req.params.pwdresetkey;
+    
+    if(req.body.password === undefined) {
+        fail_missing_params(res, ["password"], null);
+        return;
+    }
+
+    if(req.body.captchaId === undefined) {
+        fail_missing_params(res, ["captchaId"], null);
+        return;
+    }
+
+    if(req.body.captchaAnswer === undefined) {
+        fail_missing_params(res, ["captchaAnswer"], null);
+        return;
+    }
+
+    const redis = createClient({
+        url: process.env.REDIS_URL,
+    });
+    await redis.connect();
+
+    /*const ip = req.header('CF-Connecting-IP') ?? req.ip;
+    const ratelimit = await redis.get('ratelimit.' + ip + '.auth');
+    if(ratelimit !== null){
+        await redis.expire('ratelimit.' + ip + '.auth', 2);
+        res.status(429).end();
+        return;
+    }
+    await redis.set('ratelimit.' + ip + '.auth', 1);
+    await redis.expire('ratelimit.' + ip + '.auth', 2);*/
+
+    const captcha = await redis.get('captcha.' + req.body.captchaId + '.answer');
+    if(captcha === null || captcha != req.body.captchaAnswer){
+        res.status(409).json({
+            status: "error",
+            message: "wrong or expired captcha",
+        }).end();
+        return;
+    }
+    await redis.del('captcha.' + req.body.captchaId + '.answer');
+
+    if(!verifyPassword(req.body.password)){
+        res.status(400).json({
+            status: "error",
+            message: "password has to contain: one uppercase letter, one lowercase letter, one special char !@#$%^&*()_+{}\[\]:;<>,.?~\\- and be at least 8 characters long",
+        });
+        return;
+    }
+
+    const exists = await prisma.user.count({
+        where: {
+            pwdresetkey: pwdresetkey,
+        }
+    }) > 0;
+
+    if(!exists) {
+        res.status(404).json({
+            status: "error",
+            message: "wrong password reset key",
+        });
+        return;
+    }
+
+    /*await redis.set('ratelimit.' + ip + '.auth', 1);
+    await redis.expire('ratelimit.' + ip + '.auth', 30);*/
+
+    await prisma.user.update({
+        where: {
+            pwdresetkey: pwdresetkey,
+        },
+        data: {
+            password: await hashPassword(req.body.password),
+            pwdresetkey: null,
         },
     });
 

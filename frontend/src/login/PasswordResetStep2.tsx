@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 interface Props {
   loggedIn: boolean;
@@ -7,8 +7,7 @@ interface Props {
   logIn: () => void;
 }
 
-function Register(props: Props): JSX.Element {
-  const [email, setEmail] = useState('');
+function PasswordResetStep2(props: Props): JSX.Element {
   const [password, setPassword] = useState('');
   const [password2, setPassword2] = useState('');
   const [captchaSolution, setCaptchaSolution] = useState<number|undefined>(undefined);
@@ -18,7 +17,9 @@ function Register(props: Props): JSX.Element {
   const [success, setSuccess] = useState(false);
   const [buttonLock, setButtonLock] = useState(false);
 
-  const onRegisterAttempt = async function(){
+  const { pwdresetkey } = useParams();
+
+  const onChangePasswordAttempt = async function(){
     setButtonLock(true);
 
     if(password !== password2){
@@ -27,14 +28,13 @@ function Register(props: Props): JSX.Element {
       return;
     }
 
-    const response = await fetch(process.env.REACT_APP_API_URL + "/auth/register", {
+    const response = await fetch(process.env.REACT_APP_API_URL + "/auth/passwordreset/" + pwdresetkey, {
       method: "POST",
       mode: 'same-origin',
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        email: email,
         password: password,
         captchaId: captchaID,
         captchaAnswer: (captchaSolution === undefined ? 0 : captchaSolution),
@@ -47,8 +47,6 @@ function Register(props: Props): JSX.Element {
         const json = await response.json();
         if(json.message === 'wrong or expired captcha'){
           setError('Nie umiesz liczyć?');
-        }else if(json.message === 'user with this email already exists'){
-          setError('Ten użytkownik ma już konto');
         }else{
           setError(json.message);
         }
@@ -56,8 +54,6 @@ function Register(props: Props): JSX.Element {
         const json = await response.json();
         if(json.message == "password has to contain: one uppercase letter, one lowercase letter, one special char !@#$%^&*()_+{}\[\]:;<>,.?~\\- and be at least 8 characters long"){
           setError("Hasło musi zawierać: jedną wielką literę, jedną małą literę, jeden znak specjalny !@#$%^&*()_+{}\[\]:;<>,.?~\\- i musi mieć przynajmniej 8 znaków");
-        }else if(json.message === "invalid email"){
-          setError("Niewłaściwy format email (powinien być nazwa@domena.costam)");
         }else{
           setError(json.message);
         }
@@ -103,16 +99,12 @@ function Register(props: Props): JSX.Element {
       <div className="d-flex flex-column mb-3 justify-content-center align-items-center">
         {success && <>
           <h1 className="h3 mb-3 fw-normal text-center">Udało się!</h1>
-          <p>Sprawdź swój email, znajdź naszą wiadomość i kliknij w link, aby aktywować swoje konto.</p>
+          <p>Twoje hasło zostało zresetowane. Teraz możesz się zalogować.</p>
         </>}
         {!success && <div>
-          <h1 className="h3 mb-3 fw-normal text-center">Zarejestruj się</h1>
+          <h1 className="h3 mb-3 fw-normal text-center">Zresetuj swoje hasło</h1>
           {(error !== '') && <p className="text-danger text-center">Błąd: {error}</p>}
 
-          <div className="form-floating">
-            <input type="email" className="form-control" id="floatingInput" placeholder="" value={email} onChange={(e) => {setEmail(e.target.value)}} />
-            <label htmlFor="floatingInput">Email</label>
-          </div>
           <div className="form-floating">
             <input type="password" className="form-control" id="floatingPassword" placeholder="" value={password} onChange={(e) => {setPassword(e.target.value)}} />
             <label htmlFor="floatingPassword">Hasło</label>
@@ -126,12 +118,11 @@ function Register(props: Props): JSX.Element {
             <label htmlFor="captcha">{captchaQuest}</label>
           </div>
 
-          <button className="w-100 btn btn-lg btn-primary" disabled={buttonLock} onClick={onRegisterAttempt}>Zarejestruj się</button>
-          <p className="mt-3 text-center">Masz już konto? <Link to="/login">Zaloguj się</Link>.</p>
+          <button className="w-100 btn btn-lg btn-primary" disabled={buttonLock} onClick={onChangePasswordAttempt}>Zresetuj hasło</button>
         </div>}
       </div>
     </main>
   );
 }
 
-export default Register;
+export default PasswordResetStep2;
