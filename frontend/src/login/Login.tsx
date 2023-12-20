@@ -48,7 +48,7 @@ function Login(props: Props): JSX.Element {
   return (
     <main>
       <div className="d-flex flex-column mb-3 justify-content-center align-items-center">
-        <form>
+        <div>
           <img className="mb-4 login-img" src={process.env.REACT_APP_API_URL + "/static/login-image"} />
           <h1 className="h3 mb-3 fw-normal text-center">Zaloguj się</h1>
           {(error !== '') && <p className="text-danger text-center">Błąd: {error}</p>}
@@ -62,13 +62,13 @@ function Login(props: Props): JSX.Element {
             <label htmlFor="floatingPassword">Hasło</label>
           </div>
 
-          <div className="checkbox mb-3">
+          {/*<div className="checkbox mb-3">
             <input type="checkbox" name="remember-me" id="rememberMeCheckbox" checked={rememberMe} onChange={(e) => {setRememberMe(e.target.checked)}} />
             <label htmlFor="rememberMeCheckbox">Nie wylogowywuj mnie </label>
-          </div>
-          <button className="w-100 btn btn-lg btn-primary" type="submit" disabled={buttonLock} onClick={onLoginAttempt}>Zaloguj się</button>
+          </div>*/}
+          <button className="w-100 btn btn-lg btn-primary" disabled={buttonLock} onClick={onLoginAttempt}>Zaloguj się</button>
           <p className="mt-3 text-center">Nie masz konta? <Link to="/register">Zarejestruj się</Link>.</p>
-        </form>
+        </div>
       </div>
     </main>
   );

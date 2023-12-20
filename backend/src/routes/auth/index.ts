@@ -199,6 +199,8 @@ router.get('/captcha', async (req: Request, res: Response) => {
 });
 
 router.post('/register', async (req: Request, res: Response) => {
+    res.setTimeout(15000);
+
     if(req.body.email === undefined) {
         fail_missing_params(res, ["email"], null);
         return;
@@ -235,7 +237,7 @@ router.post('/register', async (req: Request, res: Response) => {
     await redis.expire('ratelimit.' + ip + '.auth', 2);*/
 
     const captcha = await redis.get('captcha.' + req.body.captchaId + '.answer');
-    if(captcha === null || captcha !== req.body.captchaAnswer){
+    if(captcha === null || captcha != req.body.captchaAnswer){
         res.status(409).json({
             status: "error",
             message: "wrong or expired captcha",
@@ -347,6 +349,8 @@ router.get('/activate/:activationkey', async (req: Request, res: Response) => {
 });
 
 router.post('/passwordreset', async (req: Request, res: Response) => {
+    res.setTimeout(15000);
+    
     if(req.body.email === undefined) {
         fail_missing_params(res, ["email"], null);
         return;

@@ -18,10 +18,16 @@ function Register(props: Props): JSX.Element {
   const [success, setSuccess] = useState(false);
   const [buttonLock, setButtonLock] = useState(false);
 
-  const onLoginAttempt = async function(){
+  const onRegisterAttempt = async function(){
     setButtonLock(true);
 
-    const response = await fetch(process.env.REACT_APP_API_URL + "/auth/login", {
+    if(password !== password2){
+      setError("Hasła nie pasują do siebie");
+      setButtonLock(false);
+      return;
+    }
+
+    const response = await fetch(process.env.REACT_APP_API_URL + "/auth/register", {
       method: "POST",
       mode: 'same-origin',
       headers: {
@@ -31,13 +37,21 @@ function Register(props: Props): JSX.Element {
         email: email,
         password: password,
         captchaId: captchaID,
-        captchaAnswer: captchaSolution,
+        captchaAnswer: (captchaSolution === undefined ? 0 : captchaSolution),
       })
     });
     setButtonLock(false);
     if(!response.ok){
+      updateCaptchaQuest();
       if(response.status === 409){
-        setError('Ten użytkownik ma już konto');
+        const json = await response.json();
+        if(json.message === 'wrong or expired captcha'){
+          setError('Nie umiesz liczyć?');
+        }else if(json.message === 'user with this email already exists'){
+          setError('Ten użytkownik ma już konto');
+        }else{
+          setError(json.message);
+        }
       }else try {
         const json = await response.json();
         if(response.status === 500){
@@ -82,7 +96,7 @@ function Register(props: Props): JSX.Element {
           <h1 className="h3 mb-3 fw-normal text-center">Udało się!</h1>
           <p>Sprawdź swój email, znajdź naszą wiadomość i kliknij w link, aby aktywować swoje konto.</p>
         </>}
-        {!success && <form>
+        {!success && <div>
           <h1 className="h3 mb-3 fw-normal text-center">Zarejestruj się</h1>
           {(error !== '') && <p className="text-danger text-center">Błąd: {error}</p>}
 
@@ -103,9 +117,9 @@ function Register(props: Props): JSX.Element {
             <label htmlFor="captcha">{captchaQuest}</label>
           </div>
 
-          <button className="w-100 btn btn-lg btn-primary" type="submit" disabled={buttonLock} onClick={onLoginAttempt}>Zaloguj się</button>
+          <button className="w-100 btn btn-lg btn-primary" disabled={buttonLock} onClick={onRegisterAttempt}>Zarejestruj się</button>
           <p className="mt-3 text-center">Masz już konto? <Link to="/login">Zaloguj się</Link>.</p>
-        </form>}
+        </div>}
       </div>
     </main>
   );
