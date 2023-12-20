@@ -32,16 +32,19 @@ model Appointment {
 
 model Attachment {
   id         Int      @id @default(autoincrement())
-  trialdId   Int
-  trial      Trial    @relation(fields: [trialdId], references: [id])
+  trialId   Int?
+  trial      Trial?    @relation(fields: [trialId], references: [id])
   name       String   @db.VarChar(50)
-  content    Bytes    @db.Blob
+  content    Bytes    @db.LongBlob
   created_at DateTime @default(now())
   extension  String?  @db.VarChar(15)
   thumbnail  Bytes?   @db.MediumBlob
 
   @@index([name])
   @@index([created_at])
+
+  @@index([name, trialId])
+  @@unique([name, extension, trialId])
 }
 
 model Quest {

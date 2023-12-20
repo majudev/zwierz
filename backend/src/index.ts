@@ -1,6 +1,6 @@
-import server from './server';
-import logger from './utils/logger';
-import {initDB} from './initdb';
+import server from './server.js';
+import logger from './utils/logger.js';
+import {initDB} from './initdb.js';
 
 import 'dotenv/config';
 

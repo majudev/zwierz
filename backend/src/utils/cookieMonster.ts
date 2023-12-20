@@ -1,7 +1,7 @@
 import {NextFunction, Response, Request} from 'express';
-import logger from './logger';
+import logger from './logger.js';
 import jwt from 'jsonwebtoken';
-import { JWT_SECRET } from '../routes/auth/jwt_secret';
+import { JWT_SECRET } from '../routes/auth/jwt_secret.js';
 
 interface UserAuthObject {
     userId: number;

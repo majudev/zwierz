@@ -1,8 +1,8 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
-import router from './routes';
-import requestLogger from './utils/requestLogger';
-import cookieMonster from './utils/cookieMonster';
+import router from './routes/index.js';
+import requestLogger from './utils/requestLogger.js';
+import cookieMonster from './utils/cookieMonster.js';
 
 const app = express();
 

@@ -3,6 +3,7 @@
   "version": "1.0.1",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "dev": "nodemon src/index.ts",
     "build": "tsc",
@@ -26,6 +27,7 @@
     "@types/cookie-parser": "^1.4.3",
     "@types/cors": "^2.8.13",
     "@types/jsonwebtoken": "^9.0.3",
+    "@types/mime-types": "^2.1.4",
     "@types/simple-oauth2": "^5.0.4",
     "@types/uuid": "^9.0.4",
     "bcrypt": "^5.1.1",

@@ -1,5 +1,5 @@
 import winston from 'winston';
-import colors from '../utils/colors';
+import colors from '../utils/colors.js';
 
 interface ColorMap {
 	[key: string]: string;

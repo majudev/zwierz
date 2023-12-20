@@ -1,12 +1,33 @@
-import logger from './utils/logger';
+import logger from './utils/logger.js';
 import { PrismaClient } from '@prisma/client';
 import { randomBytes } from 'crypto';
 import bcrypt from 'bcrypt';
+import fs from 'fs';
 
 const prisma = new PrismaClient();
 
 export async function initDB(){
     logger.info('Initializing DB');
+
+    const login_image_found = await prisma.attachment.count({
+        where: {
+            name: "login-image",
+            trialId: {
+                equals: null,
+            }
+        }
+    });
+    if(login_image_found === 0){
+        logger.info('Inserting default login image into the database...');
+        await prisma.attachment.create({
+            data: {
+                name: "login-image",
+                trialId: null,
+                extension: "png",
+                content: fs.readFileSync('defaults/logo-default.png'),
+            }
+        });
+    }
 
     const main_scribe_email = await prisma.settings.count({
         where: {
@@ -165,6 +186,54 @@ export async function initDB(){
                 value: "false",
             }
         });
+    }
+
+    const sms_account_found = await prisma.settings.count({
+        where: {
+            key: {
+                equals: "ovhSMS.account"
+            }
+        }
+    }) > 0;
+    if(!sms_account_found){
+        logger.error('Missing ovhSMS.account entry in the database');
+        process.exit(-1);
+    }
+
+    const sms_login_found = await prisma.settings.count({
+        where: {
+            key: {
+                equals: "ovhSMS.login"
+            }
+        }
+    }) > 0;
+    if(!sms_login_found){
+        logger.error('Missing ovhSMS.login entry in the database');
+        process.exit(-1);
+    }
+
+    const sms_password_found = await prisma.settings.count({
+        where: {
+            key: {
+                equals: "ovhSMS.password"
+            }
+        }
+    }) > 0;
+    if(!sms_password_found){
+        logger.error('Missing ovhSMS.password entry in the database');
+        process.exit(-1);
+    }
+
+    const sms_from_found = await prisma.settings.count({
+        where: {
+            key: {
+                equals: "ovhSMS.from"
+            }
+        }
+    }) > 0;
+    if(!sms_from_found){
+        logger.error('Missing ovhSMS.from entry in the database');
+        process.exit(-1);
     }
     
     const postal_baseurl_found = await prisma.settings.count({

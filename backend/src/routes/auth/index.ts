@@ -1,18 +1,18 @@
 import { Router, Request, Response } from 'express';
-import logger from '../../utils/logger';
+import logger from '../../utils/logger.js';
 import { PrismaClient } from '@prisma/client'
 import jwt from 'jsonwebtoken';
 import {v4 as uuidv4} from 'uuid';
-import { JWT_EXPIRATION_MINS, JWT_SECRET } from './jwt_secret';
+import { JWT_EXPIRATION_MINS, JWT_SECRET } from './jwt_secret.js';
 import { randomBytes } from 'crypto';
 import bcrypt from 'bcrypt';
-import { check_login, fail_missing_params, fail_no_permissions, fail_entity_not_found, fail_duplicate_entry, fail_internal_error } from '../../utils/http_code_helper';
-import { generateCaptchaChallenge } from '../../utils/captcha';
-import { getSetting } from '../../utils/settings';
+import { check_login, fail_missing_params, fail_no_permissions, fail_entity_not_found, fail_duplicate_entry, fail_internal_error } from '../../utils/http_code_helper.js';
+import { generateCaptchaChallenge } from '../../utils/captcha.js';
+import { getSetting } from '../../utils/settings.js';
 import { createClient } from 'redis';
 
 import { ClientCredentials, ResourceOwnerPassword, AuthorizationCode } from 'simple-oauth2';
-import sendNotificationEmail from '../../notifier/notify-email';
+import sendNotificationEmail from '../../notifier/notify-email.js';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -162,6 +162,14 @@ async function loginUser(req: Request, res: Response, id: number, email: string)
         //sameSite: "none",
         expires: expirationDate,
     });
+    res.cookie("ZWIERZ_COOKIE_EXP", expirationDate, {
+        secure: true,
+        httpOnly: false,
+        sameSite: "strict",
+        //sameSite: "lax",
+        //sameSite: "none",
+        expires: expirationDate,
+    });
 }
 
 router.get('/captcha', async (req: Request, res: Response) => {
@@ -216,7 +224,7 @@ router.post('/register', async (req: Request, res: Response) => {
     });
     await redis.connect();
 
-    const ip = req.header('CF-Connecting-IP') ?? req.ip;
+    /*const ip = req.header('CF-Connecting-IP') ?? req.ip;
     const ratelimit = await redis.get('ratelimit.' + ip + '.auth');
     if(ratelimit !== null){
         await redis.expire('ratelimit.' + ip + '.auth', 2);
@@ -224,7 +232,7 @@ router.post('/register', async (req: Request, res: Response) => {
         return;
     }
     await redis.set('ratelimit.' + ip + '.auth', 1);
-    await redis.expire('ratelimit.' + ip + '.auth', 2);
+    await redis.expire('ratelimit.' + ip + '.auth', 2);*/
 
     const captcha = await redis.get('captcha.' + req.body.captchaId + '.answer');
     if(captcha === null || captcha !== req.body.captchaAnswer){
@@ -262,8 +270,8 @@ router.post('/register', async (req: Request, res: Response) => {
         return;
     }
 
-    await redis.set('ratelimit.' + ip + '.auth', 1);
-    await redis.expire('ratelimit.' + ip + '.auth', 30);
+    /*await redis.set('ratelimit.' + ip + '.auth', 1);
+    await redis.expire('ratelimit.' + ip + '.auth', 30);*/
 
     const activationkey = randomBytes(30).toString('hex');
     const emailOk = await sendNotificationEmail(
@@ -296,7 +304,7 @@ router.post('/register', async (req: Request, res: Response) => {
 router.get('/activate/:activationkey', async (req: Request, res: Response) => {
     const activationkey = req.params.activationkey;
 
-    const redis = createClient({
+    /*const redis = createClient({
         url: process.env.REDIS_URL,
     });
     await redis.connect();
@@ -309,7 +317,7 @@ router.get('/activate/:activationkey', async (req: Request, res: Response) => {
         return;
     }
     await redis.set('ratelimit.' + ip + '.auth', 1);
-    await redis.expire('ratelimit.' + ip + '.auth', 2);
+    await redis.expire('ratelimit.' + ip + '.auth', 2);*/
 
     const exists = await prisma.user.count({
         where: {
@@ -359,7 +367,7 @@ router.post('/passwordreset', async (req: Request, res: Response) => {
     });
     await redis.connect();
 
-    const ip = req.header('CF-Connecting-IP') ?? req.ip;
+    /*const ip = req.header('CF-Connecting-IP') ?? req.ip;
     const ratelimit = await redis.get('ratelimit.' + ip + '.auth');
     if(ratelimit !== null){
         await redis.expire('ratelimit.' + ip + '.auth', 2);
@@ -367,7 +375,7 @@ router.post('/passwordreset', async (req: Request, res: Response) => {
         return;
     }
     await redis.set('ratelimit.' + ip + '.auth', 1);
-    await redis.expire('ratelimit.' + ip + '.auth', 2);
+    await redis.expire('ratelimit.' + ip + '.auth', 2);*/
 
     const captcha = await redis.get('captcha.' + req.body.captchaId + '.answer');
     if(captcha === null || captcha !== req.body.captchaAnswer){
@@ -405,8 +413,8 @@ router.post('/passwordreset', async (req: Request, res: Response) => {
         return;
     }
 
-    await redis.set('ratelimit.' + ip + '.auth', 1);
-    await redis.expire('ratelimit.' + ip + '.auth', 30);
+    /*await redis.set('ratelimit.' + ip + '.auth', 1);
+    await redis.expire('ratelimit.' + ip + '.auth', 30);*/
 
     const pwdresetkey = randomBytes(30).toString('hex');
     const emailOk = await sendNotificationEmail(
@@ -455,7 +463,7 @@ router.post('/login', async (req: Request, res: Response) => {
         return;
     }
 
-    const redis = createClient({
+    /*const redis = createClient({
         url: process.env.REDIS_URL,
     });
     await redis.connect();
@@ -474,7 +482,7 @@ router.post('/login', async (req: Request, res: Response) => {
     }else{
         await redis.set('ratelimit.' + ip + '.auth', 1);
         await redis.expire('ratelimit.' + ip + '.auth', 2);
-    }
+    }*/
 
     const email = req.body.email;
     const password = req.body.password;
@@ -502,7 +510,7 @@ router.post('/login', async (req: Request, res: Response) => {
     if(userObject === null) {
         res.status(401).json({
             status: "error",
-            message: "user does not exist",
+            message: "user does not exist or wrong password",
         });
         logger.debug("User " + email + " does not exist");
         return;
@@ -511,7 +519,7 @@ router.post('/login', async (req: Request, res: Response) => {
     if(userObject.password === null || !(await bcrypt.compare(password, userObject.password))) {
         res.status(401).json({
             status: "error",
-            message: "wrong password",
+            message: "user does not exist or wrong password",
         });
         logger.debug("User " + email + " has provided bad password");
         return;
@@ -533,6 +541,14 @@ router.get('/logout', async (req: Request, res: Response) => {
     res.cookie("ZWIERZ_COOKIE", 'none', {
         secure: true,
         httpOnly: true,
+        sameSite: "strict",
+        //sameSite: "lax",
+        //sameSite: "none",
+        expires: expirationDate,
+    });
+    res.cookie("ZWIERZ_COOKIE_EXP", expirationDate, {
+        secure: true,
+        httpOnly: false,
         sameSite: "strict",
         //sameSite: "lax",
         //sameSite: "none",
