@@ -163,7 +163,7 @@ async function loginUser(req: Request, res: Response, id: number, email: string)
         //sameSite: "none",
         expires: expirationDate,
     });
-    res.cookie("ZWIERZ_COOKIE_EXP", expirationDate, {
+    res.cookie("ZWIERZ_COOKIE_EXP", Math.floor(expirationDate.getTime()/1000), {
         secure: true,
         httpOnly: false,
         sameSite: "strict",
@@ -652,7 +652,7 @@ router.get('/logout', async (req: Request, res: Response) => {
         //sameSite: "none",
         expires: expirationDate,
     });
-    res.cookie("ZWIERZ_COOKIE_EXP", expirationDate, {
+    res.cookie("ZWIERZ_COOKIE_EXP", Math.floor(expirationDate.getTime()/1000), {
         secure: true,
         httpOnly: false,
         sameSite: "strict",

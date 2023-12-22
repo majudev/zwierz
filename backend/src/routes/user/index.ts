@@ -2,7 +2,7 @@ import { Router, Request, Response } from 'express';
 import logger from '../../utils/logger.js';
 import { PrismaClient } from '@prisma/client';
 import { check_login, fail_missing_params, fail_no_permissions, fail_entity_not_found } from '../../utils/http_code_helper.js';
-import { user_is_commitee_member, user_is_commitee_scribe, user_is_uberadmin } from '../../utils/permissionsHelper.js';
+import { user_is_commitee_member, user_is_commitee_scribe, user_is_ho_commitee_scribe, user_is_hr_commitee_scribe, user_is_uberadmin } from '../../utils/permissionsHelper.js';
 import bcrypt from 'bcrypt';
 
 const router = Router();
@@ -82,7 +82,7 @@ const prisma = new PrismaClient();
     }).end();
 });*/
 
-router.get('/:id', async (req: Request, res: Response) => {
+router.get('/:userId', async (req: Request, res: Response) => {
     if(!check_login(res)) return;
 
     if(req.params.id === 'all'){
@@ -97,7 +97,9 @@ router.get('/:id', async (req: Request, res: Response) => {
                 name: true,
                 email: true,
                 rank: true,
-                commitee: true,
+                role_HO: true,
+                role_HR: true,
+                uberadmin: true,
                 phone: true,
                 team: {
                     select: {
@@ -122,7 +124,10 @@ router.get('/:id', async (req: Request, res: Response) => {
 
                 trials: {
                     select: {
-                        id: true,
+                        type: true,
+                        open_date: true,
+                        close_date: true,
+                        predicted_closing_date: true,
                     }
                 }
             },
@@ -135,7 +140,7 @@ router.get('/:id', async (req: Request, res: Response) => {
         return;
     }
 
-    var userId: number = parseInt(req.params.id === 'me' ? res.locals.auth_user.userId : req.params.id);
+    var userId: number = parseInt(req.params.userId === 'me' ? res.locals.auth_user.userId : req.params.userId);
 
     if(Number.isNaN(userId)) {
         fail_missing_params(res, ["userId"], null);
@@ -161,7 +166,9 @@ router.get('/:id', async (req: Request, res: Response) => {
             name: true,
             email: true,
             rank: true,
-            commitee: true,
+            role_HO: true,
+            role_HR: true,
+            uberadmin: true,
             phone: true,
             team: {
                 select: {
@@ -186,7 +193,10 @@ router.get('/:id', async (req: Request, res: Response) => {
 
             trials: {
                 select: {
-                    id: true,
+                    type: true,
+                    open_date: true,
+                    close_date: true,
+                    predicted_closing_date: true,
                 }
             }
         },
@@ -203,7 +213,7 @@ router.get('/:id', async (req: Request, res: Response) => {
     }).end();
 });
 
-/*router.patch('/:userId', async (req: Request, res: Response) => {
+router.patch('/:userId', async (req: Request, res: Response) => {
     if(!check_login(res)) return;
 
     const userId: number = parseInt(req.params.userId);
@@ -233,17 +243,34 @@ router.get('/:id', async (req: Request, res: Response) => {
     const {
         id: _,
         uberadmin: __,
-        roleMappings: ___,
+        activationkey: ___,
+        role_HO: ____,
         email: _____,
         sso: ______,
         pwdresetkey: _______,
         phoneVerifyKey: ________,
         created: _________,
+        role_HR: __________,
+        disabled: ___________,
+        shadow: ____________,
+        interests: interests,
         password: password,
         ...updateQuery
     } = req.body;
     if((await user_is_uberadmin(res.locals.auth_user.userId)) && 'uberadmin' in req.body){
         updateQuery.uberadmin = req.body.uberadmin;
+    }
+    if((await user_is_uberadmin(res.locals.auth_user.userId)) && 'shadow' in req.body){
+        updateQuery.shadow = req.body.shadow;
+    }
+    if((await user_is_uberadmin(res.locals.auth_user.userId)) && 'disabled' in req.body){
+        updateQuery.disabled = req.body.disabled;
+    }
+    if((await user_is_uberadmin(res.locals.auth_user.userId) || await user_is_ho_commitee_scribe(res.locals.auth_user.userId)) && 'role_HO' in req.body){
+        updateQuery.role_HO = req.body.role_HO;
+    }
+    if((await user_is_uberadmin(res.locals.auth_user.userId) || await user_is_hr_commitee_scribe(res.locals.auth_user.userId)) && 'role_HR' in req.body){
+        updateQuery.role_HR = req.body.role_HR;
     }
     if(password !== undefined && password !== null){
         updateQuery.password = await bcrypt.hash(password, 14);
@@ -252,6 +279,22 @@ router.get('/:id', async (req: Request, res: Response) => {
     if(updateQuery === undefined || Object.keys(updateQuery).length == 0){
         fail_missing_params(res, [], "no body provided");
         return;
+    }
+
+    if(interests.length > 0){
+        await prisma.userInterest.deleteMany({
+            where: {
+                userId: userId,
+            }
+        });
+        await Array.from(interests).forEach(async (value) => {
+            await prisma.userInterest.create({
+                data: {
+                    userId: userId,
+                    text: (value as {text: string}).text,
+                }
+            });
+        });
     }
 
     const updatedObject = await prisma.user.update({
@@ -263,26 +306,40 @@ router.get('/:id', async (req: Request, res: Response) => {
             id: true,
             name: true,
             email: true,
+            rank: true,
+            role_HO: true,
+            role_HR: true,
             uberadmin: true,
             phone: true,
-
-            roleMappings: {
+            team: {
                 select: {
-                    role: true,
-                    organization: {
-                        select: {
-                            id: true,
-                            name: true,
-                        }
-                    }
+                    id: true,
+                    name: true,
+                    archived: true,
                 }
             },
+            interests: {
+                select: {
+                    text: true,
+                }
+            },
+            function: true,
 
             enableEmailNotifications: true,
             enableSMSNotifications: true,
-
+            
             sso: true,
             disabled: true,
+            shadow: true,
+
+            trials: {
+                select: {
+                    type: true,
+                    open_date: true,
+                    close_date: true,
+                    predicted_closing_date: true,
+                }
+            }
         },
     });
 
@@ -290,7 +347,7 @@ router.get('/:id', async (req: Request, res: Response) => {
         status: "success",
         data: updatedObject
     }).end();
-});*/
+});
 
 const validateEmail = (email: string) => {
     return String(email)

@@ -315,10 +315,21 @@ export async function initDB(){
                 email: 'admin@dummy.local',
                 password: password,
                 name: 'Admin',
-                commitee: 'UBERADMIN',
+                uberadmin: true,
             }
         });
     }else logger.debug('' + users_count + ' users exist in the database, not adding default one');
+
+    const teams_count = await prisma.team.count();
+    if(teams_count === 0){
+        logger.info('Adding default team');
+        const team = await prisma.team.create({
+            data: {
+                name: "Inna",
+                archived: false,
+            }
+        });
+    }else logger.debug('' + teams_count + ' teams exist in database, not adding default one');
 }
 
 export default initDB;
