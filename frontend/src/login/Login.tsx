@@ -30,6 +30,18 @@ function Login(props: Props): JSX.Element {
     }else if(query.get("activate") === 'error'){
       setActivationError(query.get("message") as string);
     }
+
+    // Submit form using Enter key
+    const listener = (event: KeyboardEvent) => {
+      if (event.code === "Enter" || event.code === "NumpadEnter") {
+        event.preventDefault();
+        document.getElementById('submit')?.click();
+      }
+    };
+    document.addEventListener("keydown", listener);
+    return () => {
+      document.removeEventListener("keydown", listener);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -86,7 +98,7 @@ function Login(props: Props): JSX.Element {
             <input type="checkbox" name="remember-me" id="rememberMeCheckbox" checked={rememberMe} onChange={(e) => {setRememberMe(e.target.checked)}} />
             <label htmlFor="rememberMeCheckbox">Nie wylogowywuj mnie </label>
           </div>*/}
-          <button className="w-100 btn btn-lg btn-primary" disabled={buttonLock} onClick={onLoginAttempt}>Zaloguj się</button>
+          <button className="w-100 btn btn-lg btn-primary" disabled={buttonLock} onClick={onLoginAttempt} id="submit">Zaloguj się</button>
           <p className="mt-3 text-center">Nie masz konta? <Link to="/register">Zarejestruj się</Link>.</p>
           <p className="mt-3 text-center">Zapomniałeś hasła? <Link to="/passwordreset">Zresetuj je</Link>.</p>
         </div>

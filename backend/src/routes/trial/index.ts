@@ -3,9 +3,13 @@ import logger from '../../utils/logger.js';
 import { PrismaClient, TrialType } from '@prisma/client';
 import { check_login, fail_missing_params, fail_no_permissions, fail_entity_not_found } from '../../utils/http_code_helper.js';
 import { user_is_commitee_member, user_is_commitee_scribe, user_is_ho_commitee_member, user_is_ho_commitee_scribe, user_is_hr_commitee_member, user_is_hr_commitee_scribe, user_is_uberadmin } from '../../utils/permissionsHelper.js';
+import { verifyPhone } from '../../utils/validationtools.js';
+import questsRouter from './quests.js';
 
 const router = Router();
 const prisma = new PrismaClient();
+
+router.use('/quests', questsRouter);
 
 router.post('/new/:type(ho|hr)', async (req: Request, res: Response) => {
     if(!check_login(res)) return;
@@ -42,6 +46,14 @@ router.post('/new/:type(ho|hr)', async (req: Request, res: Response) => {
         close_date: _________,
         ...createQuery
     } = req.body;
+    createQuery.mentor_phone = createQuery.mentor_phone.replaceAll(' ', '').replaceAll('-', '');
+    if(!verifyPhone(createQuery.mentor_phone)){
+        res.status(400).json({
+            status: "error",
+            message: "invalid phone",
+        });
+        return;
+    }
 
     const trial = await prisma.trial.create({
         data: {
@@ -215,6 +227,16 @@ router.patch('/:type(ho|hr)', async (req: Request, res: Response) => {
         type: __________,
         ...updateQuery
     } = req.body;
+    if(updateQuery.mentor_phone !== undefined){
+        updateQuery.mentor_phone = updateQuery.mentor_phone.replaceAll(' ', '').replaceAll('-', '');
+        if(!verifyPhone(updateQuery.mentor_phone)){
+            res.status(400).json({
+                status: "error",
+                message: "invalid phone",
+            });
+            return;
+        }
+    }
 
     if(updateQuery === undefined || Object.keys(updateQuery).length == 0){
         fail_missing_params(res, [], "no body provided");
@@ -240,59 +262,6 @@ router.patch('/:type(ho|hr)', async (req: Request, res: Response) => {
             mentor_phone: true,
             predicted_closing_date: true,
 
-            archived: true,
-        },
-    });
-
-    res.status(200).json({
-        status: "success",
-        data: updatedObject
-    }).end();
-});
-
-router.patch('/:type(ho|hr)', async (req: Request, res: Response) => {
-    if(!check_login(res)) return;
-    if(!(await user_is_uberadmin(res.locals.auth_user.userId)) && !(await user_is_commitee_scribe(res.locals.auth_user.userId))){
-        fail_no_permissions(res, "you don't have permissions to edit teams");
-        return;
-    }
-
-    const teamId: number = parseInt(req.params.teamId);
-
-    if(Number.isNaN(teamId)) {
-        fail_missing_params(res, ["teamId"], null);
-        return;
-    }
-
-    const exists = await prisma.team.count({
-        where: {
-            id: teamId,
-        }
-    }) > 0;
-
-    if(!exists){
-        fail_entity_not_found(res, "team with id " + teamId + " not found");
-        return;
-    }
-
-    const {
-        id: _,
-        ...updateQuery
-    } = req.body;
-
-    if(updateQuery === undefined || Object.keys(updateQuery).length == 0){
-        fail_missing_params(res, [], "no body provided");
-        return;
-    }
-
-    const updatedObject = await prisma.team.update({
-        where: {
-            id: teamId,
-        },
-        data: updateQuery,
-        select: {
-            id: true,
-            name: true,
             archived: true,
         },
     });

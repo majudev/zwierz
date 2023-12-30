@@ -91,6 +91,19 @@ function PasswordResetStep2(props: Props): JSX.Element {
 
   useEffect(() => {
     updateCaptchaQuest();
+
+    // Submit form using Enter key
+    const listener = (event: KeyboardEvent) => {
+      if (event.code === "Enter" || event.code === "NumpadEnter") {
+        event.preventDefault();
+        document.getElementById('submit')?.click();
+      }
+    };
+    document.addEventListener("keydown", listener);
+    return () => {
+      document.removeEventListener("keydown", listener);
+    };
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -118,7 +131,7 @@ function PasswordResetStep2(props: Props): JSX.Element {
             <label htmlFor="captcha">{captchaQuest}</label>
           </div>
 
-          <button className="w-100 btn btn-lg btn-primary" disabled={buttonLock} onClick={onChangePasswordAttempt}>Zresetuj hasło</button>
+          <button className="w-100 btn btn-lg btn-primary" disabled={buttonLock} onClick={onChangePasswordAttempt} id="submit">Zresetuj hasło</button>
         </div>}
       </div>
     </main>

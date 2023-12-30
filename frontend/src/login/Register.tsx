@@ -95,6 +95,19 @@ function Register(props: Props): JSX.Element {
 
   useEffect(() => {
     updateCaptchaQuest();
+
+    // Submit form using Enter key
+    const listener = (event: KeyboardEvent) => {
+      if (event.code === "Enter" || event.code === "NumpadEnter") {
+        event.preventDefault();
+        document.getElementById('submit')?.click();
+      }
+    };
+    document.addEventListener("keydown", listener);
+    return () => {
+      document.removeEventListener("keydown", listener);
+    };
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -126,7 +139,7 @@ function Register(props: Props): JSX.Element {
             <label htmlFor="captcha">{captchaQuest}</label>
           </div>
 
-          <button className="w-100 btn btn-lg btn-primary" disabled={buttonLock} onClick={onRegisterAttempt}>Zarejestruj się</button>
+          <button className="w-100 btn btn-lg btn-primary" disabled={buttonLock} onClick={onRegisterAttempt} id="submit">Zarejestruj się</button>
           <p className="mt-3 text-center">Masz już konto? <Link to="/login">Zaloguj się</Link>.</p>
         </div>}
       </div>

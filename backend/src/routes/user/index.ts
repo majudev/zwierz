@@ -4,6 +4,7 @@ import { PrismaClient } from '@prisma/client';
 import { check_login, fail_missing_params, fail_no_permissions, fail_entity_not_found } from '../../utils/http_code_helper.js';
 import { user_is_commitee_member, user_is_commitee_scribe, user_is_ho_commitee_scribe, user_is_hr_commitee_scribe, user_is_uberadmin } from '../../utils/permissionsHelper.js';
 import bcrypt from 'bcrypt';
+import { verifyPhone } from '../../utils/validationtools.js';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -274,6 +275,16 @@ router.patch('/:userId', async (req: Request, res: Response) => {
     }
     if(password !== undefined && password !== null){
         updateQuery.password = await bcrypt.hash(password, 14);
+    }
+    if(updateQuery.phone !== undefined){
+        updateQuery.phone = updateQuery.phone.replaceAll(' ', '').replaceAll('-', '');
+        if(!verifyPhone(updateQuery.phone)){
+            res.status(400).json({
+                status: "error",
+                message: "invalid phone",
+            });
+            return;
+        }
     }
 
     if(updateQuery === undefined || Object.keys(updateQuery).length == 0){

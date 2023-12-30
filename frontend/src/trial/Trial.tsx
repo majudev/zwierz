@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { TrialType, CommiteeRole, Rank, SSOManager } from '../types';
-import { predictedDateToString, stringToPredictedDate } from '../utils';
+import { predictedDateToString, stringToPredictedDate, verifyPhone } from '../utils';
 
 interface Props {
   loggedIn: boolean;
@@ -27,6 +27,13 @@ function Trial({ type }: Props): JSX.Element {
 
   const [selectableDates, setSelectableDates] = useState<Array<Date>>([]);
 
+  const [newQuestContent, setNewQuestContent] = useState('');
+  const [newQuestFinishDate, setNewQuestFinishDate] = useState(new Date());
+  const [newQuestVisible, setNewQuestVisible] = useState(false);
+  const [newQuestButtonlock, setNewQuestButtonLock] = useState(false);
+
+  const [quests, setQuests] = useState<Array<{id: number; content: string; finish_date: Date, editmode: boolean}>>([]);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -42,7 +49,7 @@ function Trial({ type }: Props): JSX.Element {
     setEditmode(false);
     setButtonLock(false);
     
-    refreshData();
+    refreshTrialData();
 
     var dates = Array<Date>();
     for(var i = 0; i < 14; ++i){
@@ -54,7 +61,7 @@ function Trial({ type }: Props): JSX.Element {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [type]);
 
-  const refreshData = async function(){
+  const refreshTrialData = async function(){
     const response = await fetch(process.env.REACT_APP_API_URL + "/trial/me/" + type.toLowerCase(), {
       method: "GET",
       mode: 'same-origin',
@@ -69,6 +76,8 @@ function Trial({ type }: Props): JSX.Element {
         return;
       }
     }
+    refreshQuestsData();
+    
     setInitMode(false);
     const body = await response.json();
     setUserID(body.data.userId);
@@ -81,7 +90,20 @@ function Trial({ type }: Props): JSX.Element {
     setArchived(body.data.archived);
   }
 
-  const onUpdateAttempt = async function(){
+  const refreshQuestsData = async function(){
+    const response = await fetch(process.env.REACT_APP_API_URL + "/trial/quests/me/" + type.toLowerCase(), {
+      method: "GET",
+      mode: 'same-origin',
+    });
+    if(!response.ok){
+      alert('Cannot fetch trial details');
+      return;
+    }
+    const body = await response.json() as {status:string; data: Array<{id: number; content: string; finish_date: string}>};
+    setQuests(body.data.map((e) => {return {...e, finish_date: new Date(e.finish_date), editmode: false}}));
+  }
+
+  const onTrialUpdateAttempt = async function(){
     setButtonLock(true);
 
     const URLinsert = initMode ? 'new/' : '';
@@ -101,12 +123,76 @@ function Trial({ type }: Props): JSX.Element {
       })
     });
     setButtonLock(false);
-    refreshData();
+    refreshTrialData();
     if(!response.ok){
       alert('Cannot update details');
       return;
     }
     setEditmode(false);
+  };
+
+  const onQuestCreateAttempt = async function(){
+    setNewQuestButtonLock(true);
+
+    const response = await fetch(process.env.REACT_APP_API_URL + "/trial/quests/new/" + type.toLowerCase(), {
+      method: 'POST',
+      mode: 'same-origin',
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        content: newQuestContent,
+        finish_date: newQuestFinishDate,
+      })
+    });
+    setNewQuestButtonLock(false);
+    if(!response.ok){
+      alert('Cannot update details');
+      return;
+    }
+    const body = await response.json();
+    setNewQuestVisible(false);
+    var newArray = [...quests];
+    newArray.push({
+      ...body.data,
+      finish_date: new Date(body.data.finish_date),
+      editmode: false,
+    });
+    setQuests(newArray);
+  };
+
+  const onQuestUpdateAttempt = async function(index: number){
+    const response = await fetch(process.env.REACT_APP_API_URL + "/trial/quests/" + quests[index].id, {
+      method: 'PATCH',
+      mode: 'same-origin',
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        content: quests[index].content,
+        finish_date: quests[index].finish_date,
+      })
+    });
+    if(!response.ok){
+      refreshQuestsData();
+      alert('Cannot update quest');
+      return;
+    }
+  };
+
+  const onQuestDeleteAttempt = async function(id: number){
+    const response = await fetch(process.env.REACT_APP_API_URL + "/trial/quests/" + id, {
+      method: 'DELETE',
+      mode: 'same-origin',
+      headers: {
+        "Content-Type": "application/json",
+      }
+    });
+    if(!response.ok){
+      refreshQuestsData();
+      alert('Cannot update quest');
+      return;
+    }
   };
 
   /*const nameConverter = function() {
@@ -121,14 +207,6 @@ function Trial({ type }: Props): JSX.Element {
     else if(rank === Rank.PHM_HR) return 'phm. ' + name + ' HR';
     else if(rank === Rank.HM_HR) return 'hm. ' + name + ' HR';
     else return name;
-  }
-
-  const runTutorial = function() {
-    return name == '' ||
-    phone == '' ||
-    interests.length == 0 ||
-    fn == '' ||
-    teamName == '';
   }*/
 
   return (
@@ -152,37 +230,68 @@ function Trial({ type }: Props): JSX.Element {
                       </tr>
                     </thead>
                     <tbody id="quest_table">
-                      <tr>
+                      {
+                        quests.map((quest, index) => {
+                          return <tr>
+                          <td className="nowrap" scope="row">{index+1}</td>
+                          <td>
+                            {!quest.editmode && quest.content}
+                            {quest.editmode && <textarea className="form-control longrecord" value={quest.content} onChange={(e) => {var newArray = [...quests]; newArray[index].content = e.target.value; setQuests(newArray)}}></textarea>}
+                          </td>
+                          <td className="text-center nowrap">
+                            {!quest.editmode && predictedDateToString(quest.finish_date)}
+                            {quest.editmode && 
+                              <select value={predictedDateToString(quest.finish_date)} onChange={(e) => {var newArray = [...quests]; newArray[index].finish_date = stringToPredictedDate(e.target.value); setQuests(newArray)}}>
+                                {
+                                  selectableDates.map((date) => {
+                                    return <option value={predictedDateToString(date)}>{predictedDateToString(date)}</option>
+                                  })
+                                }
+                              </select>
+                            }
+                          </td>
+                          <td className="nowrap">
+                            {!quest.editmode && <button type="button" className="btn btn-dark" onClick={(e) => {var newArray = [...quests]; newArray[index].editmode = true; setQuests(newArray)}}>
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-pencil-fill" viewBox="0 0 16 16">
+                                <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708l-3-3zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207l6.5-6.5zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11l.178-.178z"/>
+                              </svg>
+                            </button>}
+                            {quest.editmode && <>
+                              <button type="button" className="btn btn-danger" onClick={(e) => {var newArray = [...quests]; newArray.splice(index, 1); setQuests(newArray); onQuestDeleteAttempt(quest.id)}}>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-x-square" viewBox="0 0 16 16"><path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"></path><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"></path></svg>
+                              </button>
+                              <button type="button" className="btn btn-success" onClick={(e) => {var newArray = [...quests]; newArray[index].editmode = false; setQuests(newArray); onQuestUpdateAttempt(index)}}>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-check-lg" viewBox="0 0 16 16"><path d="M13.485 1.431a1.473 1.473 0 0 1 2.104 2.062l-7.84 9.801a1.473 1.473 0 0 1-2.12.04L.431 8.138a1.473 1.473 0 0 1 2.084-2.083l4.111 4.112 6.82-8.69a.486.486 0 0 1 .04-.045z"></path></svg>
+                              </button>
+                            </>}
+                          </td>
+                        </tr>
+                        })
+                      }
+                      {newQuestVisible && <tr>
                         <td className="nowrap" scope="row">1</td>
-                        <td>Będę się mył raz w tygodniu</td>
-                        <td className="text-center nowrap">czerwiec 2026</td>
-                        <td className="nowrap">
-                          <button type="button" className="btn btn-dark">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-pencil-fill" viewBox="0 0 16 16">
-                              <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708l-3-3zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207l6.5-6.5zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11l.178-.178z"/>
-                            </svg>
-                          </button>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td className="nowrap" scope="row">1</td>
-                        <td><textarea id="newquest_textbox" className="longrecord"></textarea></td>
+                        <td><textarea className="form-control longrecord" value={newQuestContent} onChange={(e) => setNewQuestContent(e.target.value)}></textarea></td>
                         <td className="text-center nowrap">
-                          <select id="newquest_date_select">
-                          </select>
+                        <select value={predictedDateToString(newQuestFinishDate)} onChange={(e) => setNewQuestFinishDate(stringToPredictedDate(e.target.value))}>
+                          {
+                            selectableDates.map((date) => {
+                              return <option value={predictedDateToString(date)}>{predictedDateToString(date)}</option>
+                            })
+                          }
+                        </select>
                         </td>
                         <td className="nowrap">
-                          <button type="button" className="btn btn-dark">
+                          <button type="button" className="btn btn-dark" onClick={onQuestCreateAttempt}>
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-check-lg" viewBox="0 0 16 16">
                               <path d="M13.485 1.431a1.473 1.473 0 0 1 2.104 2.062l-7.84 9.801a1.473 1.473 0 0 1-2.12.04L.431 8.138a1.473 1.473 0 0 1 2.084-2.083l4.111 4.112 6.82-8.69a.486.486 0 0 1 .04-.045z"/>
                             </svg>
                           </button>
                         </td>
-                      </tr>
+                      </tr>}
                     </tbody>
                   </table>
                   <div className="d-flex justify-content-end flex-row">
-                    <button type="button" className="btn btn-dark">Dodaj nowe</button>
+                    <button type="button" className="btn btn-dark" disabled={newQuestVisible} onClick={() => {setNewQuestContent(''); setNewQuestFinishDate(new Date()); setNewQuestVisible(true)}}>Dodaj nowe</button>
                     <div className="p-2"></div>
                     <button type="button" className="btn btn-dark" id="download_trial_pdf">Pobierz PDF próby</button>
                   </div>
@@ -204,7 +313,7 @@ function Trial({ type }: Props): JSX.Element {
                 {!editmode && <><b>Opiekun:</b> {mentorName}</>}
                 {editmode && <>
                   <b>Opiekun:</b>
-                  <input type="text" value={mentorName} onChange={(e) => setMentorName(e.target.value)}/>
+                  <input type="text" className="form-control" value={mentorName} onChange={(e) => setMentorName(e.target.value)}/>
                   <p><i>To pole zaktualizuje się automatycznie, jeśli opiekun ma konto w tej kapitule założone na e-mail który podałeś poniżej</i></p>
                 </>}
               </li>
@@ -212,14 +321,15 @@ function Trial({ type }: Props): JSX.Element {
                 {!editmode && <><b>E-mail opiekuna:</b> {mentorEmail}</>}
                 {editmode && <>
                   <b>E-mail opiekuna:</b>
-                  <input type="text" value={mentorEmail} onChange={(e) => setMentorEmail(e.target.value)}/>
+                  <input type="text" className="form-control" value={mentorEmail} onChange={(e) => setMentorEmail(e.target.value)}/>
                 </>}
               </li>
               <li className="list-group-item">
                 {!editmode && <><b>Telefon opiekuna:</b> {mentorPhone}</>}
                 {editmode && <>
                   <b>Telefon opiekuna:</b>
-                  <input type="text" value={mentorPhone} onChange={(e) => setMentorPhone(e.target.value)}/>
+                  <input type="text" className={verifyPhone(mentorPhone) ? "form-control" : "form-control invalid"} value={mentorPhone} onChange={(e) => setMentorPhone(e.target.value)}/>
+                  {!verifyPhone(mentorPhone) && <i>Zacznij od +48</i>}
                 </>}
                 <p><i>To pole zaktualizuje się automatycznie, jeśli opiekun ma konto w tej kapitule założone na e-mail który podałeś powyżej</i></p>
               </li>
@@ -247,8 +357,8 @@ function Trial({ type }: Props): JSX.Element {
               </li>}
               <li className="list-group-item d-flex justify-content-end flex-row">
                 {!editmode && <button type="button" className="btn btn-dark" onClick={(e) => setEditmode(true)} disabled={buttonlock || archived}>Edytuj</button>}
-                {editmode && <button type="button" className="btn btn-dark" onClick={onUpdateAttempt} disabled={buttonlock || archived}>Zapisz</button>}
-                {editmode && <button type="button" className="btn btn-light" onClick={(e) => {setEditmode(false); refreshData();}} disabled={buttonlock}>Anuluj</button>}
+                {editmode && <button type="button" className="btn btn-dark" onClick={onTrialUpdateAttempt} disabled={buttonlock || archived || !verifyPhone(mentorPhone)}>Zapisz</button>}
+                {editmode && <button type="button" className="btn btn-light" onClick={(e) => {setEditmode(false); refreshTrialData();}} disabled={buttonlock}>Anuluj</button>}
               </li>
             </ul>
           </div>

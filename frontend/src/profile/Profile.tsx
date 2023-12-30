@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { TrialType, CommiteeRole, Rank, SSOManager } from '../types';
+import { verifyPhone } from '../utils';
 
 interface Props {
   loggedIn: boolean;
@@ -172,19 +173,21 @@ function Profile(props: Props): JSX.Element {
                 {!editmode && <><b>Imię i nazwisko:</b> {nameConverter()}</>}
                 {editmode && <>
                   <b>Imię i nazwisko:</b>
-                  <select value={rank} onChange={(e) => setRank(e.target.value as Rank)}>
-                    <option value={Rank.NONE}>druh</option>
-                    <option value={Rank.MLODZIK}>młodzik</option>
-                    <option value={Rank.WYWIADOWCA}>wywiadowca</option>
-                    <option value={Rank.CWIK}>ćwik</option>
-                    <option value={Rank.HO}>HO</option>
-                    <option value={Rank.PWD_HO}>pwd. HO</option>
-                    <option value={Rank.HR}>HR</option>
-                    <option value={Rank.PWD_HR}>pwd. HR</option>
-                    <option value={Rank.PHM_HR}>phm. HR</option>
-                    <option value={Rank.HM_HR}>hm. HR</option>
-                  </select>
-                  <input type="text" value={name} onChange={(e) => setName(e.target.value)} />
+                  <div className="input-group">
+                    <select className="form-select" value={rank} onChange={(e) => setRank(e.target.value as Rank)} style={{maxWidth: "9rem"}}>
+                      <option value={Rank.NONE}>druh</option>
+                      <option value={Rank.MLODZIK}>młodzik</option>
+                      <option value={Rank.WYWIADOWCA}>wywiadowca</option>
+                      <option value={Rank.CWIK}>ćwik</option>
+                      <option value={Rank.HO}>HO</option>
+                      <option value={Rank.PWD_HO}>pwd. HO</option>
+                      <option value={Rank.HR}>HR</option>
+                      <option value={Rank.PWD_HR}>pwd. HR</option>
+                      <option value={Rank.PHM_HR}>phm. HR</option>
+                      <option value={Rank.HM_HR}>hm. HR</option>
+                    </select>
+                    <input type="text" className="form-control" value={name} onChange={(e) => setName(e.target.value)} />
+                  </div>
                 </>}
               </li>
               <li className="list-group-item">
@@ -194,14 +197,15 @@ function Profile(props: Props): JSX.Element {
                 {!editmode && <><b>Telefon:</b> {phone}</>}
                 {editmode && <>
                   <b>Telefon:</b>
-                  <input type="text" value={phone} onChange={(e) => setPhone(e.target.value)}/>
+                  <input type="text" className={verifyPhone(phone) ? "form-control" : "form-control invalid"} value={phone} onChange={(e) => setPhone(e.target.value)}/>
+                  {!verifyPhone(phone) && <i>Zacznij od +48</i>}
                 </>}
               </li>
               <li className="list-group-item">
                 {!editmode && <><b>Drużyna:</b> {teamName}</>}
                 {editmode && <>
                   <b>Drużyna:</b>
-                  <select value={teamID} onChange={(e) => setTeamID(Number.parseInt(e.target.value))}>
+                  <select className="form-select" value={teamID} onChange={(e) => setTeamID(Number.parseInt(e.target.value))}>
                     {
                       teams.map((value) => {
                         return <option value={value.id} disabled={value.archived}>{value.name}</option>
@@ -214,7 +218,7 @@ function Profile(props: Props): JSX.Element {
                 {!editmode && <><b>Funkcja:</b> {fn}</>}
                 {editmode && <>
                   <b>Funkcja:</b>
-                  <input type="text" value={fn} onChange={(e) => setFn(e.target.value)}/>
+                  <input type="text" className="form-control" value={fn} onChange={(e) => setFn(e.target.value)}/>
                 </>}
               </li>
               <li className="list-group-item">
@@ -225,7 +229,7 @@ function Profile(props: Props): JSX.Element {
                       if(!editmode)
                         return <li>{interest}</li>;
                       else
-                        return <input type="text" value={interest} onChange={(e) => {var newArray = [...interests]; newArray[index] = e.target.value; setInterests(newArray)}}/>
+                        return <li><input type="text" className="form-control" value={interest} onChange={(e) => {var newArray = [...interests]; newArray[index] = e.target.value; setInterests(newArray)}}/></li>
                     })
                   }
                   {editmode && <li><button className="btn btn-sm btn-dark" onClick={(e) => {setInterests([...interests, ''])}}>Dodaj kolejne</button></li>}
@@ -234,7 +238,7 @@ function Profile(props: Props): JSX.Element {
               <li className="list-group-item d-flex justify-content-end flex-row">
                 {!editmode && <button type="button" className="btn btn-dark" onClick={(e) => setEditmode(true)} disabled={buttonlock}>Edytuj</button>}
                 {editmode && <>
-                  <button type="button" className="btn btn-dark" onClick={onUpdateAttempt} disabled={buttonlock}>Zapisz</button>
+                  <button type="button" className="btn btn-dark" onClick={onUpdateAttempt} disabled={buttonlock || !verifyPhone(phone)}>Zapisz</button>
                   <button type="button" className="btn btn-light" onClick={(e) => {setEditmode(false); refreshData();}} disabled={buttonlock}>Anuluj</button>
                 </>}
               </li>
