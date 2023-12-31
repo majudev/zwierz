@@ -3,7 +3,6 @@ import logger from '../../utils/logger.js';
 import { PrismaClient, TrialType } from '@prisma/client';
 import { check_login, fail_missing_params, fail_no_permissions, fail_entity_not_found } from '../../utils/http_code_helper.js';
 import { user_is_commitee_member, user_is_commitee_scribe, user_is_ho_commitee_member, user_is_ho_commitee_scribe, user_is_hr_commitee_member, user_is_hr_commitee_scribe, user_is_uberadmin } from '../../utils/permissionsHelper.js';
-import { verifyPhone } from '../../utils/validationtools.js';
 
 const router = Router();
 const prisma = new PrismaClient();

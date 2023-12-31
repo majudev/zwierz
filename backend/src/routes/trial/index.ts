@@ -5,11 +5,13 @@ import { check_login, fail_missing_params, fail_no_permissions, fail_entity_not_
 import { user_is_commitee_member, user_is_commitee_scribe, user_is_ho_commitee_member, user_is_ho_commitee_scribe, user_is_hr_commitee_member, user_is_hr_commitee_scribe, user_is_uberadmin } from '../../utils/permissionsHelper.js';
 import { verifyPhone } from '../../utils/validationtools.js';
 import questsRouter from './quests.js';
+import attachmentsRouter from './attachments.js';
 
 const router = Router();
 const prisma = new PrismaClient();
 
 router.use('/quests', questsRouter);
+router.use('/attachments', attachmentsRouter);
 
 router.post('/new/:type(ho|hr)', async (req: Request, res: Response) => {
     if(!check_login(res)) return;

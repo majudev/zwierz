@@ -39,6 +39,7 @@ model Attachment {
   created_at DateTime @default(now())
   extension  String?  @db.VarChar(15)
   thumbnail  Bytes?   @db.MediumBlob
+  size       Int
 
   @@index([name])
   @@index([created_at])

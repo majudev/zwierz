@@ -25,6 +25,7 @@ export async function initDB(){
                 trialId: null,
                 extension: "png",
                 content: fs.readFileSync('defaults/logo-default.png'),
+                size: fs.readFileSync('defaults/logo-default.png').length,
             }
         });
     }

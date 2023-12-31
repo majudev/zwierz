@@ -38,4 +38,11 @@ router.get('/login-image', async (req: Request, res: Response) => {
     res.end();
 });
 
+router.get('/max-upload-size', async (req: Request, res: Response) => {
+    res.status(200).json({
+        status: "success",
+        data: 32 * 1024 * 1024
+    }).end();
+});
+
 export default router;
