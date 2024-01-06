@@ -528,7 +528,7 @@ function Trial({ type }: Props): JSX.Element {
                               <div className="card-body">
                                 <p className="card-text">{attachment.name + '.' + attachment.extension} ({Math.floor(attachment.size/1024) > 0 ? (Math.floor(attachment.size/(1024*1024)) > 0 ? ((attachment.size/(1024*1024)).toFixed(1) + ' MB') : ((attachment.size/1024).toFixed(1) + ' kB')) : attachment.size+' B'})</p>
                                 <div className="d-flex justify-content-between align-items-center">
-                                  <small className="text-muted">{attachment.created_at.getDay() + '.' + ((attachment.created_at.getMonth() + 1) >= 10 ? (attachment.created_at.getMonth() + 1) : '0' + (attachment.created_at.getMonth() + 1)) + '.' + attachment.created_at.getFullYear() + ' ' + attachment.created_at.getHours() + ':' + (attachment.created_at.getMinutes() >= 10 ? attachment.created_at.getMinutes() : '0' + attachment.created_at.getMinutes())}</small>
+                                  <small className="text-muted">{attachment.created_at.getDate() + '.' + ((attachment.created_at.getMonth() + 1) >= 10 ? (attachment.created_at.getMonth() + 1) : '0' + (attachment.created_at.getMonth() + 1)) + '.' + attachment.created_at.getFullYear() + ' ' + attachment.created_at.getHours() + ':' + (attachment.created_at.getMinutes() >= 10 ? attachment.created_at.getMinutes() : '0' + attachment.created_at.getMinutes())}</small>
                                   <div className="btn-group">
                                     <button type="button" className="btn btn-sm btn-danger" onClick={(e) => onAttachmentDeleteAttempt(attachment.id)}>Usuń</button>
                                   </div>
@@ -566,7 +566,8 @@ function Trial({ type }: Props): JSX.Element {
                 <h4 className="mb-1 mt-1">Komentarze i historia zmian</h4>
               </li>
               <li className="list-group-item">
-                <div className="table-responsive-sm">
+                <p>Funkcjonalność jeszcze nie została zaimplementowana.</p>
+                {/*<div className="table-responsive-sm">
                   <table className="table">
                     <thead>
                       <tr>
@@ -589,7 +590,7 @@ function Trial({ type }: Props): JSX.Element {
                       </tr>
                     </tbody>
                   </table>
-                </div>
+                </div>*/}
               </li>
             </ul>
           </div>

@@ -9,6 +9,23 @@ const prisma = new PrismaClient();
 export async function initDB(){
     logger.info('Initializing DB');
 
+    const mode_found = await prisma.settings.count({
+        where: {
+            key: {
+                equals: 'instance.mode',
+            }
+        }
+    }) > 0;
+    if(!mode_found){
+        logger.info('Setting instance mode to HO only (default)');
+        await prisma.settings.create({
+            data: {
+                key: 'instance.mode',
+                value: 'HO',
+            }
+        });
+    }
+
     const login_image_found = await prisma.attachment.count({
         where: {
             name: "login-image",

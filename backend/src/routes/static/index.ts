@@ -3,6 +3,7 @@ import logger from '../../utils/logger.js';
 import { PrismaClient } from '@prisma/client';
 import { check_login, fail_missing_params, fail_no_permissions, fail_entity_not_found, fail_internal_error } from '../../utils/http_code_helper.js';
 import mime from 'mime-types';
+import { getSetting } from '../../utils/settings.js';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -42,6 +43,20 @@ router.get('/max-upload-size', async (req: Request, res: Response) => {
     res.status(200).json({
         status: "success",
         data: 32 * 1024 * 1024
+    }).end();
+});
+
+router.get('/mode', async (req: Request, res: Response) => {
+    const mode = await getSetting('instance.mode');
+
+    if(mode === null){
+        fail_internal_error(res, "instance uninitialized");
+        return;
+    }
+
+    res.status(200).json({
+        status: "success",
+        data: mode,
     }).end();
 });
 

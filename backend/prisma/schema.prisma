@@ -16,6 +16,8 @@ model AppointmentRegistrations {
   intent         AppointmentRegistrationType
   customIntent   String?
   message        String?
+
+  @@unique([trialId, appointmentId], name: "appointment_reg_unique_constraint")
 }
 
 model Appointment {

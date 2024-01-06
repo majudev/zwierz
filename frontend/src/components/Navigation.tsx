@@ -26,6 +26,8 @@ function Navigation({loggedIn, logIn, logOut, trigger}: Props) : JSX.Element {
 
   const [initMode, setInitMode] = useState(true);
 
+  const [mode, setMode] = useState<'HO' | 'HO+HR' | 'HR'>('HO');
+
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -59,6 +61,19 @@ function Navigation({loggedIn, logIn, logOut, trigger}: Props) : JSX.Element {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);*/
 
+  const refreshMode = async function(){
+    const response = await fetch(process.env.REACT_APP_API_URL + "/static/mode", {
+      method: "GET",
+      mode: 'same-origin',
+    });
+    if(!response.ok){
+      alert('Cannot fetch instance mode');
+      return;
+    }
+    const body = await response.json();
+    setMode(body.data);
+  }
+
   const updateRole = async function() {
     const response = await fetch(process.env.REACT_APP_API_URL + "/user/me", {
       method: "GET",
@@ -89,6 +104,7 @@ function Navigation({loggedIn, logIn, logOut, trigger}: Props) : JSX.Element {
   };
 
   useEffect(() => {
+    refreshMode();
     loginStatusLoop();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -111,11 +127,11 @@ function Navigation({loggedIn, logIn, logOut, trigger}: Props) : JSX.Element {
         <div className="collapse navbar-collapse" id="navbarCollapse">
           <ul className="navbar-nav me-auto mb-2 mb-md-0">
             {loggedIn && <NiceNavLink to="/profile">Mój profil</NiceNavLink>}
-            {(!initMode && loggedIn && roleHO == CommiteeRole.NONE) && <NiceNavLink to="/trial/ho">Moja próba na HO</NiceNavLink>}
-            {(!initMode && loggedIn && roleHR == CommiteeRole.NONE) && <NiceNavLink to="/trial/hr">Moja próba na HR</NiceNavLink>}
+            {(!initMode && loggedIn && (mode === 'HO' || mode === 'HO+HR') && roleHO == CommiteeRole.NONE) && <NiceNavLink to="/trial/ho">Moja próba na HO</NiceNavLink>}
+            {(!initMode && loggedIn && (mode === 'HR' || mode === 'HO+HR') && roleHR == CommiteeRole.NONE) && <NiceNavLink to="/trial/hr">Moja próba na HR</NiceNavLink>}
             {(!initMode && loggedIn && (roleHO == CommiteeRole.NONE || roleHR == CommiteeRole.NONE)) && <NiceNavLink to="/appointments">Moje spotkania z kapitułą</NiceNavLink>}
-            {(!initMode && loggedIn && (roleHO == CommiteeRole.MEMBER || roleHO == CommiteeRole.SCRIBE)) && <NiceNavLink to="/commitee/trials/ho">Próby na HO</NiceNavLink>}
-            {(!initMode && loggedIn && (roleHR == CommiteeRole.MEMBER || roleHR == CommiteeRole.SCRIBE)) && <NiceNavLink to="/commitee/trials/hr">Próby na HR</NiceNavLink>}
+            {(!initMode && loggedIn && (mode === 'HO' || mode === 'HO+HR') && (roleHO == CommiteeRole.MEMBER || roleHO == CommiteeRole.SCRIBE)) && <NiceNavLink to="/commitee/trials/ho">Próby na HO</NiceNavLink>}
+            {(!initMode && loggedIn && (mode === 'HR' || mode === 'HO+HR') && (roleHR == CommiteeRole.MEMBER || roleHR == CommiteeRole.SCRIBE)) && <NiceNavLink to="/commitee/trials/hr">Próby na HR</NiceNavLink>}
             {(!initMode && loggedIn && (roleHO == CommiteeRole.MEMBER || roleHO == CommiteeRole.SCRIBE || roleHR == CommiteeRole.MEMBER || roleHR == CommiteeRole.SCRIBE)) && <NiceNavLink to="/commitee/appointments">Spotkania</NiceNavLink>}
             
             {(loggedIn && uberadmin) && <NiceNavLink to="/admin">Panel administratora</NiceNavLink>}
