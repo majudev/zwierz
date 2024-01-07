@@ -1,7 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { TrialType, CommiteeRole, Rank, SSOManager } from '../types';
-import { predictedDateToString, stringToPredictedDate, verifyPhone } from '../utils';
 import 'bootstrap/js/src/modal';
 
 interface Props {
@@ -234,10 +233,16 @@ function Trial({}: Props): JSX.Element {
               Dodatkowa wiadomość dla kapituły:
               <textarea className="form-control" value={registerAppointmentMessage} onChange={(e) => setRegisterAppointmentMessage(e.target.value)} placeholder='To pole może być puste. Jeśli chcesz, wpisz tu np. że preferujesz być pierwszy lub ostatni na danej kapitule.'></textarea>
             </p>
+            {((registerAppointmentLockHO || !trialHOInitialized) && registerAppointmentType === 'ho') &&
+              <p><span className="text-danger">Jesteś już zapisany na tą kapitułę w sprawie stopnia Harcerza Orlego.</span> Możesz zapisać się ze stopniem Harcerza Rzeczypospolitej.</p>
+            }
+            {((registerAppointmentLockHR || !trialHRInitialized) && registerAppointmentType === 'hr') &&
+              <p><span className="text-danger">Jesteś już zapisany na tą kapitułę w sprawie stopnia Harcerza Orlego.</span></p>
+            }
           </div>
           <div className="modal-footer">
             <button type="button" className="btn btn-light" data-bs-dismiss="modal">Anuluj</button>
-            <button type="button" className="btn btn-dark" onClick={(e) => onRegistrationAttempt()} disabled={registerAppointmentIntent === 'select' || registerAppointmentType === 'select' || registerAppointmentButtonlock}>Zapisz się</button>
+            <button type="button" className="btn btn-dark" onClick={(e) => onRegistrationAttempt()} disabled={registerAppointmentIntent === 'select' || registerAppointmentType === 'select' || registerAppointmentButtonlock || ((registerAppointmentLockHO || !trialHOInitialized) && registerAppointmentType === 'ho') || ((registerAppointmentLockHR || !trialHRInitialized) && registerAppointmentType === 'hr')}>Zapisz się</button>
           </div>
         </div>
       </div>

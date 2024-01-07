@@ -127,12 +127,12 @@ function Navigation({loggedIn, logIn, logOut, trigger}: Props) : JSX.Element {
         <div className="collapse navbar-collapse" id="navbarCollapse">
           <ul className="navbar-nav me-auto mb-2 mb-md-0">
             {loggedIn && <NiceNavLink to="/profile">Mój profil</NiceNavLink>}
-            {(!initMode && loggedIn && (mode === 'HO' || mode === 'HO+HR') && roleHO == CommiteeRole.NONE) && <NiceNavLink to="/trial/ho">Moja próba na HO</NiceNavLink>}
-            {(!initMode && loggedIn && (mode === 'HR' || mode === 'HO+HR') && roleHR == CommiteeRole.NONE) && <NiceNavLink to="/trial/hr">Moja próba na HR</NiceNavLink>}
-            {(!initMode && loggedIn && (roleHO == CommiteeRole.NONE || roleHR == CommiteeRole.NONE)) && <NiceNavLink to="/appointments">Moje spotkania z kapitułą</NiceNavLink>}
-            {(!initMode && loggedIn && (mode === 'HO' || mode === 'HO+HR') && (roleHO == CommiteeRole.MEMBER || roleHO == CommiteeRole.SCRIBE)) && <NiceNavLink to="/commitee/trials/ho">Próby na HO</NiceNavLink>}
-            {(!initMode && loggedIn && (mode === 'HR' || mode === 'HO+HR') && (roleHR == CommiteeRole.MEMBER || roleHR == CommiteeRole.SCRIBE)) && <NiceNavLink to="/commitee/trials/hr">Próby na HR</NiceNavLink>}
-            {(!initMode && loggedIn && (roleHO == CommiteeRole.MEMBER || roleHO == CommiteeRole.SCRIBE || roleHR == CommiteeRole.MEMBER || roleHR == CommiteeRole.SCRIBE)) && <NiceNavLink to="/commitee/appointments">Spotkania</NiceNavLink>}
+            {(!initMode && loggedIn && (mode === 'HO' || mode === 'HO+HR') && roleHO === CommiteeRole.NONE) && <NiceNavLink to="/trial/ho">Moja próba na HO</NiceNavLink>}
+            {(!initMode && loggedIn && (mode === 'HR' || mode === 'HO+HR') && roleHR === CommiteeRole.NONE) && <NiceNavLink to="/trial/hr">Moja próba na HR</NiceNavLink>}
+            {(!initMode && loggedIn && (roleHO === CommiteeRole.NONE || roleHR === CommiteeRole.NONE)) && <NiceNavLink to="/appointments">Moje spotkania z kapitułą</NiceNavLink>}
+            {(!initMode && loggedIn && (mode === 'HO' || mode === 'HO+HR') && (roleHO === CommiteeRole.MEMBER || roleHO === CommiteeRole.SCRIBE)) && <NiceNavLink to="/commitee/trials/ho">Próby na HO</NiceNavLink>}
+            {(!initMode && loggedIn && (mode === 'HR' || mode === 'HO+HR') && (roleHR === CommiteeRole.MEMBER || roleHR === CommiteeRole.SCRIBE)) && <NiceNavLink to="/commitee/trials/hr">Próby na HR</NiceNavLink>}
+            {(!initMode && loggedIn && (roleHO === CommiteeRole.MEMBER || roleHO === CommiteeRole.SCRIBE || roleHR === CommiteeRole.MEMBER || roleHR === CommiteeRole.SCRIBE)) && <NiceNavLink to="/commitee/appointments">Spotkania</NiceNavLink>}
             
             {(loggedIn && uberadmin) && <NiceNavLink to="/admin">Panel administratora</NiceNavLink>}
             {!loggedIn && <NiceNavLink to="/public_appointments">Lista spotkań</NiceNavLink>}

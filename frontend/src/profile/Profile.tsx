@@ -150,11 +150,11 @@ function Profile(props: Props): JSX.Element {
   }
 
   const runTutorial = function() {
-    return name == '' ||
-    phone == '' ||
-    interests.length == 0 ||
-    fn == '' ||
-    teamName == '';
+    return name === '' ||
+    phone === '' ||
+    interests.length === 0 ||
+    fn === '' ||
+    teamName === '';
   }
 
   return (

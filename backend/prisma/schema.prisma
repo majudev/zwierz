@@ -26,6 +26,7 @@ model Appointment {
   description           String   @db.VarChar(128)
   slots_HO              Int?      @db.TinyInt
   slots_HR              Int?      @db.TinyInt
+  locked                Boolean   @default(false)
 
   registrations         AppointmentRegistrations[]
 

@@ -58,11 +58,12 @@ router.post('/register/:type(ho|hr)', async (req: Request, res: Response) => {
     const appointmentExists = await prisma.appointment.count({
         where: {
             id: req.body.appointmentId,
+            locked: false,
         }
     }) > 0;
 
     if(!appointmentExists){
-        fail_entity_not_found(res, "appointment with id " + req.body.appointmentId + " does not exist");
+        fail_entity_not_found(res, "unlocked appointment with id " + req.body.appointmentId + " does not exist");
         return;
     }
 
@@ -127,6 +128,7 @@ router.get('/:type(all|me)', async (req: Request, res: Response) => {
             description: true,
             slots_HO: true,
             slots_HR: true,
+            locked: true,
             registrations: {
                 select: {
                     id: true,

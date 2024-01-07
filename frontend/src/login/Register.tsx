@@ -54,8 +54,8 @@ function Register(props: Props): JSX.Element {
         }
       }else if(response.status === 400){
         const json = await response.json();
-        if(json.message == "password has to contain: one uppercase letter, one lowercase letter, one special char !@#$%^&*()_+{}\[\]:;<>,.?~\\- and be at least 8 characters long"){
-          setError("Hasło musi zawierać: jedną wielką literę, jedną małą literę, jeden znak specjalny !@#$%^&*()_+{}\[\]:;<>,.?~\\- i musi mieć przynajmniej 8 znaków");
+        if(json.message === "password has to contain: one uppercase letter, one lowercase letter, one special char !@#$%^&*()_+{}[]:;<>,.?~\\- and be at least 8 characters long"){
+          setError("Hasło musi zawierać: jedną wielką literę, jedną małą literę, jeden znak specjalny !@#$%^&*()_+{}[]:;<>,.?~\\- i musi mieć przynajmniej 8 znaków");
         }else if(json.message === "invalid email"){
           setError("Niewłaściwy format email (powinien być nazwa@domena.costam)");
         }else{

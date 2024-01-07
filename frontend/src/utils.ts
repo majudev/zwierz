@@ -19,7 +19,7 @@ export function predictedDateToString(predicted: Date) : string {
 
 export function stringToPredictedDate(predicted: string) : Date {
     const split = predicted.split(" ");
-    return new Date(split[1] + "-" + (months.findIndex((v, i, a) => { return v == split[0] })+1) + "-01");
+    return new Date(split[1] + "-" + (months.findIndex((v, i, a) => { return v === split[0] })+1) + "-01");
 }
 
 export function verifyPassword(password: string): boolean {
