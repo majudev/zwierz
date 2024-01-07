@@ -25,7 +25,7 @@ function Trial({}: Props): JSX.Element {
   const [registerAppointmentLockHR, setRegisterAppointmentLockHR] = useState(true);
   const [registerAppointmentButtonlock, setRegisterAppointmentButtonlock] = useState(false);
 
-  const [appointments, setAppointments] = useState<Array<{id: number, date: Date, description: string, slotsHO: number, slotsHR: number, registrationsHO: number, registrationsHR: number, registrations: Array<{id: number, intent: string, customIntent: string|null, message: string|null, type: TrialType}>}>>([]);
+  const [appointments, setAppointments] = useState<Array<{id: number, date: Date, description: string, slotsHO: number, slotsHR: number, registrationsHO: number, registrationsHR: number, locked: boolean, registrations: Array<{id: number, intent: string, customIntent: string|null, message: string|null, type: TrialType}>}>>([]);
 
   const navigate = useNavigate();
 
@@ -58,7 +58,7 @@ function Trial({}: Props): JSX.Element {
       alert('Cannot fetch appointments list');
       return;
     }
-    const body = await response.json() as {status:string; data: Array<{id: number, date: string, description: string, slots_HO: number, slots_HR: number, registrationsHO: number, registrationsHR: number, registrations: Array<{id: number, intent: string, customIntent: string|null, message: string|null, type: TrialType}>}>};
+    const body = await response.json() as {status:string; data: Array<{id: number, date: string, description: string, slots_HO: number, slots_HR: number, registrationsHO: number, registrationsHR: number, locked: boolean, registrations: Array<{id: number, intent: string, customIntent: string|null, message: string|null, type: TrialType}>}>};
     setAppointments(body.data.map((e) => {return {...e, date: new Date(e.date), slotsHO: e.slots_HO, slotsHR: e.slots_HR}}));
   }
 
@@ -182,7 +182,7 @@ function Trial({}: Props): JSX.Element {
                             {(mode === 'HO+HR' || mode === 'HO') && <td className="text-center nowrap">{freeHO} z {appointment.slotsHO}</td>}
                             {(mode === 'HO+HR' || mode === 'HR') && <td className="text-center nowrap">{freeHR} z {appointment.slotsHR}</td>}
                             <td className="nowrap">
-                              <button type="button" className="btn btn-dark" onClick={(e) => {setRegisterAppointmentID(appointment.id); setRegisterAppointmentDate(appointment.date); setRegisterAppointmentIntent('select'); setRegisterAppointmentCustomIntent(''); setRegisterAppointmentMessage(''); setRegisterAppointmentLockHO(mode === 'HR' || freeHO === 0); setRegisterAppointmentLockHR(mode === 'HO' || freeHR === 0); setRegisterAppointmentType('select'); document.getElementById('open_register_modal')?.click();}} disabled={freeHO === 0 && freeHR === 0}>Zapisz się</button>
+                              <button type="button" className="btn btn-dark" onClick={(e) => {setRegisterAppointmentID(appointment.id); setRegisterAppointmentDate(appointment.date); setRegisterAppointmentIntent('select'); setRegisterAppointmentCustomIntent(''); setRegisterAppointmentMessage(''); setRegisterAppointmentLockHO(mode === 'HR' || freeHO === 0); setRegisterAppointmentLockHR(mode === 'HO' || freeHR === 0); setRegisterAppointmentType('select'); document.getElementById('open_register_modal')?.click();}} disabled={(freeHO === 0 && freeHR === 0) || appointment.locked}>Zapisz się</button>
                             </td>
                           </tr>
                         })
