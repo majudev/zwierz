@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import logger from '../utils/logger.js';
 
 const prisma = new PrismaClient();
 
@@ -43,7 +44,10 @@ async function sendNotificationEmail(to: string, reply_to: string, subject: stri
     const apiToken = await apitokenPromise;
     const from = await fromPromise;
 
-    if(baseurl === null || apiToken === null || from === null) return false;
+    if(baseurl === null || apiToken === null || from === null){
+        logger.error('Cannot find' + (baseurl === null ? ' postal.baseurl' : '') + (apiToken === null ? ' postal.apitoken' : '') + (from === null ? ' postal.from' : '') + ' in the database');
+        return false;
+    }
 
     const response = await fetch(baseurl.value + '/api/v1/send/message', {
         method: "POST",
@@ -62,6 +66,9 @@ async function sendNotificationEmail(to: string, reply_to: string, subject: stri
             bounce: false,
         }),
     });
+    if(!response.ok){
+        logger.error('Cannot send e-mail: status ' + response.status + (response.status !== 502 ? (', details: ' + await response.text()) : ' - server probably dead'));
+    }
     return response.ok;
 }
 

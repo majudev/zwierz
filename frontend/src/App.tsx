@@ -9,6 +9,7 @@ import PasswordResetStep1 from './login/PasswordResetStep1.tsx';
 import Profile from './profile/Profile.tsx';
 import Trial from './trial/Trial.tsx';
 import Appointments from './appointments/Appointments.tsx';
+import AdminPanel from './adminpanel/AdminPanel.tsx';
 
 function App(): ReactElement {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -36,6 +37,8 @@ function App(): ReactElement {
           <Route path="/trial/ho" element={<Trial loggedIn={loggedIn} logOut={logOut} logIn={logIn} type={TrialType.HO} />} />
           <Route path="/trial/hr" element={<Trial loggedIn={loggedIn} logOut={logOut} logIn={logIn} type={TrialType.HR} />} />
           <Route path="/appointments" element={<Appointments loggedIn={loggedIn} logOut={logOut} logIn={logIn}/>} />
+
+          <Route path="/admin" element={<AdminPanel loggedIn={loggedIn} logOut={logOut} logIn={logIn}/>} />
         </Routes>
       </div>
     </Router>

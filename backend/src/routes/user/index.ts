@@ -86,7 +86,7 @@ const prisma = new PrismaClient();
 router.get('/:userId', async (req: Request, res: Response) => {
     if(!check_login(res)) return;
 
-    if(req.params.id === 'all'){
+    if(req.params.userId === 'all'){
         if(!(await user_is_uberadmin(res.locals.auth_user.userId))){
             fail_no_permissions(res, "you don't have permissions to obtain userlist");
             return;
@@ -118,6 +118,8 @@ router.get('/:userId', async (req: Request, res: Response) => {
 
                 enableEmailNotifications: true,
                 enableSMSNotifications: true,
+
+                activationkey: true,
                 
                 sso: true,
                 disabled: true,
@@ -136,7 +138,7 @@ router.get('/:userId', async (req: Request, res: Response) => {
 
         res.status(200).json({
             status: "success",
-            data: users
+            data: users.map((user) => {return {...user, activated: user.activationkey === null, activationkey: undefined}}),
         }).end();
         return;
     }
@@ -292,7 +294,7 @@ router.patch('/:userId', async (req: Request, res: Response) => {
         return;
     }
 
-    if(interests.length > 0){
+    if(interests !== undefined && interests.length > 0){
         await prisma.userInterest.deleteMany({
             where: {
                 userId: userId,
@@ -313,6 +315,91 @@ router.patch('/:userId', async (req: Request, res: Response) => {
             id: userId,
         },
         data: updateQuery,
+        select: {
+            id: true,
+            name: true,
+            email: true,
+            rank: true,
+            role_HO: true,
+            role_HR: true,
+            uberadmin: true,
+            phone: true,
+            team: {
+                select: {
+                    id: true,
+                    name: true,
+                    archived: true,
+                }
+            },
+            interests: {
+                select: {
+                    text: true,
+                }
+            },
+            function: true,
+
+            enableEmailNotifications: true,
+            enableSMSNotifications: true,
+            
+            sso: true,
+            disabled: true,
+            shadow: true,
+
+            trials: {
+                select: {
+                    type: true,
+                    open_date: true,
+                    close_date: true,
+                    predicted_closing_date: true,
+                }
+            }
+        },
+    });
+
+    res.status(200).json({
+        status: "success",
+        data: updatedObject
+    }).end();
+});
+
+router.patch('/:userId/:action(shadow|disabled|active)/:state(yes|no)', async (req: Request, res: Response) => {
+    if(!check_login(res)) return;
+
+    const userId: number = parseInt(req.params.userId);
+    const state: boolean = req.params.state === "yes";
+    const action = req.params.action as 'shadow'|'disabled'|'active';
+
+    if(Number.isNaN(userId)) {
+        fail_missing_params(res, ["userId"], null);
+        return;
+    }
+
+    // User can only edit himself, uberadmin can edit everything
+    if(userId != res.locals.auth_user.userId && !(await user_is_uberadmin(res.locals.auth_user.userId))){
+        fail_no_permissions(res, "you don't have permissions to edit this userId");
+        return;
+    }
+
+    const exists = await prisma.user.count({
+        where: {
+            id: userId,
+        }
+    }) > 0;
+
+    if(!exists){
+        fail_entity_not_found(res, "user with id " + userId + " not found");
+        return;
+    }
+
+    const updatedObject = await prisma.user.update({
+        where: {
+            id: userId,
+        },
+        data: {
+            shadow: action === 'shadow' ? state : undefined,
+            disabled: action === 'disabled' ? state : undefined,
+            activationkey: action === 'active' ? null : undefined,
+        },
         select: {
             id: true,
             name: true,

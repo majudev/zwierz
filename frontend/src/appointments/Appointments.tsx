@@ -9,7 +9,7 @@ interface Props {
   logIn: () => void;
 }
 
-function Trial({}: Props): JSX.Element {
+function Appointments({}: Props): JSX.Element {
   const [mode, setMode] = useState<'HO' | 'HO+HR' | 'HR'>('HO');
 
   const [trialHOInitialized, setTrialHOInitialized] = useState(false);
@@ -250,4 +250,4 @@ function Trial({}: Props): JSX.Element {
   </>);
 }
 
-export default Trial;
+export default Appointments;
