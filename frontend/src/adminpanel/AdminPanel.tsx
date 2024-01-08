@@ -254,7 +254,7 @@ function AdminPanel({}: Props): JSX.Element {
                               </div>
                               <br/>
                               <div className="form-check form-check-inline form-switch">
-                                <input className="form-check-input" type="checkbox" id={"disabled" + user.id} checked={!user.disabled} onClick={(e) => {setDisableUserID(user.id); setDisableName(nameConverter(user.rank, user.name)); setDisableEmail(user.email); setDisableCurrentState(user.shadow); document.getElementById('open_disable_modal')?.click(); }} disabled={userlistlock}/>
+                                <input className="form-check-input" type="checkbox" id={"disabled" + user.id} checked={!user.disabled} onClick={(e) => {setDisableUserID(user.id); setDisableName(nameConverter(user.rank, user.name)); setDisableEmail(user.email); setDisableCurrentState(user.disabled); document.getElementById('open_disable_modal')?.click(); }} disabled={userlistlock}/>
                                 <label className="form-check-label" htmlFor={"disabled" + user.id}>
                                   {user.disabled ? 'Wyłączony' : 'Włączony'}
                                 </label>
