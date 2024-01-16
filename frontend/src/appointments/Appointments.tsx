@@ -1,16 +1,16 @@
 import React, {useState, useEffect} from 'react';
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { TrialType, CommiteeRole, Rank, SSOManager } from '../types';
+import { TrialType, CommiteeRole, Rank, SSOManager, SystemMode } from '../types';
 import 'bootstrap/js/src/modal';
 
 interface Props {
   loggedIn: boolean;
   logOut: () => void;
   logIn: () => void;
+  mode: SystemMode;
 }
 
-function Appointments({}: Props): JSX.Element {
-  const [mode, setMode] = useState<'HO' | 'HO+HR' | 'HR'>('HO');
+function Appointments({mode}: Props): JSX.Element {
 
   const [trialHOInitialized, setTrialHOInitialized] = useState(false);
   const [trialHRInitialized, setTrialHRInitialized] = useState(false);
@@ -30,24 +30,10 @@ function Appointments({}: Props): JSX.Element {
   const navigate = useNavigate();
 
   useEffect(() => {
-    refreshMode();
     refreshAppointments();
     refreshTrialsData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const refreshMode = async function(){
-    const response = await fetch(process.env.REACT_APP_API_URL + "/static/mode", {
-      method: "GET",
-      mode: 'same-origin',
-    });
-    if(!response.ok){
-      alert('Cannot fetch instance mode');
-      return;
-    }
-    const body = await response.json();
-    setMode(body.data);
-  }
 
   const refreshAppointments = async function(){
     const response = await fetch(process.env.REACT_APP_API_URL + "/appointments/me", {
@@ -136,7 +122,7 @@ function Appointments({}: Props): JSX.Element {
   return (<>
     <main className="container-fluid">
       <div className="row justify-content-center">
-        <div className={mode !== 'HO+HR' ? "col-lg-8 col-sm-12" : "col-lg-9 col-sm-12"}>
+        <div className={mode !== SystemMode.HO_HR ? "col-lg-8 col-sm-12" : "col-lg-9 col-sm-12"}>
           <div className="p-5">
             <ul className="list-group">
               <li className="list-group-item list-group-item-info d-flex justify-content-center bg-dark text-center text-white">
@@ -149,8 +135,8 @@ function Appointments({}: Props): JSX.Element {
                       <tr>
                         <th scope="col" className="nowrap">Data</th>
                         <th scope="col" className="text-center longrecord">Czas trwania</th>
-                        {mode !== 'HO+HR' && <th scope="col" className="nowrap text-center">Wolne miejsca</th>}
-                        {mode === 'HO+HR' && <>
+                        {mode !== SystemMode.HO_HR && <th scope="col" className="nowrap text-center">Wolne miejsca</th>}
+                        {mode === SystemMode.HO_HR && <>
                         <th scope="col" className="nowrap text-center">Wolne miejsca HO</th>
                         <th scope="col" className="nowrap text-center">Wolne miejsca HR</th>
                         </>}
@@ -179,10 +165,10 @@ function Appointments({}: Props): JSX.Element {
                                 <button className="btn btn-sm btn-danger" onClick={(e) => onUnregistrationAttempt(TrialType.HR, appointment.id)}>Usuń rejestrację</button>
                               </p>}
                             </td>
-                            {(mode === 'HO+HR' || mode === 'HO') && <td className="text-center nowrap">{freeHO} z {appointment.slotsHO}</td>}
-                            {(mode === 'HO+HR' || mode === 'HR') && <td className="text-center nowrap">{freeHR} z {appointment.slotsHR}</td>}
+                            {(mode === SystemMode.HO_HR || mode === SystemMode.HO) && <td className="text-center nowrap">{freeHO} z {appointment.slotsHO}</td>}
+                            {(mode === SystemMode.HO_HR || mode === SystemMode.HR) && <td className="text-center nowrap">{freeHR} z {appointment.slotsHR}</td>}
                             <td className="nowrap">
-                              <button type="button" className="btn btn-dark" onClick={(e) => {setRegisterAppointmentID(appointment.id); setRegisterAppointmentDate(appointment.date); setRegisterAppointmentIntent('select'); setRegisterAppointmentCustomIntent(''); setRegisterAppointmentMessage(''); setRegisterAppointmentLockHO(mode === 'HR' || freeHO === 0); setRegisterAppointmentLockHR(mode === 'HO' || freeHR === 0); setRegisterAppointmentType('select'); document.getElementById('open_register_modal')?.click();}} disabled={(freeHO === 0 && freeHR === 0) || appointment.locked}>Zapisz się</button>
+                              <button type="button" className="btn btn-dark" onClick={(e) => {setRegisterAppointmentID(appointment.id); setRegisterAppointmentDate(appointment.date); setRegisterAppointmentIntent('select'); setRegisterAppointmentCustomIntent(''); setRegisterAppointmentMessage(''); setRegisterAppointmentLockHO(mode === SystemMode.HR || freeHO === 0); setRegisterAppointmentLockHR(mode === SystemMode.HO || freeHR === 0); setRegisterAppointmentType('select'); document.getElementById('open_register_modal')?.click();}} disabled={(freeHO === 0 && freeHR === 0) || appointment.locked}>Zapisz się</button>
                             </td>
                           </tr>
                         })
@@ -213,8 +199,8 @@ function Appointments({}: Props): JSX.Element {
                 <option value='ho' disabled={registerAppointmentLockHO || !trialHOInitialized}>Harcerz Orli</option>
                 <option value='hr' disabled={registerAppointmentLockHR || !trialHRInitialized}>Harcerz Rzeczypospolitej</option>
               </select>
-              {(mode === 'HO' || mode === 'HO+HR') && !trialHOInitialized && <span className="text-danger">Twoja próba na HO nie jest wprowadzona do systemu, więc nie możesz zarejestrować się z nią na spotkanie.</span>}
-              {(mode === 'HR' || mode === 'HO+HR') && !trialHRInitialized && <span className="text-danger">Twoja próba na HR nie jest wprowadzona do systemu, więc nie możesz zarejestrować się z nią na spotkanie.</span>}
+              {(mode === SystemMode.HO || mode === SystemMode.HO_HR) && !trialHOInitialized && <span className="text-danger">Twoja próba na HO nie jest wprowadzona do systemu, więc nie możesz zarejestrować się z nią na spotkanie.</span>}
+              {(mode === SystemMode.HR || mode === SystemMode.HO_HR) && !trialHRInitialized && <span className="text-danger">Twoja próba na HR nie jest wprowadzona do systemu, więc nie możesz zarejestrować się z nią na spotkanie.</span>}
             </p>
             <p>
               Cel spotkania: <select className="form-control" value={registerAppointmentIntent} onChange={(e) => setRegisterAppointmentIntent(e.target.value as 'OPEN_TRIAL'|'CLOSE_TRIAL'|'EDIT_TRIAL'|'CUSTOM'|'select')}>

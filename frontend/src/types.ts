@@ -3,6 +3,12 @@ export enum TrialType {
   HR = "HR",
 }
 
+export enum SystemMode {
+  HO = "HO",
+  HO_HR = "HO+HR",
+  HR = "HR",
+}
+
 export enum CommiteeRole {
   NONE = "NONE",
   MEMBER = "MEMBER",

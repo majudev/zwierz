@@ -1,17 +1,16 @@
 import React, {useState, useEffect} from 'react';
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { TrialType, CommiteeRole, Rank, SSOManager } from '../types';
+import { TrialType, CommiteeRole, Rank, SSOManager, SystemMode } from '../types';
 import 'bootstrap/js/src/modal';
 
 interface Props {
   loggedIn: boolean;
   logOut: () => void;
   logIn: () => void;
+  mode: SystemMode;
 }
 
-function AdminPanel({}: Props): JSX.Element {
-  const [mode, setMode] = useState<'HO' | 'HO+HR' | 'HR'>('HO');
-
+function AdminPanel({mode}: Props): JSX.Element {
   const [userlistlock, setUserlistlock] = useState(false);
   const [users, setUsers] = useState<Array<{id: number, name: string|null, email: string, activated: boolean, rank: Rank, roleHO: CommiteeRole, roleHR: CommiteeRole, uberadmin: boolean, phone: string|null, team: {id: number, name: string, archived: boolean}|null, enableEmailNotifications: boolean, enableSMSNotifications: boolean, sso: SSOManager, disabled: boolean, shadow: boolean, trials: Array<{type: TrialType, openDate: Date, closeDate: Date, predictedClosingDate: Date}>}>>([]);
 
@@ -43,23 +42,9 @@ function AdminPanel({}: Props): JSX.Element {
   const navigate = useNavigate();
 
   useEffect(() => {
-    refreshMode();
     refreshUsers();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const refreshMode = async function(){
-    const response = await fetch(process.env.REACT_APP_API_URL + "/static/mode", {
-      method: "GET",
-      mode: 'same-origin',
-    });
-    if(!response.ok){
-      alert('Cannot fetch instance mode');
-      return;
-    }
-    const body = await response.json();
-    setMode(body.data);
-  }
 
   const refreshUsers = async function(){
     const response = await fetch(process.env.REACT_APP_API_URL + "/user/all", {
@@ -129,8 +114,8 @@ function AdminPanel({}: Props): JSX.Element {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        role_HO: (mode === 'HO' || mode === 'HO+HR') ? editPermissionsRoleHO : undefined,
-        role_HR: (mode === 'HR' || mode === 'HO+HR') ? editPermissionsRoleHR : undefined,
+        role_HO: (mode === SystemMode.HO || mode === SystemMode.HO_HR) ? editPermissionsRoleHO : undefined,
+        role_HR: (mode === SystemMode.HR || mode === SystemMode.HO_HR) ? editPermissionsRoleHR : undefined,
         uberadmin: editPermissionsUberadmin,
       })
     });
@@ -219,14 +204,14 @@ function AdminPanel({}: Props): JSX.Element {
                             </td>
                             <td className="text-center">{user.team !== null ? user.team.name : <i>nie ustawiono</i>}</td>
                             <td className="text-center nowrap">
-                              {(mode === 'HO' || mode === 'HO+HR') && <><div className="form-check form-check-inline">
+                              {(mode === SystemMode.HO || mode === SystemMode.HO_HR) && <><div className="form-check form-check-inline">
                                 <input className="form-check-input" type="checkbox" id={"HOexists" + user.id} checked={user.trials.filter((v) => {return v.type === TrialType.HO}).length > 0} disabled/>
                                 <label className="form-check-label" htmlFor={"HOexists" + user.id}>
                                   HO w systemie
                                 </label>
                               </div>
                               <br/></>}
-                              {(mode === 'HO+HR' || mode === 'HR') && <div className="form-check form-check-inline">
+                              {(mode === SystemMode.HR || mode === SystemMode.HO_HR) && <div className="form-check form-check-inline">
                                 <input className="form-check-input" type="checkbox" id={"HRexists" + user.id} checked={user.trials.filter((v) => {return v.type === TrialType.HR}).length > 0} disabled/>
                                 <label className="form-check-label" htmlFor={"HRexists" + user.id}>
                                   HR w systemie
@@ -240,8 +225,8 @@ function AdminPanel({}: Props): JSX.Element {
                             </td>
                             <td className="nowrap"><button className="btn btn-danger" onClick={(e) => {setPwdresetUserID(user.id); setPwdresetName(nameConverter(user.rank, user.name)); setPwdresetEmail(user.email); document.getElementById('open_pwdreset_modal')?.click();}} disabled>Resetuj</button></td>
                             <td className="text-center">
-                              {(mode === 'HO' || mode === 'HO+HR') && <>{"HO: " + roleConverter(user.roleHO)}<br/></>}
-                              {(mode === 'HO+HR' || mode === 'HR') && "HR: " + roleConverter(user.roleHR)}
+                              {(mode === SystemMode.HO || mode === SystemMode.HO_HR) && <>{"HO: " + roleConverter(user.roleHO)}<br/></>}
+                              {(mode === SystemMode.HR || mode === SystemMode.HO_HR) && "HR: " + roleConverter(user.roleHR)}
                               {user.uberadmin ? <><br/>Administrator</> : ''}
                               <button className="btn btn-sm btn-dark" onClick={(e) => {setEditPermissionsUserID(user.id); setEditPermissionsName(nameConverter(user.rank, user.name)); setEditPermissionsEmail(user.email); setEditPermissionsRoleHO(user.roleHO); setEditPermissionsRoleHR(user.roleHR); setEditPermissionsUberadmin(user.uberadmin); document.getElementById('open_permissions_modal')?.click();}} disabled={userlistlock}>Edytuj</button> 
                             </td>
@@ -323,10 +308,10 @@ function AdminPanel({}: Props): JSX.Element {
           <div className="modal-body">
             {!changeVisibilityCurrentState ? <>
               <p>Czy na pewno chcesz ukryć użytkownika <b>{changeVisibilityName !== null ? <>{changeVisibilityName} ({changeVisibilityEmail})</> : changeVisibilityEmail}</b>?</p>
-              <p>Po ukryciu {mode === 'HO+HR' ? 'próby użytkownika nie będą się wyświetlać' : 'próba użytkownika nie będzie się wyświetlać'} w systemie. To ustawienie nie ma wpływu na możliwość zalogowania się do systemu przez użytkownika.</p>
+              <p>Po ukryciu {mode === SystemMode.HO_HR ? 'próby użytkownika nie będą się wyświetlać' : 'próba użytkownika nie będzie się wyświetlać'} w systemie. To ustawienie nie ma wpływu na możliwość zalogowania się do systemu przez użytkownika.</p>
             </> : <>
               <p>Czy na pewno chcesz przywrócić widoczność użytkownika <b>{changeVisibilityName !== null ? <>{changeVisibilityName} ({changeVisibilityEmail})</> : changeVisibilityEmail}</b>?</p>
-              <p>Po przywróceniu widoczności {mode === 'HO+HR' ? 'próby użytkownika będą wyświetlać się' : 'próba użytkownika będzie wyświetlać się'} w systemie. To ustawienie nie ma wpływu na możliwość zalogowania się do systemu przez użytkownika.</p>
+              <p>Po przywróceniu widoczności {mode === SystemMode.HO_HR ? 'próby użytkownika będą wyświetlać się' : 'próba użytkownika będzie wyświetlać się'} w systemie. To ustawienie nie ma wpływu na możliwość zalogowania się do systemu przez użytkownika.</p>
             </>}
             <p>Ukrycie widoczności użytkownika bez wyłączenia jego konta <span className="text-danger">jest niebezpieczne</span>. Kandydat będzie mógł się zalogować do systemu i wprowadzać zmiany, myśląc że kapituła je widzi, podczas gdy kapituła nie będzie widzieć jego próby.</p>
             <p>Jeśli chcesz ukryć użytkownika, zalecamy najpierw go <b>wyłączyć</b>.</p>
@@ -376,14 +361,14 @@ function AdminPanel({}: Props): JSX.Element {
           </div>
           <div className="modal-body">
             <p>Edytujesz uprawnienia użytkownika <b>{editPermissionsName !== null ? <>{editPermissionsName} ({editPermissionsEmail})</> : editPermissionsEmail}</b>.</p>
-            {(mode === 'HO' || mode === 'HO+HR') && <p>
+            {(mode === SystemMode.HO || mode === SystemMode.HO_HR) && <p>
               Uprawnienia w kapitule HO: <select className="form-control" value={editPermissionsRoleHO} onChange={(e) => setEditPermissionsRoleHO(e.target.value as CommiteeRole)}>
                 <option value={CommiteeRole.NONE}>Kandydat</option>
                 <option value={CommiteeRole.MEMBER}>Członek kapituły</option>
                 <option value={CommiteeRole.SCRIBE}>Sekretarz kapituły</option>
               </select>
             </p>}
-            {(mode === 'HR' || mode === 'HO+HR') && <p>
+            {(mode === SystemMode.HR || mode === SystemMode.HO_HR) && <p>
               Uprawnienia w kapitule HR: <select className="form-control" value={editPermissionsRoleHR} onChange={(e) => setEditPermissionsRoleHR(e.target.value as CommiteeRole)}>
                 <option value={CommiteeRole.NONE}>Kandydat</option>
                 <option value={CommiteeRole.MEMBER}>Członek kapituły</option>

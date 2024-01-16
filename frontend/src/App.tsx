@@ -1,6 +1,6 @@
-import React, { ReactElement, useState } from 'react';
+import React, { ReactElement, useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { TrialType, CommiteeRole, Rank, SSOManager } from './types';
+import { TrialType, CommiteeRole, Rank, SSOManager, SystemMode } from './types';
 import Navigation from './components/Navigation.tsx';
 import Login from './login/Login.tsx';
 import Register from './login/Register.tsx';
@@ -10,10 +10,14 @@ import Profile from './profile/Profile.tsx';
 import Trial from './trial/Trial.tsx';
 import Appointments from './appointments/Appointments.tsx';
 import AdminPanel from './adminpanel/AdminPanel.tsx';
+import TrialsList from './commitee/TrialsList.tsx';
+import CommiteeAppointments from './commitee/CommiteeAppointments.tsx';
 
 function App(): ReactElement {
   const [loggedIn, setLoggedIn] = useState(false);
   const [trigger, pullTrigger] = useState(false);
+
+  const [mode, setMode] = useState<SystemMode>(SystemMode.HO);
 
   const logOut = () => {
     setLoggedIn(false);
@@ -23,10 +27,28 @@ function App(): ReactElement {
     setLoggedIn(true);
   };
 
+  const refreshMode = async function(){
+    const response = await fetch(process.env.REACT_APP_API_URL + "/static/mode", {
+      method: "GET",
+      mode: 'same-origin',
+    });
+    if(!response.ok){
+      alert('Cannot fetch instance mode');
+      return;
+    }
+    const body = await response.json();
+    setMode(body.data);
+  }
+
+  useEffect(() => {
+    refreshMode();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <Router>
       <div>
-        <Navigation loggedIn={loggedIn} logIn={logIn} logOut={logOut} trigger={trigger}/>
+        <Navigation loggedIn={loggedIn} logIn={logIn} logOut={logOut} mode={mode} trigger={trigger}/>
         <Routes>
           <Route path="/login" element={<Login loggedIn={loggedIn} logOut={logOut} logIn={logIn} />} />
           <Route path="/register" element={<Register loggedIn={loggedIn} logOut={logOut} logIn={logIn} />} />
@@ -36,9 +58,12 @@ function App(): ReactElement {
           <Route path="/profile" element={<Profile loggedIn={loggedIn} logOut={logOut} logIn={logIn} trigger={trigger} pullTrigger={pullTrigger} />} />
           <Route path="/trial/ho" element={<Trial loggedIn={loggedIn} logOut={logOut} logIn={logIn} type={TrialType.HO} />} />
           <Route path="/trial/hr" element={<Trial loggedIn={loggedIn} logOut={logOut} logIn={logIn} type={TrialType.HR} />} />
-          <Route path="/appointments" element={<Appointments loggedIn={loggedIn} logOut={logOut} logIn={logIn}/>} />
+          <Route path="/appointments" element={<Appointments loggedIn={loggedIn} logOut={logOut} logIn={logIn} mode={mode}/>} />
 
-          <Route path="/admin" element={<AdminPanel loggedIn={loggedIn} logOut={logOut} logIn={logIn}/>} />
+          <Route path="/commitee/trials/ho" element={<TrialsList loggedIn={loggedIn} logOut={logOut} logIn={logIn} mode={mode} type={TrialType.HO} />} />
+          <Route path="/commitee/trials/hr" element={<TrialsList loggedIn={loggedIn} logOut={logOut} logIn={logIn} mode={mode} type={TrialType.HR} />} />
+          <Route path="/commitee/appointments" element={<CommiteeAppointments loggedIn={loggedIn} logOut={logOut} logIn={logIn} mode={mode} />} />
+          <Route path="/admin" element={<AdminPanel loggedIn={loggedIn} logOut={logOut} logIn={logIn} mode={mode}/>} />
         </Routes>
       </div>
     </Router>
