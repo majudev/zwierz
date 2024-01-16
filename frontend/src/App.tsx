@@ -12,6 +12,7 @@ import Appointments from './appointments/Appointments.tsx';
 import AdminPanel from './adminpanel/AdminPanel.tsx';
 import TrialsList from './commitee/TrialsList.tsx';
 import CommiteeAppointments from './commitee/CommiteeAppointments.tsx';
+import ShowTrial from './commitee/ShowTrial.tsx';
 
 function App(): ReactElement {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -63,6 +64,7 @@ function App(): ReactElement {
           <Route path="/commitee/trials/ho" element={<TrialsList loggedIn={loggedIn} logOut={logOut} logIn={logIn} mode={mode} type={TrialType.HO} />} />
           <Route path="/commitee/trials/hr" element={<TrialsList loggedIn={loggedIn} logOut={logOut} logIn={logIn} mode={mode} type={TrialType.HR} />} />
           <Route path="/commitee/appointments" element={<CommiteeAppointments loggedIn={loggedIn} logOut={logOut} logIn={logIn} mode={mode} />} />
+          <Route path="/commitee/trial/:userId/:type" element={<ShowTrial loggedIn={loggedIn} logOut={logOut} logIn={logIn} mode={mode}/>} />
           <Route path="/admin" element={<AdminPanel loggedIn={loggedIn} logOut={logOut} logIn={logIn} mode={mode}/>} />
         </Routes>
       </div>

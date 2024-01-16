@@ -85,36 +85,74 @@ router.post('/new/:type(ho|hr)', async (req: Request, res: Response) => {
     }).end();
 });
 
-router.get('/:userId/:type(ho|hr)', async (req: Request, res: Response) => {
+router.get('/:userId/:type(ho|hr)/:archived(archived)?', async (req: Request, res: Response) => {
     if(!check_login(res)) return;
 
-    /*if(req.params.id === 'all'){
-        const teams = await prisma.team.findMany({
+    const type = req.params.type.toUpperCase() as TrialType;
+
+    const uberadmin = await user_is_uberadmin(res.locals.auth_user.userId);
+    const commitee_scribe = (type === 'HO') ? await user_is_ho_commitee_scribe(res.locals.auth_user.userId) : await user_is_hr_commitee_scribe(res.locals.auth_user.userId);
+    const commitee_member = (type === 'HO') ? await user_is_ho_commitee_member(res.locals.auth_user.userId) : await user_is_hr_commitee_member(res.locals.auth_user.userId);
+
+    if(req.params.userId === 'all'){
+        if(!uberadmin && !commitee_member && !commitee_scribe){
+            fail_no_permissions(res, "you don't have permissions to list all trials");
+            return;
+        }
+
+        const trials = await prisma.trial.findMany({
+            where: {
+                type: type,
+                archived: req.params.archived !== undefined,
+                user: {
+                    shadow: false,
+                }
+            },
+            select: {
+                id: true,
+                userId: true,
+                type: true,
+                open_date: true,
+                close_date: true,
+                mentor_email: true,
+                mentor_name: true,
+                mentor_phone: true,
+                predicted_closing_date: true,
+
+                user: {
+                    select: {
+                        id: true,
+                        name: true,
+                        rank: true,
+                    },
+                },
+    
+                archived: true,
+            },
+        });
+
+        /*const teams = await prisma.team.findMany({
             select: {
                 id: true,
                 name: true,
                 archived: true,
             },
-        });
+        });*/
 
         res.status(200).json({
             status: "success",
-            data: teams
+            data: trials
         }).end();
+        //res.status(200).json({a: "sdfsdf", archival: req.params.archived}).end();
         return;
-    }*/
+    }
 
     const userId: number = parseInt(req.params.userId === 'me' ? res.locals.auth_user.userId : req.params.userId);
-    const type = req.params.type.toUpperCase() as TrialType;
 
     if(Number.isNaN(userId)) {
         fail_missing_params(res, ["userId"], null);
         return;
     }
-
-    const uberadmin = await user_is_uberadmin(res.locals.auth_user.userId);
-    const commitee_scribe = (type === 'HO') ? await user_is_ho_commitee_scribe(res.locals.auth_user.userId) : await user_is_hr_commitee_scribe(res.locals.auth_user.userId);
-    const commitee_member = (type === 'HO') ? await user_is_ho_commitee_member(res.locals.auth_user.userId) : await user_is_hr_commitee_member(res.locals.auth_user.userId);
 
     // User can only view himself, admin can view everything
     if(userId !== res.locals.auth_user.userId && !uberadmin && !commitee_scribe && !commitee_member){
