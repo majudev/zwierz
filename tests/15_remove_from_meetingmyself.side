@@ -1,0 +1,55 @@
+{
+  "id": "bb4c04ee-6df7-493b-b256-ca5161a03693",
+  "version": "2.0",
+  "name": "15_remove_from_meeting(myself)",
+  "url": "http://localhost:8080",
+  "tests": [{
+    "id": "f0514e2d-0938-4419-87b8-62fbada0b49e",
+    "name": "Untitled",
+    "commands": [{
+      "id": "d6b76775-8ded-471a-bd25-f1d961628609",
+      "comment": "",
+      "command": "open",
+      "target": "/appointments",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "46190aba-99dd-4fd7-b007-8d788cea2abb",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=Moje spotkania z kapitułą",
+      "targets": [
+        ["linkText=Moje spotkania z kapitułą", "linkText"],
+        ["css=.active", "css:finder"],
+        ["xpath=//a[contains(text(),'Moje spotkania z kapitułą')]", "xpath:link"],
+        ["xpath=//div[@id='navbarCollapse']/ul/a[3]", "xpath:idRelative"],
+        ["xpath=//a[contains(@href, '/appointments')]", "xpath:href"],
+        ["xpath=//a[3]", "xpath:position"],
+        ["xpath=//a[contains(.,'Moje spotkania z kapitułą')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "b9b4e335-bdab-4114-b2fd-45f84ea96180",
+      "comment": "",
+      "command": "click",
+      "target": "css=.btn-sm",
+      "targets": [
+        ["css=.btn-sm", "css:finder"],
+        ["xpath=//tbody[@id='appointment_table']/tr/td[2]/p[2]/button", "xpath:idRelative"],
+        ["xpath=//p[2]/button", "xpath:position"],
+        ["xpath=//button[contains(.,'Usuń rejestrację')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }]
+  }],
+  "suites": [{
+    "id": "f5011b14-62fc-4549-a1bb-41b3104447f3",
+    "name": "Default Suite",
+    "persistSession": false,
+    "parallel": false,
+    "timeout": 300,
+    "tests": ["f0514e2d-0938-4419-87b8-62fbada0b49e"]
+  }],
+  "urls": ["http://localhost:8080/"],
+  "plugins": []
+}

@@ -1,0 +1,113 @@
+{
+  "id": "c9e6b362-096b-490d-973f-56b384794a9a",
+  "version": "2.0",
+  "name": "change_rights",
+  "url": "http://localhost:8080",
+  "tests": [{
+    "id": "0d5b059a-9325-4ee8-8654-3b3228ada4c6",
+    "name": "Untitled",
+    "commands": [{
+      "id": "b4d17b6a-ad7e-4db6-81be-074b9f9814dc",
+      "comment": "",
+      "command": "open",
+      "target": "/admin",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "d8cd0083-7cc7-4a24-aba5-316bea17c55c",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "954x697",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "b3e721b7-0f1c-4efe-a6a0-b45272f52ff8",
+      "comment": "",
+      "command": "click",
+      "target": "css=.list-group-item-info",
+      "targets": [
+        ["css=.list-group-item-info", "css:finder"],
+        ["xpath=//div[@id='root']/div/main/div/div/div/ul/li", "xpath:idRelative"],
+        ["xpath=//li", "xpath:position"],
+        ["xpath=//li[contains(.,'Lista użytkowników')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "f89f1191-12b9-4e71-8491-2a02bba0d58e",
+      "comment": "",
+      "command": "click",
+      "target": "css=#root > div",
+      "targets": [
+        ["css=#root > div", "css:finder"],
+        ["xpath=//div[@id='root']/div", "xpath:idRelative"],
+        ["xpath=//div/div", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "53bc485c-f8a0-4696-ad89-0fafcf25fbaa",
+      "comment": "",
+      "command": "click",
+      "target": "css=.btn-sm:nth-child(2)",
+      "targets": [
+        ["css=.btn-sm:nth-child(2)", "css:finder"],
+        ["xpath=//tbody[@id='users_table']/tr[3]/td[9]/button", "xpath:idRelative"],
+        ["xpath=//tr[3]/td[9]/button", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "359ce231-cbd5-4025-a94c-d68d7effdec2",
+      "comment": "",
+      "command": "click",
+      "target": "css=.form-control",
+      "targets": [
+        ["css=.form-control", "css:finder"],
+        ["xpath=//div[@id='permissions_modal']/div/div/div[2]/p[2]/select", "xpath:idRelative"],
+        ["xpath=//select", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "00a1562b-bec5-4254-aee7-0847e441b700",
+      "comment": "",
+      "command": "select",
+      "target": "css=.form-control",
+      "targets": [],
+      "value": "label=Członek kapituły"
+    }, {
+      "id": "0f4e0099-c268-444a-983b-38887dc48c84",
+      "comment": "",
+      "command": "click",
+      "target": "css=option:nth-child(2)",
+      "targets": [
+        ["css=option:nth-child(2)", "css:finder"],
+        ["xpath=//option[@value='MEMBER']", "xpath:attributes"],
+        ["xpath=//div[@id='permissions_modal']/div/div/div[2]/p[2]/select/option[2]", "xpath:idRelative"],
+        ["xpath=//option[2]", "xpath:position"],
+        ["xpath=//option[contains(.,'Członek kapituły')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "5c2adf7d-6cde-47ca-beb7-4014633ed823",
+      "comment": "",
+      "command": "click",
+      "target": "css=#permissions_modal .btn-danger",
+      "targets": [
+        ["css=#permissions_modal .btn-danger", "css:finder"],
+        ["xpath=(//button[@type='button'])[23]", "xpath:attributes"],
+        ["xpath=//div[@id='permissions_modal']/div/div/div[3]/button[2]", "xpath:idRelative"],
+        ["xpath=//div[4]/div/div/div[3]/button[2]", "xpath:position"],
+        ["xpath=//button[contains(.,'Zaktualizuj uprawnienia')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }]
+  }],
+  "suites": [{
+    "id": "3e6e1638-9f37-48b7-9fe9-1fb1dcd2ac59",
+    "name": "Default Suite",
+    "persistSession": false,
+    "parallel": false,
+    "timeout": 300,
+    "tests": ["0d5b059a-9325-4ee8-8654-3b3228ada4c6"]
+  }],
+  "urls": ["http://localhost:8080/"],
+  "plugins": []
+}

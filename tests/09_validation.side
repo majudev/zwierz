@@ -1,0 +1,98 @@
+{
+  "id": "a5ee05d4-61b8-4dbb-9d57-c3e1643ff26e",
+  "version": "2.0",
+  "name": "validation",
+  "url": "http://localhost:8080",
+  "tests": [{
+    "id": "a7f621b4-ab52-4e91-b1b4-2856a7f269cc",
+    "name": "Untitled",
+    "commands": [{
+      "id": "6b3ccc98-9439-414b-926c-a0e897c505f6",
+      "comment": "",
+      "command": "open",
+      "target": "/profile",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "e55416bd-f657-442d-9611-7e86f6fd2758",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "955x821",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "ee1e2413-cdba-484e-a2a6-363ef346c736",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=Panel administratora",
+      "targets": [
+        ["linkText=Panel administratora", "linkText"],
+        ["css=.nav-link:nth-child(5)", "css:finder"],
+        ["xpath=//a[contains(text(),'Panel administratora')]", "xpath:link"],
+        ["xpath=//div[@id='navbarCollapse']/ul/a[5]", "xpath:idRelative"],
+        ["xpath=//a[contains(@href, '/admin')]", "xpath:href"],
+        ["xpath=//a[5]", "xpath:position"],
+        ["xpath=//a[contains(.,'Panel administratora')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "2b0117c8-f96a-4a97-adb5-9b2ff244d893",
+      "comment": "",
+      "command": "click",
+      "target": "css=.btn-dark:nth-child(1)",
+      "targets": [
+        ["css=.btn-dark:nth-child(1)", "css:finder"],
+        ["xpath=//tbody[@id='users_table']/tr[3]/td[7]/button", "xpath:idRelative"],
+        ["xpath=//td[7]/button", "xpath:position"],
+        ["xpath=//button[contains(.,'Aktywuj')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "7083f2e2-4b55-4207-900f-abafbcfb11f6",
+      "comment": "",
+      "command": "mouseOver",
+      "target": "css=.btn-dark:nth-child(1)",
+      "targets": [
+        ["css=.btn-dark:nth-child(1)", "css:finder"],
+        ["xpath=//tbody[@id='users_table']/tr[3]/td[7]/button", "xpath:idRelative"],
+        ["xpath=//td[7]/button", "xpath:position"],
+        ["xpath=//button[contains(.,'Aktywuj')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "15ce8970-287e-4ffd-b0cf-f1f2cc02d48f",
+      "comment": "",
+      "command": "mouseOut",
+      "target": "css=.btn-dark:nth-child(1)",
+      "targets": [
+        ["css=.btn-dark:nth-child(1)", "css:finder"],
+        ["xpath=//tbody[@id='users_table']/tr[3]/td[7]/button", "xpath:idRelative"],
+        ["xpath=//td[7]/button", "xpath:position"],
+        ["xpath=//button[contains(.,'Aktywuj')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "ffdc9502-1fe1-4115-906d-7eedaf8e8771",
+      "comment": "",
+      "command": "click",
+      "target": "css=.modal-footer > .btn-dark",
+      "targets": [
+        ["css=.modal-footer > .btn-dark", "css:finder"],
+        ["xpath=(//button[@type='button'])[8]", "xpath:attributes"],
+        ["xpath=//div[@id='activate_modal']/div/div/div[3]/button[2]", "xpath:idRelative"],
+        ["xpath=//div[3]/button[2]", "xpath:position"]
+      ],
+      "value": ""
+    }]
+  }],
+  "suites": [{
+    "id": "f44ea9bc-9e81-4c19-9272-5f0a24c7c57e",
+    "name": "Default Suite",
+    "persistSession": false,
+    "parallel": false,
+    "timeout": 300,
+    "tests": ["a7f621b4-ab52-4e91-b1b4-2856a7f269cc"]
+  }],
+  "urls": ["http://localhost:8080/"],
+  "plugins": []
+}

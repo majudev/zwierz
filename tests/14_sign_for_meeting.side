@@ -1,0 +1,152 @@
+{
+  "id": "f8df4fd4-ecd9-4bfc-a49e-c5a0fafd260d",
+  "version": "2.0",
+  "name": "14_sign_for_meeting",
+  "url": "http://localhost:8080",
+  "tests": [{
+    "id": "74421a1a-3092-492f-b40d-6849521c27a5",
+    "name": "Untitled",
+    "commands": [{
+      "id": "ad2cb5c0-1953-4981-9471-083f5149b528",
+      "comment": "",
+      "command": "open",
+      "target": "/appointments",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "40c67a52-aa57-4721-8881-724ba8946284",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=Moje spotkania z kapitułą",
+      "targets": [
+        ["linkText=Moje spotkania z kapitułą", "linkText"],
+        ["css=.active", "css:finder"],
+        ["xpath=//a[contains(text(),'Moje spotkania z kapitułą')]", "xpath:link"],
+        ["xpath=//div[@id='navbarCollapse']/ul/a[3]", "xpath:idRelative"],
+        ["xpath=//a[contains(@href, '/appointments')]", "xpath:href"],
+        ["xpath=//a[3]", "xpath:position"],
+        ["xpath=//a[contains(.,'Moje spotkania z kapitułą')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "fa6d8dfe-dbb6-4380-8ebc-f1971e98fdc7",
+      "comment": "",
+      "command": "click",
+      "target": "css=tr:nth-child(1) .btn",
+      "targets": [
+        ["css=tr:nth-child(1) .btn", "css:finder"],
+        ["xpath=(//button[@type='button'])[2]", "xpath:attributes"],
+        ["xpath=//tbody[@id='appointment_table']/tr/td[4]/button", "xpath:idRelative"],
+        ["xpath=//td[4]/button", "xpath:position"],
+        ["xpath=//button[contains(.,'Zapisz się')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "ef517254-490b-4afc-986d-a9bd8ade35cd",
+      "comment": "",
+      "command": "click",
+      "target": "css=p:nth-child(2) > .form-control",
+      "targets": [
+        ["css=p:nth-child(2) > .form-control", "css:finder"],
+        ["xpath=//div[@id='register_modal']/div/div/div[2]/p[2]/select", "xpath:idRelative"],
+        ["xpath=//select", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "2fd30b25-96cb-4b2a-a9f3-0ab92a74a675",
+      "comment": "",
+      "command": "select",
+      "target": "css=p:nth-child(2) > .form-control",
+      "targets": [],
+      "value": "label=Harcerz Orli"
+    }, {
+      "id": "17c07bea-9de6-48ac-88f7-6efeeddf1bb2",
+      "comment": "",
+      "command": "click",
+      "target": "css=p:nth-child(2) option:nth-child(2)",
+      "targets": [
+        ["css=p:nth-child(2) option:nth-child(2)", "css:finder"],
+        ["xpath=//option[@value='ho']", "xpath:attributes"],
+        ["xpath=//div[@id='register_modal']/div/div/div[2]/p[2]/select/option[2]", "xpath:idRelative"],
+        ["xpath=//option[2]", "xpath:position"],
+        ["xpath=//option[contains(.,'Harcerz Orli')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "c260ef33-90cc-4169-8921-9e91dc4eac28",
+      "comment": "",
+      "command": "click",
+      "target": "css=p:nth-child(3) > .form-control",
+      "targets": [
+        ["css=p:nth-child(3) > .form-control", "css:finder"],
+        ["xpath=//div[@id='register_modal']/div/div/div[2]/p[3]/select", "xpath:idRelative"],
+        ["xpath=//p[3]/select", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "e0343588-2cca-4efa-b6e7-ecd4181249cf",
+      "comment": "",
+      "command": "select",
+      "target": "css=p:nth-child(3) > .form-control",
+      "targets": [],
+      "value": "label=Otwarcie stopnia"
+    }, {
+      "id": "a178a85d-ab4d-4e0c-b022-43e20f831fd3",
+      "comment": "",
+      "command": "click",
+      "target": "css=p:nth-child(3) option:nth-child(2)",
+      "targets": [
+        ["css=p:nth-child(3) option:nth-child(2)", "css:finder"],
+        ["xpath=//option[@value='OPEN_TRIAL']", "xpath:attributes"],
+        ["xpath=//div[@id='register_modal']/div/div/div[2]/p[3]/select/option[2]", "xpath:idRelative"],
+        ["xpath=//p[3]/select/option[2]", "xpath:position"],
+        ["xpath=//option[contains(.,'Otwarcie stopnia')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "2739bf96-c84f-436f-a936-2179905678f6",
+      "comment": "",
+      "command": "click",
+      "target": "css=p:nth-child(4) > .form-control",
+      "targets": [
+        ["css=p:nth-child(4) > .form-control", "css:finder"],
+        ["xpath=//div[@id='register_modal']/div/div/div[2]/p[4]/textarea", "xpath:idRelative"],
+        ["xpath=//textarea", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "c67389dc-f7f3-4c39-8eb8-9bdd9f7acb30",
+      "comment": "",
+      "command": "type",
+      "target": "css=p:nth-child(4) > .form-control",
+      "targets": [
+        ["css=p:nth-child(4) > .form-control", "css:finder"],
+        ["xpath=//div[@id='register_modal']/div/div/div[2]/p[4]/textarea", "xpath:idRelative"],
+        ["xpath=//textarea", "xpath:position"]
+      ],
+      "value": "Test"
+    }, {
+      "id": "07100551-eee8-4ba9-8c9e-e99749f386d7",
+      "comment": "",
+      "command": "click",
+      "target": "css=.btn:nth-child(2)",
+      "targets": [
+        ["css=.btn:nth-child(2)", "css:finder"],
+        ["xpath=(//button[@type='button'])[13]", "xpath:attributes"],
+        ["xpath=//div[@id='register_modal']/div/div/div[3]/button[2]", "xpath:idRelative"],
+        ["xpath=//div[3]/button[2]", "xpath:position"]
+      ],
+      "value": ""
+    }]
+  }],
+  "suites": [{
+    "id": "d75b6ab8-daee-4b49-8cb1-7baef3fda9dd",
+    "name": "Default Suite",
+    "persistSession": false,
+    "parallel": false,
+    "timeout": 300,
+    "tests": ["74421a1a-3092-492f-b40d-6849521c27a5"]
+  }],
+  "urls": ["http://localhost:8080/"],
+  "plugins": []
+}

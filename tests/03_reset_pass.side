@@ -1,0 +1,103 @@
+{
+  "id": "4ce9a76d-afa5-4e74-b8ec-107e53f2ae61",
+  "version": "2.0",
+  "name": "reset_hasla",
+  "url": "http://localhost:8080",
+  "tests": [{
+    "id": "4cc24231-f47b-44ce-9b5d-9648c5e15372",
+    "name": "Untitled",
+    "commands": [{
+      "id": "4709ebc8-4b64-49ed-9681-26d64678a8ef",
+      "comment": "",
+      "command": "open",
+      "target": "/login",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "31b505e3-7386-4f1c-9ac2-59d8aedf22f1",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "954x694",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "2f4467f3-0398-4629-a235-72ac528491fc",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=Zresetuj je",
+      "targets": [
+        ["linkText=Zresetuj je", "linkText"],
+        ["css=.mt-3:nth-child(7) > a", "css:finder"],
+        ["xpath=//a[contains(text(),'Zresetuj je')]", "xpath:link"],
+        ["xpath=//div[@id='root']/div/main/div/div/p[2]/a", "xpath:idRelative"],
+        ["xpath=//a[contains(@href, '/passwordreset')]", "xpath:href"],
+        ["xpath=//p[2]/a", "xpath:position"],
+        ["xpath=//a[contains(.,'Zresetuj je')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "9f86ec4d-c4d8-43b2-a241-e31b7594d8e9",
+      "comment": "",
+      "command": "click",
+      "target": "id=floatingInput",
+      "targets": [
+        ["id=floatingInput", "id"],
+        ["css=#floatingInput", "css:finder"],
+        ["xpath=//input[@id='floatingInput']", "xpath:attributes"],
+        ["xpath=//div[@id='root']/div/main/div/div/div/input", "xpath:idRelative"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "6d112b10-90e7-459a-8990-4adbbe7d7700",
+      "comment": "",
+      "command": "type",
+      "target": "id=floatingInput",
+      "targets": [
+        ["id=floatingInput", "id"],
+        ["css=#floatingInput", "css:finder"],
+        ["xpath=//input[@id='floatingInput']", "xpath:attributes"],
+        ["xpath=//div[@id='root']/div/main/div/div/div/input", "xpath:idRelative"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": "user@example.com"
+    }, {
+      "id": "68d3584a-4190-4197-b618-6f4bdbd76175",
+      "comment": "",
+      "command": "type",
+      "target": "id=captcha",
+      "targets": [
+        ["id=captcha", "id"],
+        ["css=#captcha", "css:finder"],
+        ["xpath=//input[@id='captcha']", "xpath:attributes"],
+        ["xpath=//div[@id='root']/div/main/div/div/div[2]/input", "xpath:idRelative"],
+        ["xpath=//div[2]/input", "xpath:position"]
+      ],
+      "value": "9"
+    }, {
+      "id": "a86eddf1-22cc-4018-bb57-f374e164d129",
+      "comment": "",
+      "command": "click",
+      "target": "id=submit",
+      "targets": [
+        ["id=submit", "id"],
+        ["css=#submit", "css:finder"],
+        ["xpath=//button[@id='submit']", "xpath:attributes"],
+        ["xpath=//div[@id='root']/div/main/div/div/button", "xpath:idRelative"],
+        ["xpath=//div/div/button", "xpath:position"],
+        ["xpath=//button[contains(.,'Wyślij link do resetu hasła')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }]
+  }],
+  "suites": [{
+    "id": "5c8234cb-7f75-4df1-9a16-c1d8582d3cb2",
+    "name": "Default Suite",
+    "persistSession": false,
+    "parallel": false,
+    "timeout": 300,
+    "tests": ["4cc24231-f47b-44ce-9b5d-9648c5e15372"]
+  }],
+  "urls": ["http://localhost:8080/"],
+  "plugins": []
+}

@@ -1,0 +1,98 @@
+{
+  "id": "2df173b9-5033-4566-8a28-6d6df194004e",
+  "version": "2.0",
+  "name": "change_tel",
+  "url": "http://localhost:8080",
+  "tests": [{
+    "id": "bc6f7d89-746e-44b5-a486-b75298fd6399",
+    "name": "Untitled",
+    "commands": [{
+      "id": "b6af49d2-77f7-4988-8b55-1006af49a7bb",
+      "comment": "",
+      "command": "open",
+      "target": "/profile",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "6dae472f-e7b2-4c6e-9122-764e32f5c3e4",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "1920x1051",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "62776159-c3a3-47ab-bb39-c85fedaca303",
+      "comment": "",
+      "command": "click",
+      "target": "css=.btn",
+      "targets": [
+        ["css=.btn", "css:finder"],
+        ["xpath=(//button[@type='button'])[2]", "xpath:attributes"],
+        ["xpath=//div[@id='root']/div/main/div/div/div/ul/li[8]/button", "xpath:idRelative"],
+        ["xpath=//li[8]/button", "xpath:position"],
+        ["xpath=//button[contains(.,'Edytuj')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "59e8f75d-4955-445d-b4b6-bba6ad533042",
+      "comment": "",
+      "command": "mouseOver",
+      "target": "css=.btn",
+      "targets": [
+        ["css=.btn", "css:finder"],
+        ["xpath=(//button[@type='button'])[2]", "xpath:attributes"],
+        ["xpath=//div[@id='root']/div/main/div/div/div/ul/li[8]/button", "xpath:idRelative"],
+        ["xpath=//li[8]/button", "xpath:position"],
+        ["xpath=//button[contains(.,'Edytuj')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "687548a7-df9e-45a9-b6fd-0e781c3f37be",
+      "comment": "",
+      "command": "click",
+      "target": "css=.list-group-item:nth-child(4) > .form-control",
+      "targets": [
+        ["css=.list-group-item:nth-child(4) > .form-control", "css:finder"],
+        ["xpath=//input[@value='+48888888888']", "xpath:attributes"],
+        ["xpath=//div[@id='root']/div/main/div/div/div/ul/li[4]/input", "xpath:idRelative"],
+        ["xpath=//li[4]/input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "7843efa9-5eed-4059-b7da-cab9b28bb219",
+      "comment": "",
+      "command": "type",
+      "target": "css=.list-group-item:nth-child(4) > .form-control",
+      "targets": [
+        ["css=.list-group-item:nth-child(4) > .form-control", "css:finder"],
+        ["xpath=//input[@value='+48777777777']", "xpath:attributes"],
+        ["xpath=//div[@id='root']/div/main/div/div/div/ul/li[4]/input", "xpath:idRelative"],
+        ["xpath=//li[4]/input", "xpath:position"]
+      ],
+      "value": "+48777777777"
+    }, {
+      "id": "fd72f7be-3529-4611-9bba-ba426e5d34fb",
+      "comment": "",
+      "command": "click",
+      "target": "css=.list-group-item > .btn-dark",
+      "targets": [
+        ["css=.list-group-item > .btn-dark", "css:finder"],
+        ["xpath=(//button[@type='button'])[2]", "xpath:attributes"],
+        ["xpath=//div[@id='root']/div/main/div/div/div/ul/li[8]/button", "xpath:idRelative"],
+        ["xpath=//li[8]/button", "xpath:position"],
+        ["xpath=//button[contains(.,'Zapisz')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }]
+  }],
+  "suites": [{
+    "id": "7d86e7d4-9943-4758-b021-c7368947d6dc",
+    "name": "Default Suite",
+    "persistSession": false,
+    "parallel": false,
+    "timeout": 300,
+    "tests": ["bc6f7d89-746e-44b5-a486-b75298fd6399"]
+  }],
+  "urls": ["http://localhost:8080/"],
+  "plugins": []
+}

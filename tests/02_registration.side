@@ -1,0 +1,129 @@
+{
+  "id": "8dc40c76-a22d-467b-82bf-0192af7da82a",
+  "version": "2.0",
+  "name": "rejestr_pr1",
+  "url": "http://localhost:8080",
+  "tests": [{
+    "id": "3938f512-a0b6-4930-850f-6c25d6b56051",
+    "name": "Untitled",
+    "commands": [{
+      "id": "aef98775-6888-45f9-8752-ce79e07f5d66",
+      "comment": "",
+      "command": "open",
+      "target": "/login",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "d9a1de0e-d5ca-435a-8774-cf121fd6074f",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "954x692",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "987f352d-78ef-4699-a4d1-8312282cbd13",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=Zarejestruj się",
+      "targets": [
+        ["linkText=Zarejestruj się", "linkText"],
+        ["css=.mt-3:nth-child(6) > a", "css:finder"],
+        ["xpath=//a[contains(text(),'Zarejestruj się')]", "xpath:link"],
+        ["xpath=//div[@id='root']/div/main/div/div/p/a", "xpath:idRelative"],
+        ["xpath=//a[contains(@href, '/register')]", "xpath:href"],
+        ["xpath=//p/a", "xpath:position"],
+        ["xpath=//a[contains(.,'Zarejestruj się')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "25a7b3ea-4819-4de4-8c16-d1b862a1ad26",
+      "comment": "",
+      "command": "click",
+      "target": "id=floatingInput",
+      "targets": [
+        ["id=floatingInput", "id"],
+        ["css=#floatingInput", "css:finder"],
+        ["xpath=//input[@id='floatingInput']", "xpath:attributes"],
+        ["xpath=//div[@id='root']/div/main/div/div/div/input", "xpath:idRelative"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "e55b1457-ae70-4db7-b6af-5364a2811e86",
+      "comment": "",
+      "command": "type",
+      "target": "id=floatingInput",
+      "targets": [
+        ["id=floatingInput", "id"],
+        ["css=#floatingInput", "css:finder"],
+        ["xpath=//input[@id='floatingInput']", "xpath:attributes"],
+        ["xpath=//div[@id='root']/div/main/div/div/div/input", "xpath:idRelative"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": "user@example.com"
+    }, {
+      "id": "6f65d6e0-196d-4d87-a1cf-d3ca227acf21",
+      "comment": "",
+      "command": "type",
+      "target": "id=floatingPassword",
+      "targets": [
+        ["id=floatingPassword", "id"],
+        ["css=#floatingPassword", "css:finder"],
+        ["xpath=//input[@id='floatingPassword']", "xpath:attributes"],
+        ["xpath=//div[@id='root']/div/main/div/div/div[2]/input", "xpath:idRelative"],
+        ["xpath=//div[2]/input", "xpath:position"]
+      ],
+      "value": "Password0%"
+    }, {
+      "id": "567f5aab-ba76-4b95-ad1f-be18fb9c1361",
+      "comment": "",
+      "command": "type",
+      "target": "id=floatingPassword2",
+      "targets": [
+        ["id=floatingPassword2", "id"],
+        ["css=#floatingPassword2", "css:finder"],
+        ["xpath=//input[@id='floatingPassword2']", "xpath:attributes"],
+        ["xpath=//div[@id='root']/div/main/div/div/div[3]/input", "xpath:idRelative"],
+        ["xpath=//div[3]/input", "xpath:position"]
+      ],
+      "value": "Password0%"
+    }, {
+      "id": "81e34fc4-bf76-483b-aa6f-1da60918120b",
+      "comment": "",
+      "command": "type",
+      "target": "id=captcha",
+      "targets": [
+        ["id=captcha", "id"],
+        ["css=#captcha", "css:finder"],
+        ["xpath=//input[@id='captcha']", "xpath:attributes"],
+        ["xpath=//div[@id='root']/div/main/div/div/div[4]/input", "xpath:idRelative"],
+        ["xpath=//div[4]/input", "xpath:position"]
+      ],
+      "value": "12"
+    }, {
+      "id": "b5798e6f-9e86-4465-9492-381aad4a6f17",
+      "comment": "",
+      "command": "click",
+      "target": "id=submit",
+      "targets": [
+        ["id=submit", "id"],
+        ["css=#submit", "css:finder"],
+        ["xpath=//button[@id='submit']", "xpath:attributes"],
+        ["xpath=//div[@id='root']/div/main/div/div/button", "xpath:idRelative"],
+        ["xpath=//div/div/button", "xpath:position"],
+        ["xpath=//button[contains(.,'Zarejestruj się')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }]
+  }],
+  "suites": [{
+    "id": "c7af0eac-65d4-4d2b-85ba-afcde28034a8",
+    "name": "Default Suite",
+    "persistSession": false,
+    "parallel": false,
+    "timeout": 300,
+    "tests": ["3938f512-a0b6-4930-850f-6c25d6b56051"]
+  }],
+  "urls": ["http://localhost:8080/"],
+  "plugins": []
+}

@@ -1,0 +1,155 @@
+{
+  "id": "c29e86ca-825d-4dc2-9af8-bd2a30b38b9d",
+  "version": "2.0",
+  "name": "13_add_new_meeting",
+  "url": "http://localhost:8080",
+  "tests": [{
+    "id": "14637854-4185-4158-9c4e-d82ebc059398",
+    "name": "Untitled",
+    "commands": [{
+      "id": "d7ebd3a7-521e-44eb-8b74-f046273d8ab4",
+      "comment": "",
+      "command": "open",
+      "target": "/commitee/appointments",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "09acef03-4358-415f-8544-55e858be5dda",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "955x826",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "431403cf-93ca-4f07-a1bc-1db89ebeee81",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=Spotkania",
+      "targets": [
+        ["linkText=Spotkania", "linkText"],
+        ["css=.active", "css:finder"],
+        ["xpath=//a[contains(text(),'Spotkania')]", "xpath:link"],
+        ["xpath=//div[@id='navbarCollapse']/ul/a[4]", "xpath:idRelative"],
+        ["xpath=//a[contains(@href, '/commitee/appointments')]", "xpath:href"],
+        ["xpath=//a[4]", "xpath:position"],
+        ["xpath=//a[contains(.,'Spotkania')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "e7f01be3-c615-4241-b20d-e22ddc9c78c1",
+      "comment": "",
+      "command": "click",
+      "target": "css=.d-flex > .btn",
+      "targets": [
+        ["css=.d-flex > .btn", "css:finder"],
+        ["xpath=(//button[@type='button'])[2]", "xpath:attributes"],
+        ["xpath=//div[@id='root']/div/main/div/div/div/ul/li[2]/div/div/button", "xpath:idRelative"],
+        ["xpath=//div/div/button", "xpath:position"],
+        ["xpath=//button[contains(.,'Dodaj nowe spotkanie')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "02264310-a283-4253-9ac6-392a5f24c472",
+      "comment": "",
+      "command": "click",
+      "target": "css=.nowrap:nth-child(1) > .form-control",
+      "targets": [
+        ["css=.nowrap:nth-child(1) > .form-control", "css:finder"],
+        ["xpath=//tbody[@id='appointment_table']/tr[5]/td/select", "xpath:idRelative"],
+        ["xpath=//select", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "eb0c9ded-810a-4791-b650-7ec7311f4af8",
+      "comment": "",
+      "command": "select",
+      "target": "css=.nowrap:nth-child(1) > .form-control",
+      "targets": [],
+      "value": "label=21.03.2024"
+    }, {
+      "id": "096d332f-116a-42f5-8673-c304e4efbfc3",
+      "comment": "",
+      "command": "click",
+      "target": "css=option:nth-child(65)",
+      "targets": [
+        ["css=option:nth-child(65)", "css:finder"],
+        ["xpath=//option[@value='2024-03-21T16:17:33.014Z']", "xpath:attributes"],
+        ["xpath=//tbody[@id='appointment_table']/tr[5]/td/select/option[65]", "xpath:idRelative"],
+        ["xpath=//option[65]", "xpath:position"],
+        ["xpath=//option[contains(.,'21.03.2024')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "4525d419-757a-4701-9e12-bd7c3370d953",
+      "comment": "",
+      "command": "click",
+      "target": "css=.longrecord:nth-child(1)",
+      "targets": [
+        ["css=.longrecord:nth-child(1)", "css:finder"],
+        ["xpath=//tbody[@id='appointment_table']/tr[5]/td[2]/textarea", "xpath:idRelative"],
+        ["xpath=//textarea", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "693e96f1-ccd1-4f24-8f22-3cc585cdea6a",
+      "comment": "",
+      "command": "type",
+      "target": "css=.longrecord:nth-child(1)",
+      "targets": [
+        ["css=.longrecord:nth-child(1)", "css:finder"],
+        ["xpath=//tbody[@id='appointment_table']/tr[5]/td[2]/textarea", "xpath:idRelative"],
+        ["xpath=//textarea", "xpath:position"]
+      ],
+      "value": "Test"
+    }, {
+      "id": "5a0bcd1b-948f-4307-9465-e321e4c4f726",
+      "comment": "",
+      "command": "click",
+      "target": "css=.text-center > .form-control",
+      "targets": [
+        ["css=.text-center > .form-control", "css:finder"],
+        ["xpath=//tbody[@id='appointment_table']/tr[5]/td[3]/select", "xpath:idRelative"],
+        ["xpath=//td[3]/select", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "740e690f-d5cf-4339-a203-7a8774f8f230",
+      "comment": "",
+      "command": "select",
+      "target": "css=.text-center > .form-control",
+      "targets": [],
+      "value": "label=3"
+    }, {
+      "id": "2eb6f4bb-0206-44ef-bb2b-a5465d3cee3c",
+      "comment": "",
+      "command": "click",
+      "target": "css=.text-center > option:nth-child(5)",
+      "targets": [
+        ["css=.text-center > option:nth-child(5)", "css:finder"],
+        ["xpath=//option[@value='3']", "xpath:attributes"],
+        ["xpath=//tbody[@id='appointment_table']/tr[5]/td[3]/select/option[5]", "xpath:idRelative"],
+        ["xpath=//td[3]/select/option[5]", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "93f93c10-b537-462c-9f3b-e524421b0c00",
+      "comment": "",
+      "command": "click",
+      "target": "css=.bi-check-lg",
+      "targets": [
+        ["css=.bi-check-lg", "css:finder"]
+      ],
+      "value": ""
+    }]
+  }],
+  "suites": [{
+    "id": "3fb4c34c-ac02-4da8-bd72-704ec6f2bc37",
+    "name": "Default Suite",
+    "persistSession": false,
+    "parallel": false,
+    "timeout": 300,
+    "tests": ["14637854-4185-4158-9c4e-d82ebc059398"]
+  }],
+  "urls": ["http://localhost:8080/"],
+  "plugins": []
+}

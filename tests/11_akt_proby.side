@@ -1,0 +1,58 @@
+{
+  "id": "d6cf7f50-9309-43b4-9853-64bc88cb41ac",
+  "version": "2.0",
+  "name": "11_akt_proby",
+  "url": "http://localhost:8080",
+  "tests": [{
+    "id": "0bb00624-1f25-40fe-b3db-e6714ad73459",
+    "name": "Untitled",
+    "commands": [{
+      "id": "ae4e5b80-e24c-4a72-8dc9-2cb233044b9c",
+      "comment": "",
+      "command": "open",
+      "target": "/profile",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "839ab7f5-e68e-4edf-b516-c3645260eb2e",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=Próby na HO",
+      "targets": [
+        ["linkText=Próby na HO", "linkText"],
+        ["css=.nav-link:nth-child(3)", "css:finder"],
+        ["xpath=//a[contains(text(),'Próby na HO')]", "xpath:link"],
+        ["xpath=//div[@id='navbarCollapse']/ul/a[3]", "xpath:idRelative"],
+        ["xpath=//a[contains(@href, '/commitee/trials/ho')]", "xpath:href"],
+        ["xpath=//a[3]", "xpath:position"],
+        ["xpath=//a[contains(.,'Próby na HO')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "d7692a71-8122-4ddc-8dc5-5d6308ea08e8",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=Wyświetl",
+      "targets": [
+        ["linkText=Wyświetl", "linkText"],
+        ["css=.list-group-item:nth-child(2) > table .btn", "css:finder"],
+        ["xpath=//a[contains(text(),'Wyświetl')]", "xpath:link"],
+        ["xpath=//ul[@id='trials_active']/li[2]/table/tbody/tr/td[2]/a", "xpath:idRelative"],
+        ["xpath=//a[contains(@href, '/commitee/trial/2/ho')]", "xpath:href"],
+        ["xpath=//td[2]/a", "xpath:position"],
+        ["xpath=//a[contains(.,'Wyświetl')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }]
+  }],
+  "suites": [{
+    "id": "e2cf57d2-6397-4d60-bffc-893c4349fc3d",
+    "name": "Default Suite",
+    "persistSession": false,
+    "parallel": false,
+    "timeout": 300,
+    "tests": ["0bb00624-1f25-40fe-b3db-e6714ad73459"]
+  }],
+  "urls": ["http://localhost:8080/"],
+  "plugins": []
+}

@@ -1,0 +1,55 @@
+{
+  "id": "6f3721c5-e272-4870-aa6d-093373122b4d",
+  "version": "2.0",
+  "name": "12_arch_proby",
+  "url": "http://localhost:8080",
+  "tests": [{
+    "id": "a3325a7e-3cdc-4cf2-a849-25996c8f49e5",
+    "name": "Untitled",
+    "commands": [{
+      "id": "177d9ded-145c-4bfa-b357-dff1d55b634f",
+      "comment": "",
+      "command": "open",
+      "target": "/profile",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "2ebe7a72-bbf6-4c0d-adb6-961f58a35251",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=Próby na HO",
+      "targets": [
+        ["linkText=Próby na HO", "linkText"],
+        ["css=.nav-link:nth-child(3)", "css:finder"],
+        ["xpath=//a[contains(text(),'Próby na HO')]", "xpath:link"],
+        ["xpath=//div[@id='navbarCollapse']/ul/a[3]", "xpath:idRelative"],
+        ["xpath=//a[contains(@href, '/commitee/trials/ho')]", "xpath:href"],
+        ["xpath=//a[3]", "xpath:position"],
+        ["xpath=//a[contains(.,'Próby na HO')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "d7b38927-f78a-4406-92c9-c79b35541d51",
+      "comment": "",
+      "command": "click",
+      "target": "css=.flex-row-reverse > .btn",
+      "targets": [
+        ["css=.flex-row-reverse > .btn", "css:finder"],
+        ["xpath=//ul[@id='trials_archived']/li[2]/button", "xpath:idRelative"],
+        ["xpath=//li[2]/button", "xpath:position"],
+        ["xpath=//button[contains(.,'Wyświetl archiwalne próby')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }]
+  }],
+  "suites": [{
+    "id": "1fe13bbf-69eb-4ba2-ba84-ebfa4cb97f0d",
+    "name": "Default Suite",
+    "persistSession": false,
+    "parallel": false,
+    "timeout": 300,
+    "tests": ["a3325a7e-3cdc-4cf2-a849-25996c8f49e5"]
+  }],
+  "urls": ["http://localhost:8080/"],
+  "plugins": []
+}

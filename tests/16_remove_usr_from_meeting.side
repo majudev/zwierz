@@ -1,0 +1,89 @@
+{
+  "id": "a997e9a4-af1b-47a7-9fbb-63b2bae1d7fd",
+  "version": "2.0",
+  "name": "16_remove_usr_from_meeting",
+  "url": "http://localhost:8080",
+  "tests": [{
+    "id": "048b6089-c8a1-4576-b504-2512acf00aa7",
+    "name": "Untitled",
+    "commands": [{
+      "id": "90ae58e7-8de6-413d-af37-9aa5bcc6ade1",
+      "comment": "",
+      "command": "open",
+      "target": "/commitee/appointments",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "dd16f92c-d46b-49d7-be59-4a5334cd55e3",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=Spotkania",
+      "targets": [
+        ["linkText=Spotkania", "linkText"],
+        ["css=.active", "css:finder"],
+        ["xpath=//a[contains(text(),'Spotkania')]", "xpath:link"],
+        ["xpath=//div[@id='navbarCollapse']/ul/a[4]", "xpath:idRelative"],
+        ["xpath=//a[contains(@href, '/commitee/appointments')]", "xpath:href"],
+        ["xpath=//a[4]", "xpath:position"],
+        ["xpath=//a[contains(.,'Spotkania')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "d9e242e9-4b94-4df2-9577-c999c7887b62",
+      "comment": "",
+      "command": "click",
+      "target": "css=.nowrap:nth-child(3) > .btn-danger",
+      "targets": [
+        ["css=.nowrap:nth-child(3) > .btn-danger", "css:finder"],
+        ["xpath=//tbody[@id='appointment_table']/tr/td[2]/table/tbody/tr/td[3]/button[2]", "xpath:idRelative"],
+        ["xpath=//button[2]", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "be1b3518-9566-4e37-a869-1510af10c29d",
+      "comment": "",
+      "command": "mouseOver",
+      "target": "css=.nowrap:nth-child(3) > .btn-danger",
+      "targets": [
+        ["css=.nowrap:nth-child(3) > .btn-danger", "css:finder"],
+        ["xpath=//tbody[@id='appointment_table']/tr/td[2]/table/tbody/tr/td[3]/button[2]", "xpath:idRelative"],
+        ["xpath=//button[2]", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "ab4bf5a4-1058-4b72-8966-37db78addcc2",
+      "comment": "",
+      "command": "mouseOut",
+      "target": "css=.nowrap:nth-child(3) > .btn-danger",
+      "targets": [
+        ["css=.nowrap:nth-child(3) > .btn-danger", "css:finder"],
+        ["xpath=//tbody[@id='appointment_table']/tr/td[2]/table/tbody/tr/td[3]/button[2]", "xpath:idRelative"],
+        ["xpath=//button[2]", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "a6235f03-d46f-42bc-8093-b4ca29acbe52",
+      "comment": "",
+      "command": "click",
+      "target": "css=.modal-footer > .btn-danger",
+      "targets": [
+        ["css=.modal-footer > .btn-danger", "css:finder"],
+        ["xpath=(//button[@type='button'])[7]", "xpath:attributes"],
+        ["xpath=//div[@id='kick_modal']/div/div/div[3]/button[2]", "xpath:idRelative"],
+        ["xpath=//div[3]/button[2]", "xpath:position"],
+        ["xpath=//button[contains(.,'Wyrzuć')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }]
+  }],
+  "suites": [{
+    "id": "a0ea8874-8e9a-41ca-8200-54992d0ec584",
+    "name": "Default Suite",
+    "persistSession": false,
+    "parallel": false,
+    "timeout": 300,
+    "tests": ["048b6089-c8a1-4576-b504-2512acf00aa7"]
+  }],
+  "urls": ["http://localhost:8080/"],
+  "plugins": []
+}
