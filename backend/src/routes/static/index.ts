@@ -91,4 +91,78 @@ router.get('/show-category-hints', async (req: Request, res: Response) => {
     }).end();
 });
 
+router.get('/trial-tutorial-image', async (req: Request, res: Response) => {
+    const showtrialtutorial = await getSetting('trial.showtrialtutorial');
+    if(showtrialtutorial !== 'true'){
+        fail_missing_params(res, [], 'show trial tutorial is disabled');
+        return;
+    }
+
+    const img = await prisma.attachment.findFirst({
+        select: {
+            content: true,
+            extension: true,
+        },
+        where: {
+            name: "trial-tutorial-image",
+            trialId: {
+                equals: null,
+            }
+        }
+    });
+
+    if(img === null || img.extension === null){
+        fail_internal_error(res, "cannot find trial tutorial image in the database");
+        return;
+    }
+
+    const mimetype = mime.lookup(img.extension);
+    if(mimetype === false){
+        fail_internal_error(res, "malformed trial tutorial image in the database");
+        return;
+    }
+
+    res.contentType(mimetype);
+    res.status(200);
+    res.send(img.content);
+    res.end();
+});
+
+router.get('/report-tutorial-image', async (req: Request, res: Response) => {
+    const showreporttutorial = await getSetting('trial.showreporttutorial');
+    if(showreporttutorial !== 'true'){
+        fail_missing_params(res, [], 'show report tutorial is disabled');
+        return;
+    }
+
+    const img = await prisma.attachment.findFirst({
+        select: {
+            content: true,
+            extension: true,
+        },
+        where: {
+            name: "report-tutorial-image",
+            trialId: {
+                equals: null,
+            }
+        }
+    });
+
+    if(img === null || img.extension === null){
+        fail_internal_error(res, "cannot find report tutorial image in the database");
+        return;
+    }
+
+    const mimetype = mime.lookup(img.extension);
+    if(mimetype === false){
+        fail_internal_error(res, "malformed report tutorial image in the database");
+        return;
+    }
+
+    res.contentType(mimetype);
+    res.status(200);
+    res.send(img.content);
+    res.end();
+});
+
 export default router;
