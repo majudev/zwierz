@@ -25,6 +25,9 @@ function Navigation({loggedIn, logIn, logOut, mode, trigger}: Props) : JSX.Eleme
   const [roleHR, setRoleHR] = useState<CommiteeRole>(CommiteeRole.NONE);
   const [uberadmin, setUberadmin] = useState<boolean>(false);
 
+  const [showTrialTutorial, setShowTrialTutorial] = useState(false);
+  const [showReportTutorial, setShowReportTutorial] = useState(false);
+
   const [initMode, setInitMode] = useState(true);
 
   const navigate = useNavigate();
@@ -50,15 +53,24 @@ function Navigation({loggedIn, logIn, logOut, mode, trigger}: Props) : JSX.Eleme
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [trigger]);
 
-  /*useEffect(() => {
-    if(!loggedIn && location.pathname !== '/login' && location.pathname !== '/passwordreset' && !location.pathname.match(/^\/passwordreset\/[a-zA-Z0-9]+/)){
-      navigate('/login');
-    }else if(location.pathname === '/login' && query.get("status") === 'success'){
-      logIn();
-      navigate('/profile');
-    }
+  useEffect(() => {
+    refreshTutorials();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);*/
+  }, []);
+
+  const refreshTutorials = async function() {
+    const response = await fetch(process.env.REACT_APP_API_URL + "/static/show-tutorials", {
+      method: "GET",
+      mode: 'same-origin'
+    });
+    if(!response.ok){
+      alert('Cannot fetch tutorials details');
+      return;
+    }
+    const body = await response.json();
+    setShowTrialTutorial(body.data.showTrialTutorial);
+    setShowReportTutorial(body.data.showReportTutorial);
+  }
 
   const updateRole = async function() {
     const response = await fetch(process.env.REACT_APP_API_URL + "/user/me", {
@@ -121,6 +133,9 @@ function Navigation({loggedIn, logIn, logOut, mode, trigger}: Props) : JSX.Eleme
             
             {(loggedIn && uberadmin) && <NiceNavLink to="/admin">Panel administratora</NiceNavLink>}
             {!loggedIn && <NiceNavLink to="/public_appointments">Lista spotkań</NiceNavLink>}
+
+            {showTrialTutorial && <NiceNavLink to="/trial-tutorial">Jak ułożyć próbę?</NiceNavLink>}
+            {showReportTutorial && <NiceNavLink to="/report-tutorial">Jak zrobić raport?</NiceNavLink>}
           </ul>
           <ul className="navbar-nav mb-2 mb-md-0">
             {!loggedIn && <NiceNavLink to="/login">Zaloguj się</NiceNavLink>}

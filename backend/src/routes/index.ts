@@ -5,6 +5,7 @@ import userRouter from './user/index.js';
 import teamRouter from './team/index.js';
 import trialRouter from './trial/index.js';
 import appointmentsRouter from './appointments/index.js';
+import administrativeRouter from './administrative/index.js';
 
 const router = Router();
 
@@ -14,5 +15,6 @@ router.use('/user', userRouter);
 router.use('/team', teamRouter);
 router.use('/trial', trialRouter);
 router.use('/appointments', appointmentsRouter);
+router.use('/administrative', administrativeRouter);
 
 export default router;

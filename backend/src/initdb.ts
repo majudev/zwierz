@@ -26,6 +26,112 @@ export async function initDB(){
         });
     }
 
+    const pdf_image_found = await prisma.attachment.count({
+        where: {
+            name: "pdf-image",
+            trialId: {
+                equals: null,
+            }
+        }
+    });
+    if(pdf_image_found === 0){
+        logger.info('Inserting default PDF header image into the database...');
+        await prisma.attachment.create({
+            data: {
+                name: "pdf-image",
+                trialId: null,
+                extension: "png",
+                content: fs.readFileSync('defaults/pdf-default.png'),
+                size: fs.readFileSync('defaults/pdf-default.png').length,
+            }
+        });
+    }
+
+    const pdf_ho_name_found = await prisma.settings.count({
+        where: {
+            key: {
+                equals: "pdf.ho.name"
+            }
+        }
+    }) > 0;
+    if(!pdf_ho_name_found){
+        logger.info('Inserting default HO trial PDF header text into the database...');
+        await prisma.settings.create({
+            data: {
+                key: "pdf.ho.name",
+                value: 'Kapituła Stopnia Harcerza Orlego\nHufca [Nazwa Hufca]',
+            }
+        });
+    }
+
+    const pdf_hr_name_found = await prisma.settings.count({
+        where: {
+            key: {
+                equals: "pdf.hr.name"
+            }
+        }
+    }) > 0;
+    if(!pdf_hr_name_found){
+        logger.info('Inserting default HR trial PDF header text into the database...');
+        await prisma.settings.create({
+            data: {
+                key: "pdf.hr.name",
+                value: 'Kapituła Stopnia Harcerza Rzeczypospolitej\nHufca [Nazwa Hufca]',
+            }
+        });
+    }
+
+    const trial_showquesthints_found = await prisma.settings.count({
+        where: {
+            key: {
+                equals: 'trial.showquesthints'
+            }
+        }
+    }) > 0;
+    if(!trial_showquesthints_found){
+        logger.info('Enabling Quest Hints by default...');
+        await prisma.settings.create({
+            data: {
+                key: 'trial.showquesthints',
+                value: 'true',
+            }
+        });
+    }
+
+    const trial_showtrialtutorial_found = await prisma.settings.count({
+        where: {
+            key: {
+                equals: 'trial.showtrialtutorial'
+            }
+        }
+    }) > 0;
+    if(!trial_showtrialtutorial_found){
+        logger.info('Disabling trial tutorial by default...');
+        await prisma.settings.create({
+            data: {
+                key: 'trial.showtrialtutorial',
+                value: 'false',
+            }
+        });
+    }
+
+    const trial_showreporttutorial_found = await prisma.settings.count({
+        where: {
+            key: {
+                equals: 'trial.showreporttutorial'
+            }
+        }
+    }) > 0;
+    if(!trial_showreporttutorial_found){
+        logger.info('Disabling report tutorial by default...');
+        await prisma.settings.create({
+            data: {
+                key: 'trial.showreporttutorial',
+                value: 'false',
+            }
+        });
+    }
+
     const login_image_found = await prisma.attachment.count({
         where: {
             name: "login-image",

@@ -9,7 +9,7 @@ const prisma = new PrismaClient();
 
 router.post('/new', async (req: Request, res: Response) => {
     if(!check_login(res)) return;
-    if(!(await user_is_uberadmin(res.locals.auth_user.userId)) && !(await user_is_commitee_scribe(res.locals.auth_user.userId))){
+    if(!(await user_is_uberadmin(res.locals.auth_user.userId))/* && !(await user_is_commitee_scribe(res.locals.auth_user.userId))*/){
         fail_no_permissions(res, "you don't have permissions to add new teams");
         return;
     }
@@ -49,18 +49,21 @@ router.post('/new', async (req: Request, res: Response) => {
 router.get('/:teamId', async (req: Request, res: Response) => {
     if(!check_login(res)) return;
 
+    const admin = (await user_is_uberadmin(res.locals.auth_user.userId))/* || (await user_is_commitee_scribe(res.locals.auth_user.userId))*/;
+
     if(req.params.teamId === 'all'){
         const teams = await prisma.team.findMany({
             select: {
                 id: true,
                 name: true,
                 archived: true,
+                _count: admin,
             },
         });
 
         res.status(200).json({
             status: "success",
-            data: teams
+            data: admin ? teams.map((e) => {return {...e, _count: undefined, members: e._count.members}}) : teams,
         }).end();
         return;
     }
@@ -80,6 +83,7 @@ router.get('/:teamId', async (req: Request, res: Response) => {
             id: true,
             name: true,
             archived: true,
+            _count: admin,
         },
     });
 
@@ -90,13 +94,13 @@ router.get('/:teamId', async (req: Request, res: Response) => {
 
     res.status(200).json({
         status: "success",
-        data: team
+        data: admin ? {...team, _count: undefined, members: team._count.members} : team,
     }).end();
 });
 
 router.patch('/:teamId', async (req: Request, res: Response) => {
     if(!check_login(res)) return;
-    if(!(await user_is_uberadmin(res.locals.auth_user.userId)) && !(await user_is_commitee_scribe(res.locals.auth_user.userId))){
+    if(!(await user_is_uberadmin(res.locals.auth_user.userId))/* && !(await user_is_commitee_scribe(res.locals.auth_user.userId))*/){
         fail_no_permissions(res, "you don't have permissions to edit teams");
         return;
     }
@@ -149,7 +153,7 @@ router.patch('/:teamId', async (req: Request, res: Response) => {
 
 router.delete('/:teamId', async (req: Request, res: Response) => {
     if(!check_login(res)) return;
-    if(!(await user_is_uberadmin(res.locals.auth_user.userId)) && !(await user_is_commitee_scribe(res.locals.auth_user.userId))){
+    if(!(await user_is_uberadmin(res.locals.auth_user.userId))/* && !(await user_is_commitee_scribe(res.locals.auth_user.userId))*/){
         fail_no_permissions(res, "you don't have permissions to delete teams");
         return;
     }

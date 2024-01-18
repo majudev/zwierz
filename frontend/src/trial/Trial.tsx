@@ -35,6 +35,8 @@ function Trial({ type }: Props): JSX.Element {
 
   const [quests, setQuests] = useState<Array<{id: number; content: string; finish_date: Date, editmode: boolean}>>([]);
 
+  const [showCategoryHints, setShowCategoryHints] = useState(false);
+
   const [maxFileSize, setMaxFileSize] = useState(-1);
   const [newAttachmentFile, setNewAttachmentFile] = useState<File | null>(null);
   const [uploadError, setUploadError] = useState('');
@@ -81,6 +83,24 @@ function Trial({ type }: Props): JSX.Element {
     setSelectableDates(dates);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [type]);
+
+  useEffect(() => {
+    refreshShowCategories();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const refreshShowCategories = async function() {
+    const response = await fetch(process.env.REACT_APP_API_URL + "/static/show-category-hints", {
+      method: "GET",
+      mode: 'same-origin'
+    });
+    if(!response.ok){
+      alert('Cannot fetch hint details');
+      return;
+    }
+    const body = await response.json();
+    setShowCategoryHints(body.data);
+  }
 
   const refreshMaxUploadSize = async function(){
     const response = await fetch(process.env.REACT_APP_API_URL + "/static/max-upload-size", {
@@ -414,7 +434,7 @@ function Trial({ type }: Props): JSX.Element {
                       }
                       {newQuestVisible && <tr>
                         <td className="nowrap" scope="row">1</td>
-                        <td><textarea className="form-control longrecord" value={newQuestContent} onChange={(e) => setNewQuestContent(e.target.value)}></textarea></td>
+                        <td><textarea className="form-control longrecord" value={newQuestContent} onChange={(e) => setNewQuestContent(e.target.value)} placeholder={showCategoryHints ? 'Pamiętaj aby dopisać kategorię lub kategorie jakich dotyczy zadanie!' : ''}></textarea></td>
                         <td className="text-center nowrap">
                         <select value={predictedDateToString(newQuestFinishDate)} onChange={(e) => setNewQuestFinishDate(stringToPredictedDate(e.target.value))}>
                           {

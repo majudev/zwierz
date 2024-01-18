@@ -60,4 +60,35 @@ router.get('/mode', async (req: Request, res: Response) => {
     }).end();
 });
 
+router.get('/show-tutorials', async (req: Request, res: Response) => {
+    if(!check_login(res)) return;
+
+    const showtrialtutorial = await getSetting('trial.showtrialtutorial');
+    const showreporttutorial = await getSetting('trial.showreporttutorial');
+
+    res.status(200).json({
+        status: "success",
+        data: {
+            showTrialTutorial: showtrialtutorial === 'true',
+            showReportTutorial: showreporttutorial === 'true',
+        }
+    }).end();
+});
+
+router.get('/show-category-hints', async (req: Request, res: Response) => {
+    if(!check_login(res)) return;
+
+    const show = await getSetting('trial.showquesthints');
+
+    if(show === null){
+        fail_internal_error(res, "instance uninitialized");
+        return;
+    }
+
+    res.status(200).json({
+        status: "success",
+        data: show === 'true',
+    }).end();
+});
+
 export default router;

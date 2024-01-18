@@ -2,6 +2,12 @@ import React, {useState, useEffect} from 'react';
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { TrialType, CommiteeRole, Rank, SSOManager, SystemMode } from '../types';
 import 'bootstrap/js/src/modal';
+import TeamsConfig from './TeamsConfig';
+import HelpPanelConfig from './HelpPanelConfig';
+import LoginScreenConfig from './LoginScreenConfig';
+import TrialPDFConfig from './TrialPDFConfig';
+import TrialTutorialConfig from './TrialTutorialConfig';
+import ReportTutorialConfig from './ReportTutorialConfig';
 
 interface Props {
   loggedIn: boolean;
@@ -152,6 +158,14 @@ function AdminPanel({mode}: Props): JSX.Element {
 
   return (<>
     <main className="container-fluid">
+      <div className="row">
+        <TeamsConfig />
+        <HelpPanelConfig />
+        <LoginScreenConfig />
+        <TrialPDFConfig mode={mode}/>
+        <TrialTutorialConfig />
+        <ReportTutorialConfig />
+      </div>
       <div className="row justify-content-center">
         <div className="col-lg-12 col-sm-12">
           <div className="p-3 pt-5 pb-5">
