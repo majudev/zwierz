@@ -124,11 +124,11 @@ function Navigation({loggedIn, logIn, logOut, mode, trigger}: Props) : JSX.Eleme
         <div className="collapse navbar-collapse" id="navbarCollapse">
           <ul className="navbar-nav me-auto mb-2 mb-md-0">
             {loggedIn && <NiceNavLink to="/profile">Mój profil</NiceNavLink>}
-            {(!initMode && loggedIn && (mode === SystemMode.HO || mode === SystemMode.HO_HR) && roleHO === CommiteeRole.NONE) && <NiceNavLink to="/trial/ho">Moja próba na HO</NiceNavLink>}
-            {(!initMode && loggedIn && (mode === SystemMode.HR || mode === SystemMode.HO_HR) && roleHR === CommiteeRole.NONE) && <NiceNavLink to="/trial/hr">Moja próba na HR</NiceNavLink>}
+            {(!initMode && loggedIn && (mode === SystemMode.HO || mode === SystemMode.HO_HR) && roleHO === CommiteeRole.NONE) && <NiceNavLink to="/trial/ho">Moja próba{mode === SystemMode.HO_HR ? ' na HO' : ''}</NiceNavLink>}
+            {(!initMode && loggedIn && (mode === SystemMode.HR || mode === SystemMode.HO_HR) && roleHR === CommiteeRole.NONE) && <NiceNavLink to="/trial/hr">Moja próba{mode === SystemMode.HO_HR ? ' na HR' : ''}</NiceNavLink>}
             {(!initMode && loggedIn && (roleHO === CommiteeRole.NONE || roleHR === CommiteeRole.NONE)) && <NiceNavLink to="/appointments">Moje spotkania z kapitułą</NiceNavLink>}
-            {(!initMode && loggedIn && (mode === SystemMode.HO || mode === SystemMode.HO_HR) && (roleHO === CommiteeRole.MEMBER || roleHO === CommiteeRole.SCRIBE)) && <NiceNavLink to="/commitee/trials/ho">Próby na HO</NiceNavLink>}
-            {(!initMode && loggedIn && (mode === SystemMode.HR || mode === SystemMode.HO_HR) && (roleHR === CommiteeRole.MEMBER || roleHR === CommiteeRole.SCRIBE)) && <NiceNavLink to="/commitee/trials/hr">Próby na HR</NiceNavLink>}
+            {(!initMode && loggedIn && (mode === SystemMode.HO || mode === SystemMode.HO_HR) && (roleHO === CommiteeRole.MEMBER || roleHO === CommiteeRole.SCRIBE)) && <NiceNavLink to="/commitee/trials/ho">Próby{mode === SystemMode.HO_HR ? ' na HO' : ''}</NiceNavLink>}
+            {(!initMode && loggedIn && (mode === SystemMode.HR || mode === SystemMode.HO_HR) && (roleHR === CommiteeRole.MEMBER || roleHR === CommiteeRole.SCRIBE)) && <NiceNavLink to="/commitee/trials/hr">Próby{mode === SystemMode.HO_HR ? ' na HR' : ''}</NiceNavLink>}
             {(!initMode && loggedIn && (roleHO === CommiteeRole.MEMBER || roleHO === CommiteeRole.SCRIBE || roleHR === CommiteeRole.MEMBER || roleHR === CommiteeRole.SCRIBE)) && <NiceNavLink to="/commitee/appointments">Spotkania</NiceNavLink>}
             
             {(loggedIn && uberadmin) && <NiceNavLink to="/admin">Panel administratora</NiceNavLink>}

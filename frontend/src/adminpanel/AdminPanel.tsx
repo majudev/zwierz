@@ -8,6 +8,7 @@ import LoginScreenConfig from './LoginScreenConfig';
 import TrialPDFConfig from './TrialPDFConfig';
 import TrialTutorialConfig from './TrialTutorialConfig';
 import ReportTutorialConfig from './ReportTutorialConfig';
+import SystemModeConfig from './SystemModeConfig';
 
 interface Props {
   loggedIn: boolean;
@@ -165,6 +166,7 @@ function AdminPanel({mode}: Props): JSX.Element {
         <TrialPDFConfig mode={mode}/>
         <TrialTutorialConfig />
         <ReportTutorialConfig />
+        <SystemModeConfig />
       </div>
       <div className="row justify-content-center">
         <div className="col-lg-12 col-sm-12">

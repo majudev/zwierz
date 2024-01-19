@@ -9,6 +9,7 @@ import fs from 'fs';
 import pdfRouter from './pdf.js';
 import trialTutorialRouter from './trialtutorial.js';
 import reportTutorialRouter from './reporttutorial.js';
+import modeRouter from './mode.js';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -16,6 +17,7 @@ const prisma = new PrismaClient();
 router.use('/pdf', pdfRouter);
 router.use('/trialtutorial', trialTutorialRouter);
 router.use('/reporttutorial', reportTutorialRouter);
+router.use('/mode', modeRouter)
 
 router.patch('/login-image', async (req: Request, res: Response) => {
     if(!check_login(res)) return;

@@ -610,6 +610,8 @@ router.post('/login', async (req: Request, res: Response) => {
             email: email,
             sso: 'LOCAL',
             disabled: false,
+
+            activationkey: null,
         }
     });
 

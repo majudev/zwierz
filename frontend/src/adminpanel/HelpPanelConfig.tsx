@@ -119,7 +119,7 @@ function HelpPanelConfig(): JSX.Element {
             <h4 className="mb-1 mt-1">Panel pomocy</h4>
           </li>
           <li className="list-group-item">
-            
+            <p>Funkcjonalność oczekuje na implementację</p>
           </li>
         </ul>
       </div>
