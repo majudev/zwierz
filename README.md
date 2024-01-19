@@ -151,3 +151,6 @@ zwierz2-frontend-1  | (node:108) [DEP0040] DeprecationWarning: The `punycode` mo
 zwierz2-frontend-1  | (Use `node --trace-deprecation ...` to show where the warning was created)
 zwierz2-frontend-1  |  INFO  Accepting connections at http://localhost:3000
 ```
+
+## License
+All rights reserved. Use without permission strictly prohibited.
