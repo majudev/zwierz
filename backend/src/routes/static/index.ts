@@ -61,8 +61,6 @@ router.get('/mode', async (req: Request, res: Response) => {
 });
 
 router.get('/show-tutorials', async (req: Request, res: Response) => {
-    if(!check_login(res)) return;
-
     const showtrialtutorial = await getSetting('trial.showtrialtutorial');
     const showreporttutorial = await getSetting('trial.showreporttutorial');
 
@@ -76,8 +74,6 @@ router.get('/show-tutorials', async (req: Request, res: Response) => {
 });
 
 router.get('/show-category-hints', async (req: Request, res: Response) => {
-    if(!check_login(res)) return;
-
     const show = await getSetting('trial.showquesthints');
 
     if(show === null){

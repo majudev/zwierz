@@ -55,7 +55,7 @@ function SystemModeConfig(): JSX.Element {
       <div className="p-3">
         <ul className="list-group">
           <li className="list-group-item list-group-item-info d-flex justify-content-center bg-dark text-center text-white">
-            <h4 className="mb-1 mt-1">Lista drużyn</h4>
+            <h4 className="mb-1 mt-1">Tryb systemu</h4>
           </li>
           <li className="list-group-item">
             <b>Tryb kapituły:</b> {

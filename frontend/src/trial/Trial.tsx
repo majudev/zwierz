@@ -393,7 +393,7 @@ function Trial({ type }: Props): JSX.Element {
                         <th></th>
                       </tr>
                     </thead>
-                    <tbody id="quest_table">
+                    <tbody>
                       {
                         quests.map((quest, index) => {
                           return <tr>

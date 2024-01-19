@@ -84,6 +84,7 @@ function TrialTutorialConfig(): JSX.Element {
     }
     await refreshTrialTutorial();
     setButtonlock(false);
+    window.location.reload();
   }
 
   const refreshMaxUploadSize = async function(){

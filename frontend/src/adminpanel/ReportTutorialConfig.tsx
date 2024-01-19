@@ -51,6 +51,7 @@ function ReportTutorialConfig(): JSX.Element {
     }
     await refreshReportTutorial();
     setButtonlock(false);
+    window.location.reload();
   }
 
   const refreshMaxUploadSize = async function(){
