@@ -19,7 +19,7 @@ interface Props {
 
 function AdminPanel({mode}: Props): JSX.Element {
   const [userlistlock, setUserlistlock] = useState(false);
-  const [users, setUsers] = useState<Array<{id: number, name: string|null, email: string, activated: boolean, rank: Rank, roleHO: CommiteeRole, roleHR: CommiteeRole, uberadmin: boolean, phone: string|null, team: {id: number, name: string, archived: boolean}|null, enableEmailNotifications: boolean, enableSMSNotifications: boolean, sso: SSOManager, disabled: boolean, shadow: boolean, trials: Array<{type: TrialType, openDate: Date, closeDate: Date, predictedClosingDate: Date}>}>>([]);
+  const [users, setUsers] = useState<Array<{id: number, name: string|null, email: string, activated: boolean, rank: Rank, roleHO: CommiteeRole, roleHR: CommiteeRole, uberadmin: boolean, phone: string|null, team: {id: number, name: string, archived: boolean}|null, enableEmailNotifications: boolean, enableSMSNotifications: boolean, phoneVerified: boolean, sso: SSOManager, disabled: boolean, shadow: boolean, trials: Array<{type: TrialType, openDate: Date, closeDate: Date, predictedClosingDate: Date}>}>>([]);
 
   const [pwdresetUserID, setPwdresetUserID] = useState(0);
   const [pwdresetName, setPwdresetName] = useState<string|null>(null);
@@ -62,7 +62,7 @@ function AdminPanel({mode}: Props): JSX.Element {
       alert('Cannot fetch users list');
       return;
     }
-    const body = await response.json() as {status:string; data: Array<{id: number, name: string|null, email: string, activated: boolean, rank: Rank, role_HO: CommiteeRole, role_HR: CommiteeRole, uberadmin: boolean, phone: string|null, team: {id: number, name: string, archived: boolean}|null, enableEmailNotifications: boolean, enableSMSNotifications: boolean, sso: SSOManager, disabled: boolean, shadow: boolean, trials: Array<{type: TrialType, open_date: string, close_date: string, predicted_closing_date: string}>}>};
+    const body = await response.json() as {status:string; data: Array<{id: number, name: string|null, email: string, activated: boolean, rank: Rank, role_HO: CommiteeRole, role_HR: CommiteeRole, uberadmin: boolean, phone: string|null, team: {id: number, name: string, archived: boolean}|null, enableEmailNotifications: boolean, enableSMSNotifications: boolean, phoneVerified: boolean, sso: SSOManager, disabled: boolean, shadow: boolean, trials: Array<{type: TrialType, open_date: string, close_date: string, predicted_closing_date: string}>}>};
     setUsers(body.data.map((e) => {return {...e, roleHO: e.role_HO, roleHR: e.role_HR, trials: e.trials.map((trial) => { return {...trial, openDate: new Date(trial.open_date), closeDate: new Date(trial.close_date), predictedClosingDate: new Date(trial.predicted_closing_date)}})}}));
     setUserlistlock(false);
   }
@@ -238,6 +238,13 @@ function AdminPanel({mode}: Props): JSX.Element {
                               {user.activated ? 'Tak' : <>
                               <button className="btn btn-dark" onClick={(e) => {setActivateEmail(user.email); setActivateName(nameConverter(user.rank, user.name)); setActivateUserID(user.id); document.getElementById('open_activate_modal')?.click();}} disabled={userlistlock}>Aktywuj</button>
                               </>}
+                              <br/>
+                              <div className="form-check form-check-inline">
+                                <input className="form-check-input" type="checkbox" id={"phoneVerified" + user.id} checked={user.phoneVerified} disabled/>
+                                <label className="form-check-label" htmlFor={"phoneVerified" + user.id}>
+                                  Telefon potwierdzony
+                                </label>
+                              </div>
                             </td>
                             <td className="nowrap"><button className="btn btn-danger" onClick={(e) => {setPwdresetUserID(user.id); setPwdresetName(nameConverter(user.rank, user.name)); setPwdresetEmail(user.email); document.getElementById('open_pwdreset_modal')?.click();}} disabled>Resetuj</button></td>
                             <td className="text-center">

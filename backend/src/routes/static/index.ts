@@ -90,7 +90,7 @@ router.get('/show-category-hints', async (req: Request, res: Response) => {
 router.get('/trial-tutorial-image', async (req: Request, res: Response) => {
     const showtrialtutorial = await getSetting('trial.showtrialtutorial');
     if(showtrialtutorial !== 'true'){
-        fail_missing_params(res, [], 'show trial tutorial is disabled');
+        fail_entity_not_found(res, 'show trial tutorial is disabled');
         return;
     }
 
@@ -127,7 +127,7 @@ router.get('/trial-tutorial-image', async (req: Request, res: Response) => {
 router.get('/report-tutorial-image', async (req: Request, res: Response) => {
     const showreporttutorial = await getSetting('trial.showreporttutorial');
     if(showreporttutorial !== 'true'){
-        fail_missing_params(res, [], 'show report tutorial is disabled');
+        fail_entity_not_found(res, 'show report tutorial is disabled');
         return;
     }
 

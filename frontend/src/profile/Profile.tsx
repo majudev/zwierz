@@ -26,6 +26,7 @@ function Profile(props: Props): JSX.Element {
   const [fn, setFn] = useState('');
   const [enableEmailNotifications, setEnableEmailNotifications] = useState(false);
   const [enableSMSNotifications, setEnableSMSNotifications] = useState(false);
+  const [phoneVerified, setPhoneVerified] = useState(false);
   const [sso, setSSO] = useState<SSOManager>(SSOManager.LOCAL);
   const [disabled, setDisabled] = useState(false);
   const [shadow, setShadow] = useState(false);
@@ -37,6 +38,11 @@ function Profile(props: Props): JSX.Element {
 
   const [editmode, setEditmode] = useState(false);
   const [buttonlock, setButtonLock] = useState(false);
+
+  const [phoneChanged, setPhoneChanged] = useState(false);
+  const [phoneVerifyLock, setPhoneVerifyLock] = useState(false);
+  const [phoneVerifyCode, setPhoneVerifyCode] = useState('');
+  const [phoneVerifyError, setPhoneVerifyError] = useState('');
 
   const navigate = useNavigate();
 
@@ -70,6 +76,7 @@ function Profile(props: Props): JSX.Element {
     setFn(body.data.function);
     setEnableEmailNotifications(body.data.enableEmailNotifications);
     setEnableSMSNotifications(body.data.enableSMSNotifications);
+    setPhoneVerified(body.data.phoneVerified);
     setSSO(body.data.sso);
     setDisabled(body.data.disabled);
     setShadow(body.data.shadow);
@@ -86,6 +93,8 @@ function Profile(props: Props): JSX.Element {
       open_date: hr[0].open_date !== null ? new Date(hr[0].open_date) : null,
       predicted_closing_date: new Date(hr[0].predicted_closing_date),
     });
+
+    setPhoneChanged(false);
   }
 
   const refreshTeams = async function(){
@@ -116,7 +125,7 @@ function Profile(props: Props): JSX.Element {
       body: JSON.stringify({
         name: name,
         rank: rank,
-        phone: phone,
+        phone: phoneChanged ? phone : undefined,
         interests: interests.map((value) => {return {text: value}}),
         teamId: teamID,
         function: fn,
@@ -134,6 +143,43 @@ function Profile(props: Props): JSX.Element {
     props.pullTrigger(!props.trigger);
     setEditmode(false);
   };
+
+  const sendPhoneVerifyCode = async function() {
+    setPhoneVerifyLock(true);
+    const response = await fetch(process.env.REACT_APP_API_URL + "/auth/phoneverify", {
+      method: "POST",
+      mode: 'same-origin',
+    });
+    if(!response.ok){
+      alert('Cannot send phone verify code');
+      setPhoneVerifyLock(false);
+      return;
+    }
+    setTimeout(() => {
+      setPhoneVerifyLock(false);
+    }, 10000);
+  }
+
+  const onVerifyPhoneAttempt = async function() {
+    setButtonLock(true);
+    const response = await fetch(process.env.REACT_APP_API_URL + "/auth/phoneverify/" + phoneVerifyCode, {
+      method: "POST",
+      mode: 'same-origin',
+    });
+    if(!response.ok){
+      if(response.status === 403){
+        setPhoneVerifyError('Niepoprawny kod');
+        setButtonLock(false);
+        return;
+      }
+      alert('Cannot send phone verify code');
+      setButtonLock(false);
+      return;
+    }
+    await refreshData();
+    setButtonLock(false);
+    document.getElementById('close_phoneverify_modal')?.click();
+  }
 
   const nameConverter = function() {
     if(rank === Rank.NONE) return 'dh ' + name;
@@ -157,7 +203,7 @@ function Profile(props: Props): JSX.Element {
     teamName === '';
   }
 
-  return (
+  return (<>
     <main className="container-fluid">
       <div className="row">
         <div className="col-lg-6 col-sm-12">
@@ -194,10 +240,10 @@ function Profile(props: Props): JSX.Element {
                 <b>E-mail:</b> {email}
               </li>
               <li className="list-group-item">
-                {!editmode && <><b>Telefon:</b> {phone}</>}
+                {!editmode && <><b>Telefon:</b> {phone}{(phone !== '') && !phoneVerified && <><span className="text-danger"> (niezweryfikowany)</span><button className="btn btn-sm btn-dark" data-bs-toggle="modal" data-bs-target="#phoneverify_modal">Zweryfikuj</button></>}</>}
                 {editmode && <>
                   <b>Telefon:</b>
-                  <input type="text" className={verifyPhone(phone) ? "form-control" : "form-control invalid"} value={phone} onChange={(e) => setPhone(e.target.value)}/>
+                  <input type="text" className={verifyPhone(phone) ? "form-control" : "form-control invalid"} value={phone} onChange={(e) => {setPhone(e.target.value); setPhoneChanged(true);}}/>
                   {!verifyPhone(phone) && <i>Zacznij od +48</i>}
                 </>}
               </li>
@@ -235,6 +281,36 @@ function Profile(props: Props): JSX.Element {
                   {editmode && <li><button className="btn btn-sm btn-dark" onClick={(e) => {setInterests([...interests, ''])}}>Dodaj kolejne</button></li>}
                 </ul>
               </li>
+              <li className="list-group-item">
+                <div className="form-check form-switch">
+                  <input className="form-check-input" type="checkbox" id="emailNofiticationsEnabled" checked={enableEmailNotifications} onChange={(e) => {setEnableEmailNotifications(e.target.checked)}} disabled={!editmode}></input>
+                  <label className="form-check-label" htmlFor="emailNofiticationsEnabled">
+                    Włącz powiadomienia e-mail
+                  </label>
+                </div>
+                <div className="form-check form-switch">
+                  <input className="form-check-input" type="checkbox" id="smsNofiticationsEnabled" checked={enableSMSNotifications} onChange={(e) => {setEnableSMSNotifications(e.target.checked)}} disabled={!editmode || !phoneVerified}></input>
+                  <label className="form-check-label" htmlFor="smsNofiticationsEnabled">
+                    Włącz powiadomienia SMS
+                  </label>
+                </div>
+                {editmode && <>
+                  <p>Powiadomienia e-mail otrzymasz na temat:</p>
+                  <ul>
+                    <li>Zapisania się na spotkanie</li>
+                    <li>Usunięcia się ze spotkania</li>
+                    <li className="text-danger">Usunięcia cię przez kapitułę ze spotkania</li>
+                    <li style={{textDecoration: "line-through"}}>Zamknięcia i otwarcia stopnia rozkazem</li>
+                    <li>Jeśli jesteś opiekunem: gdy twój podopieczny zapisze się lub zostanie usunięty ze spotkania</li>
+                  </ul>
+                  <p>Powiadomienia SMS otrzymasz na temat:</p>
+                  <ul>
+                    <li>Nadchodzącego spotkania na które się zapisałeś</li>
+                    <li className="text-danger">Usunięcia cię przez kapitułę ze spotkania</li>
+                    <li>Jeśli jesteś opiekunem: gdy twój podopieczny zapisze się lub zostanie usunięty ze spotkania</li>
+                  </ul>
+                </>}
+              </li>
               <li className="list-group-item d-flex justify-content-end flex-row">
                 {!editmode && <button type="button" className="btn btn-dark" onClick={(e) => setEditmode(true)} disabled={buttonlock}>Edytuj</button>}
                 {editmode && <>
@@ -253,7 +329,7 @@ function Profile(props: Props): JSX.Element {
                 <h4 className="mb-1 mt-1">Twój progress</h4>
               </li>
               {(trialsCount === 0) && <li className="list-group-item">
-                <b>Halo! Musisz najpierw otworzyć próbę!</b> Przejdź do zakładki "moja próba" aby to zrobić.
+                <b>Halo! Musisz najpierw otworzyć próbę!</b> Przejdź do zakładki "Moja próba" aby to zrobić.
               </li>}
               {(trialsCount !== 0) && <li className="list-group-item text-center">
                 <b>Wprowadziłeś próbę do systemu!</b> Dobra robota. Teraz przejdź do zakładki <i>"Moje spotkania z kapitułą"</i> aby zapisać się na spotkanie i otworzyć swoją próbę!
@@ -294,7 +370,34 @@ function Profile(props: Props): JSX.Element {
         </div>}
       </div>
     </main>
-  );
+    <button type="button" className="btn" id="close_phoneverify_modal" data-bs-dismiss="modal" data-bs-target="#phoneverify_modal" style={{display: 'none'}}></button>
+    <div className="modal fade" id="phoneverify_modal" aria-hidden="true">
+      <div className="modal-dialog">
+        <div className="modal-content">
+          <div className="modal-header">
+            <h5 className="modal-title">Potwierdź telefon</h5>
+            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div className="modal-body">
+            <p>Po zweryfikowaniu numeru telefonu będziesz mógł:</p>
+            <ul>
+              <li>Przypomnieć swój login (e-mail) po wpisaniu numeru telefonu</li>
+              <li>Włączyć przypomnienia SMS przed każdą kapitułą na którą się zapisałeś</li>
+              <li><span style={{textDecoration: "line-through"}}>Zresetować swoje hasło używając kodu SMS</span> SMS-y są jednak za drogie</li>
+            </ul>
+            <button className="btn btn-dark" onClick={(e) => {sendPhoneVerifyCode()}} disabled={phoneVerifyLock || buttonlock}>Wyślij kod SMS-em na numer {phone}</button>
+            <p>Kod:</p>
+            <input type="text" className="form-control" value={phoneVerifyCode} onChange={(e) => setPhoneVerifyCode(e.target.value)}/>
+            {(phoneVerifyError !== '') && <p className="text-danger">{phoneVerifyError}</p>}
+          </div>
+          <div className="modal-footer">
+            <button type="button" className="btn btn-light" data-bs-dismiss="modal">Anuluj</button>
+            <button type="button" className="btn btn-dark" onClick={(e) => onVerifyPhoneAttempt()} disabled={phoneVerifyCode === '' || buttonlock}>Aktywuj</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </>);
 }
 
 export default Profile;

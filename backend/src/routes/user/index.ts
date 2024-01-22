@@ -5,6 +5,7 @@ import { check_login, fail_missing_params, fail_no_permissions, fail_entity_not_
 import { user_is_commitee_member, user_is_commitee_scribe, user_is_ho_commitee_scribe, user_is_hr_commitee_scribe, user_is_uberadmin } from '../../utils/permissionsHelper.js';
 import bcrypt from 'bcrypt';
 import { verifyPhone } from '../../utils/validationtools.js';
+import { randomInt } from 'crypto';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -120,6 +121,7 @@ router.get('/:userId', async (req: Request, res: Response) => {
                 enableSMSNotifications: true,
 
                 activationkey: true,
+                phoneVerifyKey: true,
                 
                 sso: true,
                 disabled: true,
@@ -138,7 +140,7 @@ router.get('/:userId', async (req: Request, res: Response) => {
 
         res.status(200).json({
             status: "success",
-            data: users.map((user) => {return {...user, activated: user.activationkey === null, activationkey: undefined}}),
+            data: users.map((user) => {return {...user, activated: user.activationkey === null, activationkey: undefined, phoneVerified: user.phoneVerifyKey === null, phoneVerifyKey: undefined}}),
         }).end();
         return;
     }
@@ -189,6 +191,8 @@ router.get('/:userId', async (req: Request, res: Response) => {
 
             enableEmailNotifications: true,
             enableSMSNotifications: true,
+
+            phoneVerifyKey: true,
             
             sso: true,
             disabled: true,
@@ -212,7 +216,7 @@ router.get('/:userId', async (req: Request, res: Response) => {
 
     res.status(200).json({
         status: "success",
-        data: user
+        data: {...user, phoneVerified: user.phoneVerifyKey === null, phoneVerifyKey: undefined},
     }).end();
 });
 
@@ -287,6 +291,15 @@ router.patch('/:userId', async (req: Request, res: Response) => {
             });
             return;
         }
+        const digits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+        updateQuery.phoneVerifyKey = 
+            digits[randomInt(digits.length)] +
+            digits[randomInt(digits.length)] +
+            digits[randomInt(digits.length)] +
+            digits[randomInt(digits.length)] +
+            digits[randomInt(digits.length)] +
+            digits[randomInt(digits.length)];
+        updateQuery.enableSMSNotifications = false;
     }
 
     if(updateQuery === undefined || Object.keys(updateQuery).length == 0){
@@ -340,6 +353,8 @@ router.patch('/:userId', async (req: Request, res: Response) => {
 
             enableEmailNotifications: true,
             enableSMSNotifications: true,
+
+            phoneVerifyKey: true,
             
             sso: true,
             disabled: true,
@@ -358,7 +373,7 @@ router.patch('/:userId', async (req: Request, res: Response) => {
 
     res.status(200).json({
         status: "success",
-        data: updatedObject
+        data: {...updatedObject, phoneVerified: updatedObject.phoneVerifyKey === null, phoneVerifyKey: undefined}
     }).end();
 });
 
@@ -425,6 +440,8 @@ router.patch('/:userId/:action(shadow|disabled|active)/:state(yes|no)', async (r
 
             enableEmailNotifications: true,
             enableSMSNotifications: true,
+
+            phoneVerifyKey: true,
             
             sso: true,
             disabled: true,
@@ -443,7 +460,7 @@ router.patch('/:userId/:action(shadow|disabled|active)/:state(yes|no)', async (r
 
     res.status(200).json({
         status: "success",
-        data: updatedObject
+        data: {...updatedObject, phoneVerified: updatedObject.phoneVerifyKey === null, phoneVerifyKey: undefined}
     }).end();
 });
 

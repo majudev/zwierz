@@ -14,6 +14,7 @@ import { createClient } from 'redis';
 
 import { ClientCredentials, ResourceOwnerPassword, AuthorizationCode } from 'simple-oauth2';
 import sendNotificationEmail from '../../notifier/notify-email.js';
+import sendNotificationSMS from '../../notifier/notify-sms.js';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -297,8 +298,8 @@ router.post('/register', async (req: Request, res: Response) => {
         req.body.email,
         main_scribe_email,
         activation_email_subject,
-        activation_email_plaintext + process.env.BASEURL + '/api/auth/activate/' + activationkey,
-        activation_email_html + '<a href="' + process.env.BASEURL + '/api/auth/activate/' + activationkey + '">' + process.env.BASEURL + '/api/auth/activate/' + activationkey + '</a>',
+        activation_email_plaintext.replace('[ACTIVATE_LINK]', process.env.BASEURL + '/api/auth/activate/' + activationkey),
+        activation_email_html.replace('[ACTIVATE_LINK]', process.env.BASEURL + '/api/auth/activate/' + activationkey).replace('[ACTIVATE_LINK]', process.env.BASEURL + '/api/auth/activate/' + activationkey),
     );
 
     if(!emailOk){
@@ -363,6 +364,108 @@ router.get('/activate/:activationkey', async (req: Request, res: Response) => {
         data: null,
 	});*/
     res.redirect(process.env.BASEURL + '/login?activate=success');
+});
+
+router.post('/phoneverify', async (req: Request, res: Response) => {
+    if(!check_login(res)) return;
+
+    const userId: number = parseInt(res.locals.auth_user.userId);
+
+    /*const redis = createClient({
+        url: process.env.REDIS_URL,
+    });
+    await redis.connect();
+
+    const ip = req.header('CF-Connecting-IP') ?? req.ip;
+    const ratelimit = await redis.get('ratelimit.' + ip + '.auth');
+    if(ratelimit !== null){
+        await redis.expire('ratelimit.' + ip + '.auth', 2);
+        res.status(429).end();
+        return;
+    }
+    await redis.set('ratelimit.' + ip + '.auth', 1);
+    await redis.expire('ratelimit.' + ip + '.auth', 2);*/
+
+    const user = await prisma.user.findUnique({
+        where: {
+            id: userId,
+        },
+        select: {
+            phone: true,
+            phoneVerifyKey: true,
+        }
+    });
+
+    if(user === null || user.phone === null || user.phoneVerifyKey === null) {
+        res.status(409).json({
+            status: "error",
+            message: "no phone provided",
+        }).end();
+        return;
+    }
+
+    const status = await sendNotificationSMS(user.phone, 'Twój kod aktywacyjny: ' + user.phoneVerifyKey);
+    if(!status){
+        fail_internal_error(res, "couldn't send verification code via SMS");
+        return;
+    }
+
+	res.status(204).json({
+		status: "success",
+        data: null,
+	});
+});
+
+router.post('/phoneverify/:activationkey', async (req: Request, res: Response) => {
+    if(!check_login(res)) return;
+
+    const userId: number = parseInt(res.locals.auth_user.userId);
+
+    const activationkey = req.params.activationkey;
+
+    /*const redis = createClient({
+        url: process.env.REDIS_URL,
+    });
+    await redis.connect();
+
+    const ip = req.header('CF-Connecting-IP') ?? req.ip;
+    const ratelimit = await redis.get('ratelimit.' + ip + '.auth');
+    if(ratelimit !== null){
+        await redis.expire('ratelimit.' + ip + '.auth', 2);
+        res.status(429).end();
+        return;
+    }
+    await redis.set('ratelimit.' + ip + '.auth', 1);
+    await redis.expire('ratelimit.' + ip + '.auth', 2);*/
+
+    const exists = await prisma.user.count({
+        where: {
+            id: userId,
+            phoneVerifyKey: activationkey,
+        }
+    }) > 0;
+
+    if(!exists) {
+        res.status(403).json({
+            status: "error",
+            message: "wrong activation key",
+        }).end();
+        return;
+    }
+
+    await prisma.user.update({
+        where: {
+            id: userId,
+        },
+        data: {
+            phoneVerifyKey: null,
+        },
+    });
+
+	res.status(204).json({
+		status: "success",
+        data: null,
+	});
 });
 
 router.post('/passwordreset', async (req: Request, res: Response) => {
@@ -437,14 +540,13 @@ router.post('/passwordreset', async (req: Request, res: Response) => {
 
     /*await redis.set('ratelimit.' + ip + '.auth', 1);
     await redis.expire('ratelimit.' + ip + '.auth', 30);*/
-
     const pwdresetkey = randomBytes(30).toString('hex');
     const emailOk = await sendNotificationEmail(
         req.body.email,
         main_scribe_email,
         pwdreset_email_subject,
-        pwdreset_email_plaintext + process.env.BASEURL + '/passwordreset/' + pwdresetkey,
-        pwdreset_email_html + '<a href="' + process.env.BASEURL + '/passwordreset/' + pwdresetkey + '">' + process.env.BASEURL + '/passwordreset/' + pwdresetkey + '</a>',
+        pwdreset_email_plaintext.replace('[RESETPWD_LINK]', process.env.BASEURL + '/passwordreset/' + pwdresetkey),
+        pwdreset_email_html.replace('[RESETPWD_LINK]', process.env.BASEURL + '/passwordreset/' + pwdresetkey).replace('[RESETPWD_LINK]', process.env.BASEURL + '/passwordreset/' + pwdresetkey),
     );
 
     if(!emailOk){
