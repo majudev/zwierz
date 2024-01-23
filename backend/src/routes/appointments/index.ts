@@ -72,8 +72,8 @@ router.post('/new', async (req: Request, res: Response) => {
     }).end();
 });
 
-router.get('/:type(all|me)', async (req: Request, res: Response) => {
-    if(!check_login(res)) return;
+router.get('/:type(all|me|public)', async (req: Request, res: Response) => {
+    if(req.params.type !== 'public' && !check_login(res)) return;
 
     const mode = await getSystemMode();
     if(mode === null){
@@ -83,11 +83,11 @@ router.get('/:type(all|me)', async (req: Request, res: Response) => {
     const HOenabled = (mode === SystemMode.HO || mode === SystemMode.HO_HR);
     const HRenabled = (mode === SystemMode.HR || mode === SystemMode.HO_HR);
 
-    const uberadmin = await user_is_uberadmin(res.locals.auth_user.userId);
-    const commitee_scribe_ho = HOenabled && await user_is_ho_commitee_scribe(res.locals.auth_user.userId);
-    const commitee_scribe_hr = HRenabled && await user_is_hr_commitee_scribe(res.locals.auth_user.userId);
-    const commitee_member_ho = HOenabled && await user_is_ho_commitee_member(res.locals.auth_user.userId);
-    const commitee_member_hr = HRenabled && await user_is_hr_commitee_member(res.locals.auth_user.userId);
+    const uberadmin = req.params.type !== 'public' && await user_is_uberadmin(res.locals.auth_user.userId);
+    const commitee_scribe_ho = HOenabled && req.params.type !== 'public' && await user_is_ho_commitee_scribe(res.locals.auth_user.userId);
+    const commitee_scribe_hr = HRenabled && req.params.type !== 'public' && await user_is_hr_commitee_scribe(res.locals.auth_user.userId);
+    const commitee_member_ho = HOenabled && req.params.type !== 'public' && await user_is_ho_commitee_member(res.locals.auth_user.userId);
+    const commitee_member_hr = HRenabled && req.params.type !== 'public' && await user_is_hr_commitee_member(res.locals.auth_user.userId);
     if(req.params.type === 'all' && !uberadmin && !commitee_scribe_ho && !commitee_scribe_hr && !commitee_member_ho && !commitee_member_hr){
         fail_no_permissions(res, "you don't have permissions to list trials");
         return;
@@ -138,6 +138,22 @@ router.get('/:type(all|me)', async (req: Request, res: Response) => {
             data: appointments,
         }).end();
         return;
+    }
+
+    if(req.params.type === 'public'){    
+        const filtered = appointments.map((entry) => {
+            return {
+                ...entry,
+                registrationsHO: HOenabled ? entry.registrations.filter((reg) => {return reg.trial.type === TrialType.HO}).length : undefined,
+                registrationsHR: HRenabled ? entry.registrations.filter((reg) => {return reg.trial.type === TrialType.HR}).length : undefined,
+                registrations: undefined,
+            };
+        });
+    
+        res.status(200).json({
+            status: "success",
+            data: filtered,
+        }).end();
     }
 
     const filtered = appointments.map((entry) => {
