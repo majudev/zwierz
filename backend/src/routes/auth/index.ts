@@ -15,6 +15,7 @@ import { createClient } from 'redis';
 import { ClientCredentials, ResourceOwnerPassword, AuthorizationCode } from 'simple-oauth2';
 import sendNotificationEmail from '../../notifier/notify-email.js';
 import sendNotificationSMS from '../../notifier/notify-sms.js';
+import { user_is_uberadmin } from '../../utils/permissionsHelper.js';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -651,6 +652,52 @@ router.post('/passwordreset/:pwdresetkey', async (req: Request, res: Response) =
 		status: "success",
         data: null,
 	});
+});
+
+router.post('/override/:userId', async (req: Request, res: Response) => {
+    if(!check_login(res)) return;
+
+    if(!(await user_is_uberadmin(res.locals.auth_user.userId))){
+        fail_no_permissions(res, "you don't have permissions to override login");
+        return;
+    }
+
+    var userId: number = parseInt(req.params.userId);
+    if(Number.isNaN(userId)) {
+        fail_missing_params(res, ["userId"], null);
+        return;
+    }
+
+    logger.debug("User " + res.locals.auth_user.email + " is trying to override log in of userId=" + userId);
+
+    var userObject = await prisma.user.findUnique({
+        select: {
+            id: true,
+            email: true,
+            password: true,
+        },
+        where: {
+            id: userId,
+        }
+    });
+
+    if(userObject === null) {
+        res.status(401).json({
+            status: "error",
+            message: "user does not exist or wrong password",
+        });
+        logger.debug("User " + userId + " does not exist");
+        return;
+    }
+
+    await loginUser(req, res, userObject.id, userObject.email);
+
+    res.status(200).json({
+		status: "success"
+	});
+    logger.debug("User " + res.locals.auth_user.email + " overriden log in of userId=" + userId);
+    //res.set('Content-Type', 'text/html');
+    //res.send(Buffer.from('<html><head><META http-equiv="refresh" content="0;' + (process.env.BASEURL as string) + '/login?status=success"></head></html>'));
 });
 
 router.post('/login', async (req: Request, res: Response) => {

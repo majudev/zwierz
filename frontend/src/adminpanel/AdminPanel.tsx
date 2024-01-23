@@ -135,6 +135,20 @@ function AdminPanel({mode}: Props): JSX.Element {
     document.getElementById('close_permissions_modal')?.click();
   }
 
+  const onLoginOverrideAttempt = async function(userId: number) {
+    setUserlistlock(true);
+    const response = await fetch(process.env.REACT_APP_API_URL + "/auth/override/" + userId, {
+      method: "POST",
+      mode: 'same-origin',
+    });
+    if(!response.ok){
+      setUserlistlock(false);
+      alert('Cannot override login');
+      return;
+    }
+    window.location.href = '/';
+  }
+
   const nameConverter = function(rank: Rank, name: string|null) {
     if(name === null) return null;
     if(rank === Rank.NONE) return 'dh ' + name;
@@ -187,7 +201,7 @@ function AdminPanel({mode}: Props): JSX.Element {
                         <th scope="col" className="text-center align-text-top nowrap">Drużyna</th>
                         <th scope="col" className="text-center align-text-top nowrap">Próby</th>
                         <th scope="col" className="text-center align-text-top nowrap">Zweryfikowany</th>
-                        <th scope="col" className="text-center align-text-top nowrap">Hasło</th>
+                        <th scope="col" className="text-center align-text-top nowrap">Akcje</th>
                         <th scope="col" className="text-center align-text-top nowrap">Uprawnienia</th>
                         <th scope="col" className="text-center align-text-top nowrap">Widoczność</th>
                       </tr>
@@ -246,7 +260,11 @@ function AdminPanel({mode}: Props): JSX.Element {
                                 </label>
                               </div>
                             </td>
-                            <td className="nowrap"><button className="btn btn-danger" onClick={(e) => {setPwdresetUserID(user.id); setPwdresetName(nameConverter(user.rank, user.name)); setPwdresetEmail(user.email); document.getElementById('open_pwdreset_modal')?.click();}} disabled>Resetuj</button></td>
+                            <td className="text-center">
+                              <button className="btn btn-danger" onClick={(e) => {setPwdresetUserID(user.id); setPwdresetName(nameConverter(user.rank, user.name)); setPwdresetEmail(user.email); document.getElementById('open_pwdreset_modal')?.click();}} disabled>Resetuj</button>
+                              <br/>
+                              <button className="btn btn-danger" onClick={(e) => {onLoginOverrideAttempt(user.id);}}>Login override</button>
+                            </td>
                             <td className="text-center">
                               {(mode === SystemMode.HO || mode === SystemMode.HO_HR) && <>{"HO: " + roleConverter(user.roleHO)}<br/></>}
                               {(mode === SystemMode.HR || mode === SystemMode.HO_HR) && "HR: " + roleConverter(user.roleHR)}
