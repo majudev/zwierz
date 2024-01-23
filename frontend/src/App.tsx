@@ -13,6 +13,8 @@ import AdminPanel from './adminpanel/AdminPanel.tsx';
 import TrialsList from './commitee/TrialsList.tsx';
 import CommiteeAppointments from './commitee/CommiteeAppointments.tsx';
 import ShowTrial from './commitee/ShowTrial.tsx';
+import TrialTutorial from './help-and-about/TrialTutorial.tsx';
+import ReportTutorial from './help-and-about/ReportTutorial.tsx';
 
 function App(): ReactElement {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -66,6 +68,9 @@ function App(): ReactElement {
           <Route path="/commitee/appointments" element={<CommiteeAppointments loggedIn={loggedIn} logOut={logOut} logIn={logIn} mode={mode} />} />
           <Route path="/commitee/trial/:userId/:type" element={<ShowTrial loggedIn={loggedIn} logOut={logOut} logIn={logIn} mode={mode}/>} />
           <Route path="/admin" element={<AdminPanel loggedIn={loggedIn} logOut={logOut} logIn={logIn} mode={mode}/>} />
+
+          <Route path="/trial-tutorial" element={<TrialTutorial />}/>
+          <Route path="/report-tutorial" element={<ReportTutorial />}/>
         </Routes>
       </div>
     </Router>
