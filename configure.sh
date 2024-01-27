@@ -45,6 +45,12 @@ if [[ "$URL" != "" ]]; then
 	cat docker-compose.yml | grep REACT_APP_API_URL | sed 's_http://localhost:8080_'"$URL"'_g' >> $TEMP/frontend.yml
 fi
 
+
+if [[ "$PORT" != "" ]] || [ -z "$(ls -A /path/to/dir)" ]; then
+	echo 'services:' >> compose-local.yml
+fi
+
+
 if [[ "$PORT" != "" ]]; then
 cat << EOF >> compose-local.yml
   nginx:
@@ -52,7 +58,6 @@ cat << EOF >> compose-local.yml
       - "$PORT:8080"
 EOF
 fi
-
 
 if [ -e $TEMP/backend.yml ]; then
 	cat << EOF >> compose-local.yml
