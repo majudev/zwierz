@@ -15,6 +15,7 @@ services:
       - backend/.env
     environment:
       DATABASE_URL: mysql://master:sakjfsdfasfasersfedfsdfa@mysql:3306/master
+      BASEURL: http://localhost:8080
       SITE_ORIGIN: https://localhost
       WEBAUTHN_RPID: localhost
       REDIS_URL: redis://redis:6379
