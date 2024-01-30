@@ -1,5 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import { Link, useNavigate, useParams } from "react-router-dom";
+import PwnedPasswordDialog from './PwnedPasswordDialog';
+import checkHIBP from '../CheckHIBP';
 
 interface Props {
   loggedIn: boolean;
@@ -17,6 +19,8 @@ function PasswordResetStep2(props: Props): JSX.Element {
   const [success, setSuccess] = useState(false);
   const [buttonLock, setButtonLock] = useState(false);
 
+  const [pwned, setPwned] = useState(false);
+
   const { pwdresetkey } = useParams();
 
   const onChangePasswordAttempt = async function(){
@@ -26,6 +30,17 @@ function PasswordResetStep2(props: Props): JSX.Element {
       setError("Hasła nie pasują do siebie");
       setButtonLock(false);
       return;
+    }
+
+    setPwned(false);
+    try{
+      if(await checkHIBP(password)){
+        setPwned(true);
+        setButtonLock(false);
+        return;
+      }
+    }catch(e){
+      alert('Nie można sprawdzić twojego hasła w bazie wykradzionych haseł - reset hasła z pominięciem tego kroku');
     }
 
     const response = await fetch(process.env.REACT_APP_API_URL + "/auth/passwordreset/" + pwdresetkey, {
@@ -134,6 +149,7 @@ function PasswordResetStep2(props: Props): JSX.Element {
           <button className="w-100 btn btn-lg btn-primary" disabled={buttonLock} onClick={onChangePasswordAttempt} id="submit">Zresetuj hasło</button>
         </div>}
       </div>
+      <PwnedPasswordDialog visible={pwned} />
     </main>
   );
 }

@@ -1,5 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import { Link, useNavigate } from "react-router-dom";
+import PwnedPasswordDialog from './PwnedPasswordDialog';
+import checkHIBP from '../CheckHIBP';
 
 interface Props {
   loggedIn: boolean;
@@ -18,6 +20,8 @@ function Register(props: Props): JSX.Element {
   const [success, setSuccess] = useState(false);
   const [buttonLock, setButtonLock] = useState(false);
 
+  const [pwned, setPwned] = useState(false);
+
   const onRegisterAttempt = async function(){
     setButtonLock(true);
 
@@ -25,6 +29,17 @@ function Register(props: Props): JSX.Element {
       setError("Hasła nie pasują do siebie");
       setButtonLock(false);
       return;
+    }
+
+    setPwned(false);
+    try{
+      if(await checkHIBP(password)){
+        setPwned(true);
+        setButtonLock(false);
+        return;
+      }
+    }catch(e){
+      alert('Nie można sprawdzić twojego hasła w bazie wykradzionych haseł - rejestrowanie z pominięciem tego kroku');
     }
 
     const response = await fetch(process.env.REACT_APP_API_URL + "/auth/register", {
@@ -143,6 +158,7 @@ function Register(props: Props): JSX.Element {
           <p className="mt-3 text-center">Masz już konto? <Link to="/login">Zaloguj się</Link>.</p>
         </div>}
       </div>
+      <PwnedPasswordDialog visible={pwned} />
     </main>
   );
 }
