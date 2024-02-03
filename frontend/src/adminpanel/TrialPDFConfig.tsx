@@ -49,10 +49,11 @@ function TrialPDFConfig({mode}: Props): JSX.Element {
     else setMaxFileSize(uploadHardLimit);
   }
 
-  const refreshImage = async function(){
+  const refreshImage = async function(flushCache: boolean = false){
     setButtonlock(true);
     fetch(process.env.REACT_APP_API_URL + "/administrative/pdf/image", {
       method: "GET",
+      cache: flushCache ? "reload" : undefined,
       mode: 'same-origin',
     }).then(async (img) => {
       if(img.ok){
@@ -85,7 +86,6 @@ function TrialPDFConfig({mode}: Props): JSX.Element {
     const response = await fetch(process.env.REACT_APP_API_URL + "/administrative/pdf/image", {
       method: 'PATCH',
       mode: 'same-origin',
-      cache: "reload",
       headers: {
         "Content-Type": "application/json",
       },
@@ -100,7 +100,7 @@ function TrialPDFConfig({mode}: Props): JSX.Element {
       setUploadError('Nie udało się dodać załącznika: ' + body.message);
       return;
     }
-    await refreshImage();
+    await refreshImage(true);
     setButtonlock(false);
   };
 
@@ -117,7 +117,7 @@ function TrialPDFConfig({mode}: Props): JSX.Element {
       setUploadError('Nie udało się przywrócić domyślnego obrazka: ' + body.message);
       return;
     }
-    await refreshImage();
+    await refreshImage(true);
     setButtonlock(false);
   };
 

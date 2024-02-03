@@ -38,10 +38,11 @@ function LoginScreenConfig(): JSX.Element {
     else setMaxFileSize(uploadHardLimit);
   }
 
-  const refreshImage = async function(){
+  const refreshImage = async function(flushCache: boolean = false){
     setButtonlock(true);
     fetch(process.env.REACT_APP_API_URL + "/static/login-image", {
       method: "GET",
+      cache: flushCache ? "reload" : undefined,
       mode: 'same-origin',
     }).then(async (img) => {
       if(img.ok){
@@ -74,7 +75,6 @@ function LoginScreenConfig(): JSX.Element {
     const response = await fetch(process.env.REACT_APP_API_URL + "/administrative/login-image", {
       method: 'PATCH',
       mode: 'same-origin',
-      cache: "reload",
       headers: {
         "Content-Type": "application/json",
       },
@@ -89,7 +89,7 @@ function LoginScreenConfig(): JSX.Element {
       setUploadError('Nie udało się dodać załącznika: ' + body.message);
       return;
     }
-    await refreshImage();
+    await refreshImage(true);
     setButtonlock(false);
   };
 
@@ -106,7 +106,7 @@ function LoginScreenConfig(): JSX.Element {
       setUploadError('Nie udało się przywrócić domyślnego obrazka: ' + body.message);
       return;
     }
-    await refreshImage();
+    await refreshImage(true);
     setButtonlock(false);
   };
 
