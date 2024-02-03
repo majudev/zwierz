@@ -6,7 +6,32 @@ import mime from 'mime-types';
 import { SystemMode, getSetting } from '../../utils/settings.js';
 
 const router = Router();
-const prisma = new PrismaClient({log: ['query', 'info', 'warn', 'error']});
+const prisma = new PrismaClient({
+    log: [
+      {
+        emit: 'event',
+        level: 'query',
+      },
+      {
+        emit: 'stdout',
+        level: 'error',
+      },
+      {
+        emit: 'stdout',
+        level: 'info',
+      },
+      {
+        emit: 'stdout',
+        level: 'warn',
+      },
+    ],
+  });
+
+  prisma.$on('query', (e) => {
+    console.log('Query: ' + e.query)
+    console.log('Params: ' + e.params)
+    console.log('Duration: ' + e.duration + 'ms')
+  })
 
 router.get('/login-image', async (req: Request, res: Response) => {
     const img = await prisma.attachment.findFirst({
