@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react';
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { TrialType, CommiteeRole, Rank, SSOManager } from '../types';
 import { verifyPhone } from '../utils';
+import FullscreenSpinner from '../components/FullscreenSpinner';
 
 interface Props {
   loggedIn: boolean;
@@ -12,6 +13,8 @@ interface Props {
 }
 
 function Profile(props: Props): JSX.Element {
+  const [ready, setReady] = useState(false);
+
   const [id, setID] = useState(0);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -61,6 +64,8 @@ function Profile(props: Props): JSX.Element {
       alert('Cannot fetch user details');
       return;
     }
+    if(!ready) setReady(true);
+
     const body = await response.json();
     setID(body.data.id);
     if(body.data.name !== null) setName(body.data.name);
@@ -205,6 +210,8 @@ function Profile(props: Props): JSX.Element {
 
   return (<>
     <main className="container-fluid">
+      {!ready ? <FullscreenSpinner />
+      :
       <div className="row">
         <div className="col-lg-6 col-sm-12">
           <div className="p-5">
@@ -368,7 +375,7 @@ function Profile(props: Props): JSX.Element {
             </ul>
           </div>
         </div>}
-      </div>
+      </div>}
     </main>
     <button type="button" className="btn" id="close_phoneverify_modal" data-bs-dismiss="modal" data-bs-target="#phoneverify_modal" style={{display: 'none'}}></button>
     <div className="modal fade" id="phoneverify_modal" aria-hidden="true">
