@@ -7,7 +7,7 @@ import mime from 'mime-types';
 import sharp from 'sharp';
 
 const router = Router();
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({log: ['query', 'info', 'warn', 'error']});
 
 router.post('/new/:type(ho|hr)', async (req: Request, res: Response) => {
     if(!check_login(res)) return;

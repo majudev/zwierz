@@ -8,7 +8,7 @@ import { verifyPhone } from '../../utils/validationtools.js';
 import { randomInt } from 'crypto';
 
 const router = Router();
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({log: ['query', 'info', 'warn', 'error']});
 
 /*router.post('/new', async (req: Request, res: Response) => {
     if(!check_login(res)) return;
