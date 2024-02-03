@@ -51,6 +51,8 @@ function Trial({ type }: Props): JSX.Element {
   const navigate = useNavigate();
 
   useEffect(() => {
+    setReady(false);
+
     setUserID(0);
     setMentorName('');
     setMentorPhone('');
@@ -136,7 +138,7 @@ function Trial({ type }: Props): JSX.Element {
       }
     }
     if(!ready) setReady(true);
-    
+
     refreshQuests();
     refreshAttachmentsList();
     
