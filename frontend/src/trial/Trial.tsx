@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { TrialType, CommiteeRole, Rank, SSOManager } from '../types';
 import { predictedDateToString, stringToPredictedDate, verifyPhone } from '../utils';
 import 'bootstrap/js/src/modal';
+import FullscreenSpinner from '../components/FullscreenSpinner';
 
 interface Props {
   loggedIn: boolean;
@@ -12,6 +13,8 @@ interface Props {
 }
 
 function Trial({ type }: Props): JSX.Element {
+  const [ready, setReady] = useState(false);
+
   const [userId, setUserID] = useState(0);
   const [mentorName, setMentorName] = useState('');
   const [mentorPhone, setMentorPhone] = useState('');
@@ -123,6 +126,7 @@ function Trial({ type }: Props): JSX.Element {
     });
     if(!response.ok){
       if(response.status === 404){
+        if(!ready) setReady(true);
         setInitMode(true);
         setEditmode(true);
         return;
@@ -131,6 +135,8 @@ function Trial({ type }: Props): JSX.Element {
         return;
       }
     }
+    if(!ready) setReady(true);
+    
     refreshQuests();
     refreshAttachmentsList();
     
@@ -375,6 +381,8 @@ function Trial({ type }: Props): JSX.Element {
   }*/
 
   return (<>
+    {!ready ? <FullscreenSpinner />
+    :
     <main className="container-fluid">
       <div className="row">
         {!initMode && <div className="col-lg-8 col-sm-12">
@@ -617,7 +625,7 @@ function Trial({ type }: Props): JSX.Element {
           </div>
         </div>
       </div>}
-    </main>
+    </main>}
     <div className="modal modal-lg fade" id="new_attachment">
       <div className="modal-dialog">
         <div className="modal-content">
