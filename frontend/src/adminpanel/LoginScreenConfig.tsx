@@ -74,6 +74,7 @@ function LoginScreenConfig(): JSX.Element {
     const response = await fetch(process.env.REACT_APP_API_URL + "/administrative/login-image", {
       method: 'PATCH',
       mode: 'same-origin',
+      cache: "reload",
       headers: {
         "Content-Type": "application/json",
       },

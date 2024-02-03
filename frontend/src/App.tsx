@@ -35,6 +35,7 @@ function App(): ReactElement {
     const response = await fetch(process.env.REACT_APP_API_URL + "/static/mode", {
       method: "GET",
       mode: 'same-origin',
+      cache: "reload",
     });
     if(!response.ok){
       alert('Cannot fetch instance mode');

@@ -85,6 +85,7 @@ function TrialPDFConfig({mode}: Props): JSX.Element {
     const response = await fetch(process.env.REACT_APP_API_URL + "/administrative/pdf/image", {
       method: 'PATCH',
       mode: 'same-origin',
+      cache: "reload",
       headers: {
         "Content-Type": "application/json",
       },
