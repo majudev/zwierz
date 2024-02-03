@@ -89,9 +89,10 @@ function Trial({ type }: Props): JSX.Element {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const refreshShowCategories = async function() {
+  const refreshShowCategories = async function(flushCache: boolean = false) {
     const response = await fetch(process.env.REACT_APP_API_URL + "/static/show-category-hints", {
       method: "GET",
+      cache: flushCache ? "reload" : undefined,
       mode: 'same-origin'
     });
     if(!response.ok){

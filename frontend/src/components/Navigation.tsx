@@ -54,13 +54,14 @@ function Navigation({loggedIn, logIn, logOut, mode, trigger}: Props) : JSX.Eleme
   }, [trigger]);
 
   useEffect(() => {
-    refreshTutorials();
+    refreshTutorials(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const refreshTutorials = async function() {
+  const refreshTutorials = async function(flushCache: boolean = false) {
     const response = await fetch(process.env.REACT_APP_API_URL + "/static/show-tutorials", {
       method: "GET",
+      cache: flushCache ? "reload" : undefined,
       mode: 'same-origin'
     });
     if(!response.ok){
