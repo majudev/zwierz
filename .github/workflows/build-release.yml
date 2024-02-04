@@ -1,0 +1,35 @@
+name: Docker Image CI
+
+on:
+  push:
+    tags: [ v* ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Log into the Container registry
+      uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+      with:
+        registry: hub.kapitula-ho.pl
+        username: github
+        password: ${{ secrets.HUB_TOKEN }}
+    - uses: actions/checkout@v3
+    - name: Build the frontend Docker image
+      env:
+        IMAGE_TAG: ${{ github.ref_name }}
+      run: |
+        cd frontend && docker build -t hub.kapitula-ho.pl/zwierz/frontend:$IMAGE_TAG .
+        docker push hub.kapitula-ho.pl/zwierz/frontend:$IMAGE_TAG
+    - name: Build the backend Docker image
+      env:
+        IMAGE_TAG: ${{ github.ref_name }}
+      run: |
+        cd backend && docker build -t hub.kapitula-ho.pl/zwierz/backend:$IMAGE_TAG .
+        docker push hub.kapitula-ho.pl/zwierz/backend:$IMAGE_TAG
+    - name: Build the nginx Docker image
+      env:
+        IMAGE_TAG: ${{ github.ref_name }}
+      run: |
+        cd nginx && docker build -t hub.kapitula-ho.pl/zwierz/nginx:$IMAGE_TAG .
+        docker push hub.kapitula-ho.pl/zwierz/nginx:$IMAGE_TAG
