@@ -128,7 +128,7 @@ function Trial({ type }: Props): JSX.Element {
     });
     if(!response.ok){
       if(response.status === 404){
-        if(!ready) setReady(true);
+        setReady(true);
         setInitMode(true);
         setEditmode(true);
         return;
@@ -137,7 +137,7 @@ function Trial({ type }: Props): JSX.Element {
         return;
       }
     }
-    if(!ready) setReady(true);
+    setReady(true);
 
     refreshQuests();
     refreshAttachmentsList();
