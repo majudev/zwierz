@@ -46,7 +46,7 @@ if [[ "$URL" != "" ]]; then
 fi
 
 
-if [[ "$PORT" != "" ]] || [ -z "$(ls -A /path/to/dir)" ]; then
+if [[ "$PORT" != "" ]] || [ -z "$(ls -A $TEMP)" ]; then
 	echo 'services:' >> compose-local.yml
 fi
 
