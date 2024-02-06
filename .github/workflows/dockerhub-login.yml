@@ -8,9 +8,6 @@ jobs:
   build:
     runs-on: self-hosted
     steps:
-    - name: Add host to /etc/hosts
-      run: |
-        echo "2001:67c:d60:41:be24:11ff:fece:278f hub.majudev.net" | sudo tee -a /etc/hosts
     - name: Log into the Container registry
       uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
       with:
