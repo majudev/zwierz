@@ -8,7 +8,7 @@ jobs:
   build:
     runs-on: self-hosted
     steps:
-    - name: Add hosts to /etc/hosts
+    - name: Add host to /etc/hosts
       run: |
         echo "2001:67c:d60:41:be24:11ff:fece:278f hub.majudev.net" | sudo tee -a /etc/hosts
     - name: Log into the Container registry
