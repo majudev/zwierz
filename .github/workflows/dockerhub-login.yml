@@ -20,13 +20,13 @@ jobs:
     - uses: actions/checkout@v3
     - name: Build the frontend Docker image
       run: |
-        cd frontend && docker build -t hub.majudev.net/zwierz/frontend:$IMAGE_TAG .
+        cd frontend && docker build -t hub.majudev.net/zwierz/frontend:$IMAGE_TAG . --progress=plain
         docker push hub.majudev.net/zwierz/frontend:$IMAGE_TAG
     - name: Build the backend Docker image
       run: |
-        cd backend && docker build -t hub.majudev.net/zwierz/backend:$IMAGE_TAG .
+        cd backend && docker build -t hub.majudev.net/zwierz/backend:$IMAGE_TAG . --progress=plain
         docker push hub.majudev.net/zwierz/backend:$IMAGE_TAG
     - name: Build the nginx Docker image
       run: |
-        cd nginx && docker build -t hub.majudev.net/zwierz/nginx:$IMAGE_TAG .
+        cd nginx && docker build -t hub.majudev.net/zwierz/nginx:$IMAGE_TAG . --progress=plain
         docker push hub.majudev.net/zwierz/nginx:$IMAGE_TAG
