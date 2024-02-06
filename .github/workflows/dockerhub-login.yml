@@ -1,0 +1,26 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "master" ]
+  
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Add hosts to /etc/hosts
+      run: |
+        echo "2001:67c:d60:41:be24:11ff:fece:278f hub.majudev.net" | sudo tee -a /etc/hosts
+    - name: Log into the Container registry
+      uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+      with:
+        registry: hub.majudev.net
+        username: ${{ env.HUB_LOGIN }}
+        password: ${{ secrets.HUB_PASSWORD }}
+    - uses: actions/checkout@v3
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
