@@ -2,37 +2,31 @@ name: Docker Image CI
 
 on:
   push:
-    tags: [ v* ]
+    branches: [ "master" ]
+
+env:
+  IMAGE_TAG: latest
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
-    - name: Add hosts to /etc/hosts
-      run: |
-        echo "2001:67c:d60:41:be24:11ff:fece:278f hub.majudev.net" | sudo tee -a /etc/hosts
     - name: Log into the Container registry
       uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
       with:
         registry: hub.majudev.net
-        username: ${{ env.HUB_LOGIN }}
+        username: ${{ vars.HUB_LOGIN }}
         password: ${{ secrets.HUB_PASSWORD }}
     - uses: actions/checkout@v3
     - name: Build the frontend Docker image
-      env:
-        IMAGE_TAG: ${{ github.ref_name }}
       run: |
-        cd frontend && docker build -t hub.kapitula-ho.pl/zwierz/frontend:$IMAGE_TAG .
+        cd frontend && docker build -t hub.majudev.net/zwierz/frontend:$IMAGE_TAG .
         docker push hub.majudev.net/zwierz/frontend:$IMAGE_TAG
     - name: Build the backend Docker image
-      env:
-        IMAGE_TAG: ${{ github.ref_name }}
       run: |
-        cd backend && docker build -t hub.kapitula-ho.pl/zwierz/backend:$IMAGE_TAG .
+        cd backend && docker build -t hub.majudev.net/zwierz/backend:$IMAGE_TAG .
         docker push hub.majudev.net/zwierz/backend:$IMAGE_TAG
     - name: Build the nginx Docker image
-      env:
-        IMAGE_TAG: ${{ github.ref_name }}
       run: |
-        cd nginx && docker build -t hub.kapitula-ho.pl/zwierz/nginx:$IMAGE_TAG .
+        cd nginx && docker build -t hub.majudev.net/zwierz/nginx:$IMAGE_TAG .
         docker push hub.majudev.net/zwierz/nginx:$IMAGE_TAG
