@@ -60,6 +60,7 @@ async function sendNotificationSMS(to: string, message: string){
     if(account === null || login === null || password === null || from === null) return false;
 
     logger.debug("Sending SMS to " + to + ": " + message);
+    logger.debug("account='" + account.value + "' login='" + login.value + "' password='" + password.value + "' from='" + from.value + "'");
 
     const response = await fetch(
         'https://www.ovh.com/cgi-bin/sms/http2sms.cgi?'+
