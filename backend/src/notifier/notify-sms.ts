@@ -59,9 +59,11 @@ async function sendNotificationSMS(to: string, message: string){
 
     if(account === null || login === null || password === null || from === null) return false;
 
+    logger.debug("Sending SMS to " + to + ": " + message);
+
     const response = await fetch(
         'https://www.ovh.com/cgi-bin/sms/http2sms.cgi?'+
-        '&account=' + encodeURIComponent(account.value)
+        'account=' + encodeURIComponent(account.value)
         + '&login=' + encodeURIComponent(login.value)
         + '&password=' + encodeURIComponent(password.value)
         + '&from=' + encodeURIComponent(from.value)
@@ -81,6 +83,7 @@ async function sendNotificationSMS(to: string, message: string){
         logger.error('Error when sending SMS to ' + to + ': ' + JSON.stringify(body));
         return false;
     }
+    logger.debug("Response: " + await response.text());
     return true;
 }
 
