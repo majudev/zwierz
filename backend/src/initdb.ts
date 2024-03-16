@@ -360,39 +360,108 @@ export async function initDB(){
         process.exit(-1);
     }
     
-    const postal_baseurl_found = await prisma.settings.count({
+    var mailer_provider_found = await prisma.settings.findFirst({
         where: {
             key: {
-                equals: "postal.baseurl"
+                equals: "mailer.provider"
             }
         }
-    }) > 0;
-    if(!postal_baseurl_found){
-        logger.error('Missing postal.baseurl entry in the database');
-        process.exit(-1);
+    });
+    if(mailer_provider_found === null){
+        logger.warn('Missing mailer.provider entry in the database - adding default one');
+        mailer_provider_found = await prisma.settings.create({
+            data: {
+                key: "mailer.provider",
+                value: "postal",
+            }
+        });
     }
-
-    const postal_apitoken_found = await prisma.settings.count({
-        where: {
-            key: {
-                equals: "postal.apitoken"
+    if(mailer_provider_found.value === "postal"){
+        const postal_baseurl_found = await prisma.settings.count({
+            where: {
+                key: {
+                    equals: "postal.baseurl"
+                }
             }
+        }) > 0;
+        if(!postal_baseurl_found){
+            logger.error('Missing postal.baseurl entry in the database');
+            process.exit(-1);
         }
-    }) > 0;
-    if(!postal_apitoken_found){
-        logger.error('Missing postal.apitoken entry in the database');
-        process.exit(-1);
-    }
-
-    const postal_from_found = await prisma.settings.count({
-        where: {
-            key: {
-                equals: "postal.from"
+    
+        const postal_apitoken_found = await prisma.settings.count({
+            where: {
+                key: {
+                    equals: "postal.apitoken"
+                }
             }
+        }) > 0;
+        if(!postal_apitoken_found){
+            logger.error('Missing postal.apitoken entry in the database');
+            process.exit(-1);
         }
-    }) > 0;
-    if(!postal_from_found){
-        logger.error('Missing postal.from entry in the database');
+    
+        const postal_from_found = await prisma.settings.count({
+            where: {
+                key: {
+                    equals: "postal.from"
+                }
+            }
+        }) > 0;
+        if(!postal_from_found){
+            logger.error('Missing postal.from entry in the database');
+            process.exit(-1);
+        }
+    }else if(mailer_provider_found.value === "mailjet"){
+        const mailjet_apikey_public_found = await prisma.settings.count({
+            where: {
+                key: {
+                    equals: "mailjet.apitoken.public"
+                }
+            }
+        }) > 0;
+        if(!mailjet_apikey_public_found){
+            logger.error('Missing mailjet.apitoken.public entry in the database');
+            process.exit(-1);
+        }
+
+        const mailjet_apikey_secret_found = await prisma.settings.count({
+            where: {
+                key: {
+                    equals: "mailjet.apitoken.secret"
+                }
+            }
+        }) > 0;
+        if(!mailjet_apikey_secret_found){
+            logger.error('Missing mailjet.apitoken.secret entry in the database');
+            process.exit(-1);
+        }
+    
+        const mailjet_from_name_found = await prisma.settings.count({
+            where: {
+                key: {
+                    equals: "mailjet.from.name"
+                }
+            }
+        }) > 0;
+        if(!mailjet_from_name_found){
+            logger.error('Missing mailjet.from.name entry in the database');
+            process.exit(-1);
+        }
+
+        const mailjet_from_email_found = await prisma.settings.count({
+            where: {
+                key: {
+                    equals: "mailjet.from.email"
+                }
+            }
+        }) > 0;
+        if(!mailjet_from_email_found){
+            logger.error('Missing mailjet.from.email entry in the database');
+            process.exit(-1);
+        }
+    }else{
+        logger.error('Entry mailer.provider has value "' + mailer_provider_found.value + '" which is unsupported');
         process.exit(-1);
     }
 
