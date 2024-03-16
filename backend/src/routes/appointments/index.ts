@@ -176,7 +176,7 @@ router.get('/:type(all|me|public)/:archived(archived)?', async (req: Request, re
     return;
 });
 
-router.patch('/:appointmentId', async (req: Request, res: Response) => {
+router.patch('/:appointmentId/:lock(lock|unlock)?', async (req: Request, res: Response) => {
     if(!check_login(res)) return;
 
     const mode = await getSystemMode();
@@ -186,21 +186,12 @@ router.patch('/:appointmentId', async (req: Request, res: Response) => {
     }
     const HOenabled = (mode === SystemMode.HO || mode === SystemMode.HO_HR);
     const HRenabled = (mode === SystemMode.HR || mode === SystemMode.HO_HR);
-
-    if(req.body.description === undefined && ((HOenabled && HRenabled && req.body.slots_HO === undefined && req.body.slots_HR === undefined) || (HOenabled && !HRenabled && req.body.slots_HO === undefined) || (!HOenabled && HRenabled && req.body.slots_HR === undefined))){
-        fail_missing_params(res, ["description", "slots_HO", "slots_HR"], null);
-        return;
-    }
+    const action: 'LOCK'|'UNLOCK'|'MODIFY' = (req.params.lock === undefined ? 'MODIFY' : (req.params.lock === 'lock' ? 'LOCK' : 'UNLOCK'));
 
     if(!(await user_is_uberadmin(res.locals.auth_user.userId)) && (HOenabled && req.body.slots_HO !== undefined && !(await user_is_ho_commitee_scribe(res.locals.auth_user.userId))) && (HRenabled && req.body.slots_HR !== undefined && !(await user_is_hr_commitee_scribe(res.locals.auth_user.userId))) && (req.body.description !== undefined && !(await user_is_ho_commitee_scribe(res.locals.auth_user.userId)) && !(await user_is_hr_commitee_scribe(res.locals.auth_user.userId)))){
         fail_no_permissions(res, "you don't have permissions to edit this appointment");
         return;
     }
-
-    /*if(req.body.description === undefined && (HOenabled && req.body.slots_HO === undefined) && (HRenabled && req.body.slots_HR === undefined)){
-        fail_missing_params(res, [], "no body provided");
-        return;
-    }*/
 
     const appointmentId: number = parseInt(req.params.appointmentId);
 
@@ -209,35 +200,47 @@ router.patch('/:appointmentId', async (req: Request, res: Response) => {
         return;
     }
 
-    const current_appointment = await prisma.appointment.findUnique({
-        where: {
-            id: appointmentId,
-        },
-        select: {
-            registrations: {
-                select: {
-                    id: true,
-                    trial: {
-                        select: {
-                            type: true,
+    if(action === 'MODIFY'){
+        if(req.body.description === undefined && ((HOenabled && HRenabled && req.body.slots_HO === undefined && req.body.slots_HR === undefined) || (HOenabled && !HRenabled && req.body.slots_HO === undefined) || (!HOenabled && HRenabled && req.body.slots_HR === undefined))){
+            fail_missing_params(res, ["description", "slots_HO", "slots_HR"], null);
+            return;
+        }
+    
+        /*if(req.body.description === undefined && (HOenabled && req.body.slots_HO === undefined) && (HRenabled && req.body.slots_HR === undefined)){
+            fail_missing_params(res, [], "no body provided");
+            return;
+        }*/
+    
+        const current_appointment = await prisma.appointment.findUnique({
+            where: {
+                id: appointmentId,
+            },
+            select: {
+                registrations: {
+                    select: {
+                        id: true,
+                        trial: {
+                            select: {
+                                type: true,
+                            }
                         }
                     }
                 }
             }
+        });
+    
+        if(current_appointment === null){
+            fail_entity_not_found(res, "appointment with id " + appointmentId + " not found");
+            return;
         }
-    });
-
-    if(current_appointment === null){
-        fail_entity_not_found(res, "appointment with id " + appointmentId + " not found");
-        return;
-    }
-
-    const HOregs = current_appointment.registrations.filter((value) => {return value.trial.type === TrialType.HO});
-    const HRregs = current_appointment.registrations.filter((value) => {return value.trial.type === TrialType.HR});
-
-    if((HOenabled && HOregs.length > req.body.slots_HO) || (HRenabled && HRregs.length > req.body.slots_HR)){
-        fail_duplicate_entry(res, ((HOenabled && HOregs.length > req.body.slots_HO) ? 'slots_HO' : '') + ' ' + ((HRenabled && HRregs.length > req.body.slots_HR) ? 'slots_HR' : ''), 'you cannot shrink available slots more than number of currently registered people');
-        return;
+    
+        const HOregs = current_appointment.registrations.filter((value) => {return value.trial.type === TrialType.HO});
+        const HRregs = current_appointment.registrations.filter((value) => {return value.trial.type === TrialType.HR});
+    
+        if((HOenabled && HOregs.length > req.body.slots_HO) || (HRenabled && HRregs.length > req.body.slots_HR)){
+            fail_duplicate_entry(res, ((HOenabled && HOregs.length > req.body.slots_HO) ? 'slots_HO' : '') + ' ' + ((HRenabled && HRregs.length > req.body.slots_HR) ? 'slots_HR' : ''), 'you cannot shrink available slots more than number of currently registered people');
+            return;
+        }
     }
 
     const appointment = await prisma.appointment.update({
@@ -245,9 +248,11 @@ router.patch('/:appointmentId', async (req: Request, res: Response) => {
             id: appointmentId,
         },
         data: {
-            description: req.body.description,
-            slots_HO: (req.body.slots_HO !== undefined && HOenabled) ? req.body.slots_HO : undefined,
-            slots_HR: (req.body.slots_HR !== undefined && HRenabled) ? req.body.slots_HR : undefined,
+            description: action !== 'MODIFY' ? undefined : req.body.description,
+            slots_HO: action !== 'MODIFY' ? undefined : (req.body.slots_HO !== undefined && HOenabled) ? req.body.slots_HO : undefined,
+            slots_HR: action !== 'MODIFY' ? undefined : (req.body.slots_HR !== undefined && HRenabled) ? req.body.slots_HR : undefined,
+
+            locked: (action === 'MODIFY' ? undefined : (action === 'LOCK' ? true : false)),
         },
         select: {
             id: true,

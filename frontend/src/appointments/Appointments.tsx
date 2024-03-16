@@ -164,6 +164,7 @@ function Appointments({mode}: Props): JSX.Element {
                                 {regsHR[0].message !== null && <>Wiadomość dla kapituły: {regsHR[0].message}<br/></>}
                                 <button className="btn btn-sm btn-danger" onClick={(e) => onUnregistrationAttempt(TrialType.HR, appointment.id)}>Usuń rejestrację</button>
                               </p>}
+                              {appointment.locked && <p>To spotkanie jest zablokowane i nie można się na nie zapisać.</p>}
                             </td>
                             {(mode === SystemMode.HO_HR || mode === SystemMode.HO) && <td className="text-center nowrap">{freeHO} z {appointment.slotsHO}</td>}
                             {(mode === SystemMode.HO_HR || mode === SystemMode.HR) && <td className="text-center nowrap">{freeHR} z {appointment.slotsHR}</td>}
