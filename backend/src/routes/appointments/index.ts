@@ -72,7 +72,7 @@ router.post('/new', async (req: Request, res: Response) => {
     }).end();
 });
 
-router.get('/:type(all|me|public)', async (req: Request, res: Response) => {
+router.get('/:type(all|me|public)/:archived(archived)?', async (req: Request, res: Response) => {
     if(req.params.type !== 'public' && !check_login(res)) return;
 
     const mode = await getSystemMode();
@@ -93,10 +93,14 @@ router.get('/:type(all|me|public)', async (req: Request, res: Response) => {
         return;
     }
 
+    const archived = (req.params.archived !== undefined);
+
     const appointments = await prisma.appointment.findMany({
         where: {
-            date: {
+            date: !archived ? {
                 gte: new Date(),
+            } : {
+                lt: new Date(),
             }
         },
         select: {
@@ -281,41 +285,41 @@ router.patch('/:appointmentId', async (req: Request, res: Response) => {
     }).end();
 });
 
-router.delete('/:teamId', async (req: Request, res: Response) => {
-    /*if(!check_login(res)) return;
+router.delete('/:appointmentId', async (req: Request, res: Response) => {
+    if(!check_login(res)) return;
     if(!(await user_is_uberadmin(res.locals.auth_user.userId)) && !(await user_is_commitee_scribe(res.locals.auth_user.userId))){
         fail_no_permissions(res, "you don't have permissions to delete teams");
         return;
     }
 
-    const teamId: number = parseInt(req.params.teamId);
+    const appointmentId: number = parseInt(req.params.appointmentId);
 
-    if(Number.isNaN(teamId)) {
-        fail_missing_params(res, ["teamId"], null);
+    if(Number.isNaN(appointmentId)) {
+        fail_missing_params(res, ["appointmentId"], null);
         return;
     }
 
-    const exists = await prisma.team.count({
+    const exists = await prisma.appointmentRegistrations.count({
         where: {
-            id: teamId,
+            appointmentId: appointmentId,
         }
     }) > 0;
 
-    if(!exists){
-        fail_entity_not_found(res, "team with id " + teamId + " not found");
+    if(exists){
+        fail_entity_not_found(res, "appointment with id " + appointmentId + " still has people registererd");
         return;
     }
 
-    const updatedObject = await prisma.team.delete({
+    await prisma.appointment.delete({
         where: {
-            id: teamId,
+            id: appointmentId,
         }
     });
 
     res.status(204).json({
         status: "success",
         data: null
-    }).end();*/
+    }).end();
 });
 
 router.post('/register/:type(ho|hr)', async (req: Request, res: Response) => {

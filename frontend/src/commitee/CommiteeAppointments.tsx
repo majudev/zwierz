@@ -31,8 +31,10 @@ function CommiteeAppointments({mode}: Props): JSX.Element {
   const [selectableDates, setSelectableDates] = useState<Array<Date>>([]);
 
   const [appointments, setAppointments] = useState<Array<{id: number, date: Date, description: string, slotsHO: number, slotsHR: number, locked: boolean, registrations: Array<{id: number, intent: string, customIntent: string|null, message: string|null, trial: {userId: number; type: TrialType; user: {name: string; rank: Rank;}}}>; editmode: boolean;}>>([]);
+  const [archivalAppointments, setArchivalAppointments] = useState<Array<{id: number, date: Date, description: string, slotsHO: number, slotsHR: number, locked: boolean, registrations: Array<{id: number, intent: string, customIntent: string|null, message: string|null, trial: {userId: number; type: TrialType; user: {name: string; rank: Rank;}}}>;}>>([]);
 
   const [buttonlock, setButtonlock] = useState(false);
+  const [archivalVisible, setArchivalVisible] = useState(false);
 
   const navigate = useNavigate();
 
@@ -77,6 +79,19 @@ function CommiteeAppointments({mode}: Props): JSX.Element {
     setAppointments(body.data.map((e) => {return {...e, date: new Date(e.date), slotsHO: e.slots_HO, slotsHR: e.slots_HR, editmode: false}}));
   }
 
+  const refreshArchival = async function(){
+    const response = await fetch(process.env.REACT_APP_API_URL + "/appointments/all/archived", {
+      method: "GET",
+      mode: 'same-origin',
+    });
+    if(!response.ok){
+      alert('Cannot fetch archived appointments list');
+      return;
+    }
+    const body = await response.json() as {status:string; data: Array<{id: number, date: string, description: string, slots_HO: number, slots_HR: number, locked: boolean, registrations: Array<{id: number, intent: string, customIntent: string|null, message: string|null, trial: {userId: number; type: TrialType; user: {name: string; rank: Rank;}}}>}>};
+    setArchivalAppointments(body.data.map((e) => {return {...e, date: new Date(e.date), slotsHO: e.slots_HO, slotsHR: e.slots_HR}}));
+  }
+
   const onCreateAppointmentAttempt = async function(){
     setButtonlock(true);
     const response = await fetch(process.env.REACT_APP_API_URL + "/appointments/new", {
@@ -118,6 +133,24 @@ function CommiteeAppointments({mode}: Props): JSX.Element {
     if(!response.ok){
       setButtonlock(false);
       alert('Cannot create new appointment');
+      return;
+    }
+    await refreshAppointments();
+    setButtonlock(false);
+  };
+
+  const onDeleteAppointmentAttempt = async function(index: number){
+    setButtonlock(true);
+    const response = await fetch(process.env.REACT_APP_API_URL + "/appointments/" + appointments[index].id, {
+      method: 'DELETE',
+      mode: 'same-origin',
+      headers: {
+        "Content-Type": "application/json",
+      }
+    });
+    if(!response.ok){
+      setButtonlock(false);
+      alert('Cannot delete the appointment');
       return;
     }
     await refreshAppointments();
@@ -234,7 +267,8 @@ function CommiteeAppointments({mode}: Props): JSX.Element {
                                           {registration.message !== null && <><br/><br/>Wiadomość dla kapituły: {registration.message}</>}
                                         </td>
                                         <td className="nowrap">
-                                          <button className="btn btn-dark nowrap" onClick={(e) => alert()} disabled={buttonlock || ((registration.trial.type === TrialType.HO) ? (roleHO === CommiteeRole.NONE) : (roleHR === CommiteeRole.NONE))}>Zobacz próbę</button>
+                                          {/*<button className="btn btn-dark nowrap" onClick={(e) => alert()} disabled={buttonlock || ((registration.trial.type === TrialType.HO) ? (roleHO === CommiteeRole.NONE) : (roleHR === CommiteeRole.NONE))}>Zobacz próbę</button>*/}
+                                          <button className="btn btn-dark nowrap" onClick={(e) => {navigate("/commitee/trial/" + registration.trial.userId + "/" + registration.trial.type.toLowerCase());}} disabled={buttonlock || ((registration.trial.type === TrialType.HO) ? (roleHO === CommiteeRole.NONE) : (roleHR === CommiteeRole.NONE))}>Zobacz próbę</button>
                                           {(roleHO === CommiteeRole.SCRIBE || roleHR === CommiteeRole.SCRIBE) && <button className="btn btn-danger" onClick={(e) => {setKickRegistrationID(registration.id); setKickUserName(nameConverter(registration.trial.user.rank, registration.trial.user.name)); setKickAppointmentID(registration.id); setKickAppointmentDate(appointment.date); setKickAppointmentIntent(intentTranslator(registration)); document.getElementById('open_kick_modal')?.click();}} disabled={buttonlock || ((registration.trial.type === TrialType.HO) ? (roleHO !== CommiteeRole.SCRIBE) : (roleHR !== CommiteeRole.SCRIBE))}><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-x-square" viewBox="0 0 16 16"><path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"></path><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"></path></svg></button>}
                                         </td>
                                       </tr>;
@@ -283,7 +317,7 @@ function CommiteeAppointments({mode}: Props): JSX.Element {
                               :
                                 <button className="btn btn-dark" onClick={(e) => {var newArray = [...appointments]; newArray[index].editmode = true; setAppointments(newArray);}} disabled={buttonlock}><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-pencil-fill" viewBox="0 0 16 16"><path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708l-3-3zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207l6.5-6.5zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11l.178-.178z"/></svg></button>
                               }
-                              <button className="btn btn-danger" onClick={(e) => alert()} disabled={buttonlock || appointment.registrations.length > 0}><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-x-square" viewBox="0 0 16 16"><path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"></path><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"></path></svg></button>
+                              <button className="btn btn-danger" onClick={(e) => {onDeleteAppointmentAttempt(index);}} disabled={buttonlock || appointment.registrations.length > 0}><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-x-square" viewBox="0 0 16 16"><path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"></path><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"></path></svg></button>
                             </td>}
                           </tr>
                         })
@@ -348,6 +382,87 @@ function CommiteeAppointments({mode}: Props): JSX.Element {
                   </div>}
                 </div>
               </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div className="row justify-content-center">
+        <div className={mode !== SystemMode.HO_HR ? "col-lg-8 col-sm-12" : "col-lg-10 col-sm-12"}>
+          <div className="p-5">
+            <ul className="list-group">
+              <li className="list-group-item list-group-item-info d-flex justify-content-center bg-dark text-center text-white">
+                <h4 className="mb-1 mt-1">Lista minionych spotkań</h4>
+              </li>
+              {!archivalVisible && 
+              <li className="list-group-item d-flex flex-row-reverse trial-entry">
+                <button className="btn btn-dark" onClick={(e) => {setArchivalVisible(true); refreshArchival();}}>Wyświetl minione spotkania</button>
+              </li>}
+              {archivalVisible && <li className="list-group-item">
+                <div className="table-responsive-sm">
+                  <table className="table">
+                    <thead>
+                      <tr>
+                        <th scope="col" className="nowrap">Data</th>
+                        <th scope="col" className="text-center longrecord">Czas trwania</th>
+                        {mode !== SystemMode.HO_HR && <th scope="col" className="nowrap text-center">Rejestracje</th>}
+                        {mode === SystemMode.HO_HR && <>
+                        <th scope="col" className="nowrap text-center">Rejestracje HO</th>
+                        <th scope="col" className="nowrap text-center">Rejestracje HR</th>
+                        </>}
+                        {(roleHO === CommiteeRole.SCRIBE || roleHR === CommiteeRole.SCRIBE) && <th></th>}
+                      </tr>
+                    </thead>
+                    <tbody id="appointment_table">
+                      {
+                        archivalAppointments.map((appointment, index) => {
+                          const regsHO = appointment.registrations.filter((reg) => {return reg.trial.type === TrialType.HO});
+                          const regsHR = appointment.registrations.filter((reg) => {return reg.trial.type === TrialType.HR});
+                          return <tr>
+                            <td className="nowrap" scope="row">{appointment.date.getDate() + '.' + ((appointment.date.getMonth() + 1) >= 10 ? (appointment.date.getMonth() + 1) : '0' + (appointment.date.getMonth() + 1)) + '.' + appointment.date.getFullYear()}</td>
+                            <td>
+                              <p>{appointment.description}</p>
+                              {(regsHO.length > 0 || regsHR.length > 0) ? <table className="table">
+                                <thead>
+                                  <tr>
+                                    <th className="text-center nowrap">Imię i nazwisko</th>
+                                    {mode === SystemMode.HO_HR && <th className="text-center">Stopień</th>}
+                                    <th className="text-center longrecord">Cel</th>
+                                    <th className="text-center nowrap">Akcje</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {
+                                    appointment.registrations.toSorted((a, b) => {return (a.trial.type === TrialType.HR ? (b.trial.type === TrialType.HR ? 0 : 1) : (b.trial.type === TrialType.HR ? -1 : 0))}).map((registration) => {
+                                      return <tr>
+                                        <td className="text-center name">{nameConverter(registration.trial.user.rank, registration.trial.user.name)}</td>
+                                        {mode === SystemMode.HO_HR && <td className="text-center">{registration.trial.type}</td>}
+                                        <td className="text-center">
+                                          {intentTranslator(registration)}
+                                          {registration.message !== null && <><br/><br/>Wiadomość dla kapituły: {registration.message}</>}
+                                        </td>
+                                        <td className="nowrap">
+                                          {/*<button className="btn btn-dark nowrap" onClick={(e) => alert()} disabled={buttonlock || ((registration.trial.type === TrialType.HO) ? (roleHO === CommiteeRole.NONE) : (roleHR === CommiteeRole.NONE))}>Zobacz próbę</button>*/}
+                                          <button className="btn btn-dark nowrap" onClick={(e) => {navigate("/commitee/trial/" + registration.trial.userId + "/" + registration.trial.type.toLowerCase());}} disabled={buttonlock || ((registration.trial.type === TrialType.HO) ? (roleHO === CommiteeRole.NONE) : (roleHR === CommiteeRole.NONE))}>Zobacz próbę</button>
+                                        </td>
+                                      </tr>;
+                                    })
+                                  }
+                                </tbody>
+                              </table> : <><br/><p>Brak zapisanych kandydatów</p></>}
+                            </td>
+                            {(mode === SystemMode.HO_HR || mode === SystemMode.HO) && <td className="text-center nowrap">
+                              {regsHO.length} z {appointment.slotsHO}
+                            </td>}
+                            {(mode === SystemMode.HO_HR || mode === SystemMode.HR) && <td className="text-center nowrap">
+                              {regsHR.length} z {appointment.slotsHR}
+                            </td>}
+                          </tr>
+                        })
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </li>}
             </ul>
           </div>
         </div>
