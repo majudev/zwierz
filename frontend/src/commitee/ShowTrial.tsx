@@ -113,24 +113,15 @@ function ShowTrial({ mode }: Props): JSX.Element {
     setQuests(body.data.map((e) => {return {...e, finish_date: new Date(e.finish_date)}}));
   }
 
-  /*const onTrialUpdateAttempt = async function(){
+  const onTrialChangeArchivalStateAttempt = async function(state: boolean){
     setButtonLock(true);
 
-    const URLinsert = initMode ? 'new/' : '';
-    const method = initMode ? 'POST' : 'PATCH';
-
-    const response = await fetch(process.env.REACT_APP_API_URL + "/trial/" + URLinsert + type.toLowerCase(), {
-      method: method,
+    const response = await fetch(process.env.REACT_APP_API_URL + "/trial/archived/" + userId + "/" + type?.toLowerCase() + "/" + (state ? "yes" : "no"), {
+      method: 'PATCH',
       mode: 'same-origin',
       headers: {
         "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        mentor_email: mentorEmail,
-        mentor_name: mentorName,
-        mentor_phone: mentorPhone,
-        predicted_closing_date: predictedClosingDate,
-      })
+      }
     });
     setButtonLock(false);
     refreshTrialData();
@@ -138,8 +129,7 @@ function ShowTrial({ mode }: Props): JSX.Element {
       alert('Cannot update details');
       return;
     }
-    setEditmode(false);
-  };*/
+  };
 
   const refreshAttachmentsList = async function(){
     const response = await fetch(process.env.REACT_APP_API_URL + "/trial/attachments/" + userId + "/" + type, {
@@ -298,8 +288,8 @@ function ShowTrial({ mode }: Props): JSX.Element {
               </li>}
               <li className="list-group-item">
                 <div className="d-flex flex-row-reverse">
-                  {!archived && <button className="btn btn-danger" onClick={(e) => alert()}>Archiwizuj próbę</button>}
-                  {archived && <button className="btn btn-danger" onClick={(e) => alert()}>Dearchiwizuj próbę</button>}
+                  {!archived && <button className="btn btn-danger" onClick={(e) => {onTrialChangeArchivalStateAttempt(true);}}>Archiwizuj próbę</button>}
+                  {archived && <button className="btn btn-danger" onClick={(e) => {onTrialChangeArchivalStateAttempt(false);}}>Dearchiwizuj próbę</button>}
                   <button className="btn btn-dark" onClick={(e) => alert()}>{(openedOn === null) ? 'Otwórz próbę' : 'Edytuj otwarcie'}</button>
                   {(openedOn !== null) && <button className="btn btn-dark" onClick={(e) => alert()}>{(closedOn === null) ? 'Zamknij próbę' : 'Edytuj zamknięcie'}</button>}
                 </div>

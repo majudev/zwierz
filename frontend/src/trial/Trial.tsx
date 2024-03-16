@@ -466,7 +466,7 @@ function Trial({ type }: Props): JSX.Element {
                     </tbody>
                   </table>
                   <div className="d-flex justify-content-end flex-row">
-                    <button type="button" className="btn btn-dark" disabled={newQuestVisible} onClick={() => {setNewQuestContent(''); setNewQuestFinishDate(new Date()); setNewQuestVisible(true)}}>Dodaj nowe</button>
+                    <button type="button" className="btn btn-dark" disabled={newQuestVisible || archived} onClick={() => {setNewQuestContent(''); setNewQuestFinishDate(new Date()); setNewQuestVisible(true)}}>Dodaj nowe</button>
                     <div className="p-2"></div>
                     <button type="button" className="btn btn-dark" id="download_trial_pdf">Pobierz PDF próby</button>
                   </div>
@@ -530,6 +530,9 @@ function Trial({ type }: Props): JSX.Element {
               {!initMode && <li className="list-group-item bg-danger text-center">
                 <b>Pamiętaj, żeby zapisać się na spotkanie z kapitułą!</b>
               </li>}
+              {archived && <li className="list-group-item bg-danger text-center">
+                <b>Próba została zarchiwizowana. Nie możesz jej edytować.</b>
+              </li>}
               <li className="list-group-item d-flex justify-content-end flex-row">
                 {!editmode && <button type="button" className="btn btn-dark" onClick={(e) => setEditmode(true)} disabled={buttonlock || archived}>Edytuj</button>}
                 {editmode && <button type="button" className="btn btn-dark" onClick={onTrialUpdateAttempt} disabled={buttonlock || archived || !verifyPhone(mentorPhone)}>Zapisz</button>}
@@ -569,7 +572,7 @@ function Trial({ type }: Props): JSX.Element {
                           </div>;
                         })
                       }
-                      <div className="col" id="attachment_new">
+                      {!archived && <div className="col" id="attachment_new">
                         <div className="card attachment" data-bs-toggle="modal" data-bs-target="#new_attachment">
                           <svg className="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" preserveAspectRatio="xMidYMid slice" focusable="false">
                             <rect width="100%" height="100%" fill="#55595c"></rect>
@@ -582,7 +585,7 @@ function Trial({ type }: Props): JSX.Element {
                             </g>
                           </svg>
                         </div>
-                      </div>
+                      </div>}
                     </div>
                   </div>
                 </div>

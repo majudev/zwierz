@@ -154,7 +154,7 @@ function TrialsList({mode, type}: Props): JSX.Element {
                             </td>
                             <td>
                               {/*<button className="btn btn-dark nowrap" onClick={(e) => alert()}>Wyświetl</button>*/}
-                              <Link className="btn btn-dark nowrap" to={"/commitee/trial/" + trial.id}>Wyświetl</Link>
+                              <Link className="btn btn-dark nowrap" to={"/commitee/trial/" + trial.userId + "/" + trial.type.toLowerCase()}>Wyświetl</Link>
                             </td>
                           </tr>
                         </tbody>

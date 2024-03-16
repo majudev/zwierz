@@ -357,4 +357,69 @@ router.delete('/:userId/:type(ho|hr)', async (req: Request, res: Response) => {
     }).end();
 });
 
+router.patch('/archived/:userId/:type(ho|hr)/:newArchivalState(yes|no)?', async (req: Request, res: Response) => {
+    if(!check_login(res)) return;
+
+    const userId: number = parseInt(req.params.userId);
+    const type = req.params.type.toUpperCase() as TrialType;
+    const archived = (req.params.newArchivalState === 'yes');
+
+    if(Number.isNaN(userId)) {
+        fail_missing_params(res, ["userId"], null);
+        return;
+    }
+
+    const uberadmin = await user_is_uberadmin(res.locals.auth_user.userId);
+    const commitee_scribe = (type === 'HO') ? await user_is_ho_commitee_scribe(res.locals.auth_user.userId) : await user_is_hr_commitee_scribe(res.locals.auth_user.userId);
+    const commitee_member = (type === 'HO') ? await user_is_ho_commitee_member(res.locals.auth_user.userId) : await user_is_hr_commitee_member(res.locals.auth_user.userId);
+
+    // User can only view himself, admin can view everything
+    if(!uberadmin && !commitee_scribe && !commitee_member){
+        fail_no_permissions(res, "you don't have permissions to view this trial");
+        return;
+    }
+
+    const exists = await prisma.trial.count({
+        where: {
+            userId: userId,
+            type: type
+        }
+    }) > 0;
+
+    if(!exists){
+        fail_entity_not_found(res, "trial on account " + userId + " with type " + type + " not found");
+        return;
+    }
+
+    const updatedObject = await prisma.trial.update({
+        where: {
+            trial_unique_contraint: {
+                userId: userId,
+                type: type,
+            }
+        },
+        data: {
+            archived: archived,
+        },
+        select: {
+            id: true,
+            userId: true,
+            type: true,
+            open_date: true,
+            close_date: true,
+            mentor_email: true,
+            mentor_name: true,
+            mentor_phone: true,
+            predicted_closing_date: true,
+
+            archived: true,
+        },
+    });
+
+    res.status(200).json({
+        status: "success",
+        data: updatedObject
+    }).end();
+});
+
 export default router;
