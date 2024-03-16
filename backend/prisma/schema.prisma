@@ -67,7 +67,7 @@ model TrialLogbook {
   type TrialLogbookEntryType
   author TrialLogbookAuthorType
 
-  note String?
+  note String? @db.Text
 
   @@index([type])
   @@index([author])
