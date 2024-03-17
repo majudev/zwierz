@@ -158,6 +158,7 @@ router.get('/:type(all|me|public)/:archived(archived)?', async (req: Request, re
             status: "success",
             data: filtered,
         }).end();
+        return;
     }
 
     const filtered = appointments.map((entry) => {
