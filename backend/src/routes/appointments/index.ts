@@ -132,7 +132,7 @@ router.get('/:type(all|me|public)/:archived(archived)?', async (req: Request, re
             }
         },
         orderBy: {
-            date: 'asc'
+            date: !archived ? 'asc' : 'desc',
         }
     });
 
