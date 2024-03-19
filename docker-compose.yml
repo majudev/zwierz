@@ -1,5 +1,12 @@
 version: '3.4'
 
+x-logging:
+      &default-logging
+      driver: "local"
+      options:
+        max-size: 20m
+        max-file: 10
+
 services:
   frontend:
     build: frontend
@@ -8,6 +15,7 @@ services:
       - frontend/.env
     environment:
       REACT_APP_API_URL: http://localhost:8080/api
+    logging: *default-logging
   backend:
     build: backend
     restart: always
@@ -21,9 +29,11 @@ services:
       REDIS_URL: redis://redis:6379
       LOGIN_SUCCESSFUL_CALLBACK: https://localhost/login
       OAUTH_GOOGLE_CALLBACK: https://localhost/api/auth/google/callback
+    logging: *default-logging
   mysql:
     image: mariadb:11
     restart: always
+    command: --max-allowed-packet=65011712
     volumes:
       - './database:/var/lib/mysql'
     environment:
@@ -31,6 +41,7 @@ services:
       MARIADB_USER: master
       MARIADB_DATABASE: master
       MARIADB_RANDOM_ROOT_PASSWORD: yes
+    logging: *default-logging
   redis:
     image: redis:alpine
     restart: always
@@ -38,9 +49,11 @@ services:
       --protected-mode no
       --save ""
       --appendonly no
+    logging: *default-logging
   nginx:
     build: nginx
     restart: always
+    logging: *default-logging
   cloudflared:
     image: cloudflare/cloudflared
     restart: unless-stopped
@@ -48,3 +61,4 @@ services:
     environment:
       TUNNEL_URL: http://nginx:8080
       TUNNEL_TOKEN: your_token_here
+    logging: *default-logging
