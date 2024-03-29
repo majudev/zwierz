@@ -34,7 +34,9 @@ router.post('/new/:type(ho|hr)', async (req: Request, res: Response) => {
         fail_entity_not_found(res, "trial on your account with type " + type + " does not exist");
         return;
     }
-
+console.log(trial.id);
+console.log(req.body.content);
+console.log(req.body.finish_date);
     const quest = await prisma.quest.create({
         data: {
             trialId: trial.id,
