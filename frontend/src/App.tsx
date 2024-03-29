@@ -16,10 +16,12 @@ import ShowTrial from './commitee/ShowTrial.tsx';
 import TrialTutorial from './help-and-about/TrialTutorial.tsx';
 import ReportTutorial from './help-and-about/ReportTutorial.tsx';
 import PublicAppointments from './help-and-about/PublicAppointments.tsx';
+import SafariErrorBanner from './components/SafariErrorBanner.tsx';
 
 function App(): ReactElement {
   const [loggedIn, setLoggedIn] = useState(false);
   const [trigger, pullTrigger] = useState(false);
+  const [isSafari, setIsSafari] = useState(false);
 
   const [mode, setMode] = useState<SystemMode>(SystemMode.HO);
 
@@ -47,10 +49,16 @@ function App(): ReactElement {
 
   useEffect(() => {
     refreshMode();
+
+    const userAgent = window.navigator.userAgent;
+    setIsSafari(userAgent.indexOf('Safari') !== -1 && userAgent.indexOf('Chrome') === -1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
+    isSafari ? 
+    <SafariErrorBanner />
+    :
     <Router>
       <div>
         <Navigation loggedIn={loggedIn} logIn={logIn} logOut={logOut} mode={mode} trigger={trigger}/>
