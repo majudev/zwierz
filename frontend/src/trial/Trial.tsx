@@ -341,6 +341,12 @@ function Trial({ type }: Props): JSX.Element {
       if(response.status === 409){
         setUploadError('Załącznik z tą nazwą już istnieje!');
         return;
+      }else if(response.status === 413){
+        setUploadError('Załącznik zbyt duży: ' + ((base64contents as string).split(',')[1]).length + 'B');
+        console.log(newAttachmentFile.length);
+        console.log(((base64contents as string).split(',')[1]).length + 'B');
+        console.log((base64contents as string).split(',')[1]);
+        return;
       }
       const body = await response.json();
       setUploadError('Nie udało się dodać załącznika: ' + body.message);
@@ -646,6 +652,7 @@ function Trial({ type }: Props): JSX.Element {
             { newAttachmentFile && <p className={newAttachmentFile.size <= maxFileSize ? "text-success" : "text-danger"}>
               Rozmiar: {Math.floor(newAttachmentFile.size/1024) > 0 ? (Math.floor(newAttachmentFile.size/(1024*1024)) > 0 ? ((newAttachmentFile.size/(1024*1024)).toFixed(1) + ' MB') : ((newAttachmentFile.size/1024).toFixed(1) + ' kB')) : newAttachmentFile.size+' B'}
             </p>}
+            {newAttachmentButtonlock && <p>Trwa wysyłanie... Nie zamykaj tego okna!</p>}
             {uploadError !== '' && <p id="new_attachment_error" className="pt-2 text-danger">{uploadError}</p>}
           </div>
           <div className="modal-footer">
