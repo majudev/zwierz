@@ -160,6 +160,7 @@ async function sendNotificationEmailViaMailjet(to: string, reply_to: string, sub
     if(!response.ok){
         logger.error('Cannot send e-mail via mailjet: status ' + response.status + ', details: ' + await response.text());
     }
+    logger.debug('Sent e-mail via mailjet: status ' + response.status + ', details: ' + await response.text());
     return response.ok;
 }
 
