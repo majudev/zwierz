@@ -177,13 +177,15 @@ async function sendNotificationEmail(to: string, reply_to: string, subject: stri
         }
     });
 
+    logger.debug('E-mail provider: ' + mailerProvider?.value);
+
     if(mailerProvider === null){
         logger.error("Inconsistent database: couldn't find mailer.provider!");
         return false;
     }else if(mailerProvider.value === "postal"){
-        return sendNotificationEmailViaPostal(to, reply_to, subject, plain_body, html_body);
+        return await sendNotificationEmailViaPostal(to, reply_to, subject, plain_body, html_body);
     }else if(mailerProvider.value === "mailjet"){
-        return sendNotificationEmailViaMailjet(to, reply_to, subject, plain_body, html_body);
+        return await sendNotificationEmailViaMailjet(to, reply_to, subject, plain_body, html_body);
     }
 
     logger.error("Inconsistent database: mailer.provider has invalid value of \"" + mailerProvider.value + "\"");
