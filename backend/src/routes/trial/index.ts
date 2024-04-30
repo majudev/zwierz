@@ -427,7 +427,7 @@ router.patch('/:action(open|close)/:userId/:type(ho|hr)/:date?', async (req: Req
 
     const userId: number = parseInt(req.params.userId);
     const type = req.params.type.toUpperCase() as TrialType;
-    const action = (req.params.newArchivalState) as 'open' | 'close';
+    const action = (req.params.action) as 'open' | 'close';
     console.log(req.params.date);
     const date = (req.params.date !== "null" && req.params.date !== undefined) ? new Date(req.params.date[0] === '"' ? req.params.date.substring(1, req.params.date.length - 1) : req.params.date) : null;
     console.log(date);
