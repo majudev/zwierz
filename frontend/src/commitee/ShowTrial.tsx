@@ -159,6 +159,8 @@ function ShowTrial({ mode }: Props): JSX.Element {
       alert('Cannot update details');
       return;
     }
+    document.getElementById('open_opentrial_modal')?.click();
+    document.getElementById('open_closetrial_modal')?.click();
   };
 
   const refreshAttachmentsList = async function(){
@@ -311,10 +313,10 @@ function ShowTrial({ mode }: Props): JSX.Element {
                 <b>Planowane zamknięcie stopnia:</b> {predictedDateToString(predictedClosingDate)}
               </li>
               {(openedOn != null) && <li className="list-group-item">
-                <b>Próbę otwarto:</b>
+                <b>Próbę otwarto:</b> {dateToString(openedOn)}
               </li>}
               {(closedOn != null) && <li className="list-group-item">
-                <b>Próbę zamknięto:</b>
+                <b>Próbę zamknięto:</b> {dateToString(closedOn)}
               </li>}
               <li className="list-group-item">
                 <div className="d-flex flex-row-reverse">
@@ -355,7 +357,7 @@ function ShowTrial({ mode }: Props): JSX.Element {
                           </div>;
                         })
                       }
-                      <div className="col" id="attachment_new">
+                      {/*<div className="col" id="attachment_new">
                         <div className="card attachment" data-bs-toggle="modal" data-bs-target="#new_attachment">
                           <svg className="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" preserveAspectRatio="xMidYMid slice" focusable="false">
                             <rect width="100%" height="100%" fill="#55595c"></rect>
@@ -368,7 +370,7 @@ function ShowTrial({ mode }: Props): JSX.Element {
                             </g>
                           </svg>
                         </div>
-                      </div>
+                      </div>*/}
                     </div>
                   </div>
                 </div>
