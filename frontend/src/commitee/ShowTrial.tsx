@@ -514,7 +514,6 @@ function dateToString(predicted: Date|null) : string {
 function stringToDate(predicted: string) : Date|null {
   if(predicted === "null") return null;
   const split = predicted.split(" ");
-  console.log(split[2] + "-" + (months.findIndex((v, i, a) => { return v === split[1] })+1) + "-" + split[0]);
   return new Date(split[2] + "-" + (months.findIndex((v, i, a) => { return v === split[1] })+1) + "-" + split[0]);
 }
 

@@ -428,9 +428,8 @@ router.patch('/:action(open|close)/:userId/:type(ho|hr)/:date?', async (req: Req
     const userId: number = parseInt(req.params.userId);
     const type = req.params.type.toUpperCase() as TrialType;
     const action = (req.params.action) as 'open' | 'close';
-    console.log(req.params.date);
     const date = (req.params.date !== "null" && req.params.date !== undefined) ? new Date(req.params.date[0] === '"' ? req.params.date.substring(1, req.params.date.length - 1) : req.params.date) : null;
-    console.log(date);
+    
     if(date !== null && !(date instanceof Date && !isNaN(date as any))){
         fail_missing_params(res, ["date"], "Invalid format of date: " + req.params.date);
         return;
@@ -467,9 +466,6 @@ router.patch('/:action(open|close)/:userId/:type(ho|hr)/:date?', async (req: Req
         fail_duplicate_entry(res, "", "You cannot close trial when it hasn't been opened.");
         return;
     }
-
-    console.log(JSON.stringify({open_date: (action === 'open') ? date : undefined,
-    close_date: (action === 'close') ? date : undefined,}));
 
     const updatedObject = await prisma.trial.update({
         where: {
