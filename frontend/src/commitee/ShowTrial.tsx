@@ -159,8 +159,8 @@ function ShowTrial({ mode }: Props): JSX.Element {
       alert('Cannot update details');
       return;
     }
-    document.getElementById('open_opentrial_modal')?.click();
-    document.getElementById('open_closetrial_modal')?.click();
+    document.getElementById('close_opentrial_modal')?.click();
+    document.getElementById('close_closetrial_modal')?.click();
   };
 
   const refreshAttachmentsList = async function(){
