@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import logger from '../../utils/logger.js';
 import { PrismaClient, TrialType } from '@prisma/client';
-import { check_login, fail_missing_params, fail_no_permissions, fail_entity_not_found } from '../../utils/http_code_helper.js';
+import { check_login, fail_missing_params, fail_no_permissions, fail_entity_not_found, fail_duplicate_entry } from '../../utils/http_code_helper.js';
 import { user_is_commitee_member, user_is_commitee_scribe, user_is_ho_commitee_member, user_is_ho_commitee_scribe, user_is_hr_commitee_member, user_is_hr_commitee_scribe, user_is_uberadmin } from '../../utils/permissionsHelper.js';
 import { verifyPhone } from '../../utils/validationtools.js';
 import questsRouter from './quests.js';
@@ -375,7 +375,7 @@ router.patch('/archived/:userId/:type(ho|hr)/:newArchivalState(yes|no)?', async 
 
     // User can only view himself, admin can view everything
     if(!uberadmin && !commitee_scribe && !commitee_member){
-        fail_no_permissions(res, "you don't have permissions to view this trial");
+        fail_no_permissions(res, "you don't have permissions to edit this trial");
         return;
     }
 
@@ -400,6 +400,78 @@ router.patch('/archived/:userId/:type(ho|hr)/:newArchivalState(yes|no)?', async 
         },
         data: {
             archived: archived,
+        },
+        select: {
+            id: true,
+            userId: true,
+            type: true,
+            open_date: true,
+            close_date: true,
+            mentor_email: true,
+            mentor_name: true,
+            mentor_phone: true,
+            predicted_closing_date: true,
+
+            archived: true,
+        },
+    });
+
+    res.status(200).json({
+        status: "success",
+        data: updatedObject
+    }).end();
+});
+
+router.patch('/:action(open|close)/:userId/:type(ho|hr)/:date?', async (req: Request, res: Response) => {
+    if(!check_login(res)) return;
+
+    const userId: number = parseInt(req.params.userId);
+    const type = req.params.type.toUpperCase() as TrialType;
+    const action = (req.params.newArchivalState) as 'open' | 'close';
+    const date = (req.params.date !== undefined) ? new Date(req.params.date) : null;
+
+    if(Number.isNaN(userId)) {
+        fail_missing_params(res, ["userId"], null);
+        return;
+    }
+
+    const uberadmin = await user_is_uberadmin(res.locals.auth_user.userId);
+    const commitee_scribe = (type === 'HO') ? await user_is_ho_commitee_scribe(res.locals.auth_user.userId) : await user_is_hr_commitee_scribe(res.locals.auth_user.userId);
+    const commitee_member = (type === 'HO') ? await user_is_ho_commitee_member(res.locals.auth_user.userId) : await user_is_hr_commitee_member(res.locals.auth_user.userId);
+
+    // User can only view himself, admin can view everything
+    if(!uberadmin && !commitee_scribe && !commitee_member){
+        fail_no_permissions(res, "you don't have permissions to edit this trial");
+        return;
+    }
+
+    const exists = await prisma.trial.findFirst({
+        where: {
+            userId: userId,
+            type: type
+        }
+    });
+
+    if(exists === null){
+        fail_entity_not_found(res, "trial on account " + userId + " with type " + type + " not found");
+        return;
+    }
+
+    if(action === 'close' && exists.open_date === null){
+        fail_duplicate_entry(res, "", "You cannot close trial when it hasn't been opened.");
+        return;
+    }
+
+    const updatedObject = await prisma.trial.update({
+        where: {
+            trial_unique_contraint: {
+                userId: userId,
+                type: type,
+            }
+        },
+        data: {
+            open_date: (action === 'open') ? date : undefined,
+            close_date: (action === 'close') ? date : undefined,
         },
         select: {
             id: true,

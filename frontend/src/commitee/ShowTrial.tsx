@@ -29,6 +29,8 @@ function ShowTrial({ mode }: Props): JSX.Element {
 
   const [buttonlock, setButtonLock] = useState(false);
 
+  const [selectableDates, setSelectableDates] = useState<Array<Date|null>>([]);
+
   const [quests, setQuests] = useState<Array<{id: number; content: string; finish_date: Date}>>([]);
 
   const [attachments, setAttachments] = useState<Array<{id: number; name: string; extension: string; created_at: Date, thumbnail: string | null; size: number, img: JSX.Element}>>([]);
@@ -56,6 +58,15 @@ function ShowTrial({ mode }: Props): JSX.Element {
     
     refreshUserData();
     refreshTrialData();
+
+    var dates = Array<Date|null>();
+    dates.push(null);
+    for(var i = -366; i < 366; ++i){
+      const now = new Date();
+      const entry = new Date(now.setDate(now.getDate() + i));
+      dates.push(entry);
+    }
+    setSelectableDates(dates);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [type]);
 
@@ -117,6 +128,24 @@ function ShowTrial({ mode }: Props): JSX.Element {
     setButtonLock(true);
 
     const response = await fetch(process.env.REACT_APP_API_URL + "/trial/archived/" + userId + "/" + type?.toLowerCase() + "/" + (state ? "yes" : "no"), {
+      method: 'PATCH',
+      mode: 'same-origin',
+      headers: {
+        "Content-Type": "application/json",
+      }
+    });
+    setButtonLock(false);
+    refreshTrialData();
+    if(!response.ok){
+      alert('Cannot update details');
+      return;
+    }
+  };
+
+  const onOpenCloseAttempt = async function(action: 'open'|'close', when: Date|null){
+    setButtonLock(true);
+
+    const response = await fetch(process.env.REACT_APP_API_URL + "/trial/" + action + "/" + userId + "/" + type?.toLowerCase() + "/" + encodeURIComponent(JSON.stringify(action === 'open' ? openedOn : closedOn)), {
       method: 'PATCH',
       mode: 'same-origin',
       headers: {
@@ -288,10 +317,10 @@ function ShowTrial({ mode }: Props): JSX.Element {
               </li>}
               <li className="list-group-item">
                 <div className="d-flex flex-row-reverse">
-                  {!archived && <button className="btn btn-danger" onClick={(e) => {onTrialChangeArchivalStateAttempt(true);}}>Archiwizuj próbę</button>}
-                  {archived && <button className="btn btn-danger" onClick={(e) => {onTrialChangeArchivalStateAttempt(false);}}>Dearchiwizuj próbę</button>}
-                  <button className="btn btn-dark" onClick={(e) => alert()}>{(openedOn === null) ? 'Otwórz próbę' : 'Edytuj otwarcie'}</button>
-                  {(openedOn !== null) && <button className="btn btn-dark" onClick={(e) => alert()}>{(closedOn === null) ? 'Zamknij próbę' : 'Edytuj zamknięcie'}</button>}
+                  {!archived && <button className="btn btn-danger" onClick={(e) => {onTrialChangeArchivalStateAttempt(true);}} disabled={buttonlock}>Archiwizuj próbę</button>}
+                  {archived && <button className="btn btn-danger" onClick={(e) => {onTrialChangeArchivalStateAttempt(false);}} disabled={buttonlock}>Dearchiwizuj próbę</button>}
+                  <button className="btn btn-dark" onClick={(e) => {document.getElementById('open_opentrial_modal')?.click();}} disabled={buttonlock}>{(openedOn === null) ? 'Otwórz próbę' : 'Edytuj otwarcie'}</button>
+                  {(openedOn !== null) && <button className="btn btn-dark" onClick={(e) => {document.getElementById('open_closetrial_modal')?.click();}} disabled={buttonlock}>{(closedOn === null) ? 'Zamknij próbę' : 'Edytuj zamknięcie'}</button>}
                 </div>
               </li>
             </ul>
@@ -383,6 +412,36 @@ function ShowTrial({ mode }: Props): JSX.Element {
           </div>
         </div>
       </div>
+      <button type="button" className="btn" id="open_opentrial_modal" data-bs-toggle="modal" data-bs-target="#opentrial_modal" style={{display: 'none'}}></button>
+      <button type="button" className="btn" id="close_opentrial_modal" data-bs-dismiss="modal" data-bs-target="#opentrial_modal" style={{display: 'none'}}></button>
+      <div className="modal fade" id="opentrial_modal" aria-hidden="true">
+        <div className="modal-dialog">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title">Otwórz próbę</h5>
+              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div className="modal-body">
+              {openedOn === null ? <>
+                <p>Otwórz z datą: </p>
+              </> : <>
+                <p>Zmień datę: </p>
+              </>}
+              <select value={dateToString(openedOn !== null ? openedOn : (new Date()))} onChange={(e) => setOpenedOn(stringToDate(e.target.value))}>
+                {
+                  selectableDates.map((date) => {
+                    return <option value={dateToString(date)}>{date !== null ? dateToString(date) : "Anuluj otwarcie próby"}</option>
+                  })
+                }
+              </select>
+            </div>
+            <div className="modal-footer">
+              <button type="button" className="btn btn-light" data-bs-dismiss="modal">Anuluj</button>
+              <button type="button" className="btn btn-danger" onClick={(e) => {onOpenCloseAttempt('open', openedOn)}} disabled={buttonlock}>Zapisz</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </main>
   </>);
 }
@@ -397,6 +456,32 @@ function getBase64(file: File) {
       resolve(fileReader.result);
     };
   })
+}
+
+const months = [
+  "stycznia",
+  "lutego",
+  "marca",
+  "kwietnia",
+  "maja",
+  "czerwca",
+  "lipca",
+  "sierpnia",
+  "września",
+  "października",
+  "listopada",
+  "grudnia",
+];
+
+function dateToString(predicted: Date|null) : string {
+  if(predicted === null) return "null";
+  return predicted.getDate() + " " + months[predicted.getMonth()] + " " + predicted.getFullYear();
+}
+
+function stringToDate(predicted: string) : Date|null {
+  if(predicted === "null") return null;
+  const split = predicted.split(" ");
+  return new Date(split[2] + "-" + (months.findIndex((v, i, a) => { return v === split[1] })+1) + "-" + split[0]);
 }
 
 export default ShowTrial;
