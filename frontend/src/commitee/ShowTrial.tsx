@@ -146,7 +146,7 @@ function ShowTrial({ mode }: Props): JSX.Element {
   const onOpenCloseAttempt = async function(action: 'open'|'close', when: Date|null){
     setButtonLock(true);
 
-    const response = await fetch(process.env.REACT_APP_API_URL + "/trial/" + action + "/" + userId + "/" + type?.toLowerCase() + "/" + encodeURIComponent(JSON.stringify(action === 'open' ? openedOn : closedOn)), {
+    const response = await fetch(process.env.REACT_APP_API_URL + "/trial/" + action + "/" + userId + "/" + type?.toLowerCase() + "/" + encodeURIComponent(JSON.stringify(dialogDateSelector)), {
       method: 'PATCH',
       mode: 'same-origin',
       headers: {
