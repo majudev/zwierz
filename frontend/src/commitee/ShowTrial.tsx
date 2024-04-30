@@ -427,7 +427,7 @@ function ShowTrial({ mode }: Props): JSX.Element {
               </> : <>
                 <p>Zmień datę: </p>
               </>}
-              <select value={dateToString(openedOn !== null ? openedOn : (new Date()))} onChange={(e) => setOpenedOn(stringToDate(e.target.value))}>
+              <select className="form-control" value={dateToString(openedOn !== null ? openedOn : (new Date()))} onChange={(e) => setOpenedOn(stringToDate(e.target.value))}>
                 {
                   selectableDates.map((date) => {
                     return <option value={dateToString(date)}>{date !== null ? dateToString(date) : "Anuluj otwarcie próby"}</option>
@@ -438,6 +438,36 @@ function ShowTrial({ mode }: Props): JSX.Element {
             <div className="modal-footer">
               <button type="button" className="btn btn-light" data-bs-dismiss="modal">Anuluj</button>
               <button type="button" className="btn btn-danger" onClick={(e) => {onOpenCloseAttempt('open', openedOn)}} disabled={buttonlock}>Zapisz</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button type="button" className="btn" id="open_closetrial_modal" data-bs-toggle="modal" data-bs-target="#closetrial_modal" style={{display: 'none'}}></button>
+      <button type="button" className="btn" id="close_closetrial_modal" data-bs-dismiss="modal" data-bs-target="#closetrial_modal" style={{display: 'none'}}></button>
+      <div className="modal fade" id="closetrial_modal" aria-hidden="true">
+        <div className="modal-dialog">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title">Zamknij próbę</h5>
+              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div className="modal-body">
+              {closedOn === null ? <>
+                <p>Zamknij z datą: </p>
+              </> : <>
+                <p>Zmień datę: </p>
+              </>}
+              <select className="form-control" value={dateToString(closedOn !== null ? closedOn : (new Date()))} onChange={(e) => setClosedOn(stringToDate(e.target.value))}>
+                {
+                  selectableDates.map((date) => {
+                    return <option value={dateToString(date)}>{date !== null ? dateToString(date) : "Anuluj otwarcie próby"}</option>
+                  })
+                }
+              </select>
+            </div>
+            <div className="modal-footer">
+              <button type="button" className="btn btn-light" data-bs-dismiss="modal">Anuluj</button>
+              <button type="button" className="btn btn-danger" onClick={(e) => {onOpenCloseAttempt('close', closedOn)}} disabled={buttonlock}>Zapisz</button>
             </div>
           </div>
         </div>
@@ -481,6 +511,7 @@ function dateToString(predicted: Date|null) : string {
 function stringToDate(predicted: string) : Date|null {
   if(predicted === "null") return null;
   const split = predicted.split(" ");
+  console.log(split[2] + "-" + (months.findIndex((v, i, a) => { return v === split[1] })+1) + "-" + split[0]);
   return new Date(split[2] + "-" + (months.findIndex((v, i, a) => { return v === split[1] })+1) + "-" + split[0]);
 }
 
