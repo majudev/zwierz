@@ -429,7 +429,7 @@ router.patch('/:action(open|close)/:userId/:type(ho|hr)/:date?', async (req: Req
     const type = req.params.type.toUpperCase() as TrialType;
     const action = (req.params.newArchivalState) as 'open' | 'close';
     console.log(req.params.date);
-    const date = (req.params.date !== undefined) ? new Date(req.params.date) : null;
+    const date = (req.params.date !== undefined) ? new Date(req.params.date[0] === '"' ? req.params.date.substring(1, req.params.date.length - 1) : req.params.date) : null;
     console.log(date);
     console.log(date instanceof Date && !isNaN(date as any));
 
