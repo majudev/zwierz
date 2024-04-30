@@ -431,6 +431,7 @@ router.patch('/:action(open|close)/:userId/:type(ho|hr)/:date?', async (req: Req
     console.log(req.params.date);
     const date = (req.params.date !== undefined) ? new Date(req.params.date) : null;
     console.log(date);
+    console.log(date instanceof Date && !isNaN(date as any));
 
     if(Number.isNaN(userId)) {
         fail_missing_params(res, ["userId"], null);
