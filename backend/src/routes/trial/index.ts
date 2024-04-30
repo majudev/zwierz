@@ -428,7 +428,9 @@ router.patch('/:action(open|close)/:userId/:type(ho|hr)/:date?', async (req: Req
     const userId: number = parseInt(req.params.userId);
     const type = req.params.type.toUpperCase() as TrialType;
     const action = (req.params.newArchivalState) as 'open' | 'close';
+    console.log(req.params.date);
     const date = (req.params.date !== undefined) ? new Date(req.params.date) : null;
+    console.log(date);
 
     if(Number.isNaN(userId)) {
         fail_missing_params(res, ["userId"], null);

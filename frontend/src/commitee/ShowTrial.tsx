@@ -30,6 +30,7 @@ function ShowTrial({ mode }: Props): JSX.Element {
   const [buttonlock, setButtonLock] = useState(false);
 
   const [selectableDates, setSelectableDates] = useState<Array<Date|null>>([]);
+  const [dialogDateSelector, setDialogDateSelector] = useState<Date|null>(null);
 
   const [quests, setQuests] = useState<Array<{id: number; content: string; finish_date: Date}>>([]);
 
@@ -319,8 +320,8 @@ function ShowTrial({ mode }: Props): JSX.Element {
                 <div className="d-flex flex-row-reverse">
                   {!archived && <button className="btn btn-danger" onClick={(e) => {onTrialChangeArchivalStateAttempt(true);}} disabled={buttonlock}>Archiwizuj próbę</button>}
                   {archived && <button className="btn btn-danger" onClick={(e) => {onTrialChangeArchivalStateAttempt(false);}} disabled={buttonlock}>Dearchiwizuj próbę</button>}
-                  <button className="btn btn-dark" onClick={(e) => {document.getElementById('open_opentrial_modal')?.click();}} disabled={buttonlock}>{(openedOn === null) ? 'Otwórz próbę' : 'Edytuj otwarcie'}</button>
-                  {(openedOn !== null) && <button className="btn btn-dark" onClick={(e) => {document.getElementById('open_closetrial_modal')?.click();}} disabled={buttonlock}>{(closedOn === null) ? 'Zamknij próbę' : 'Edytuj zamknięcie'}</button>}
+                  <button className="btn btn-dark" onClick={(e) => {setDialogDateSelector(openedOn !== null ? openedOn : (new Date())); document.getElementById('open_opentrial_modal')?.click();}} disabled={buttonlock}>{(openedOn === null) ? 'Otwórz próbę' : 'Edytuj otwarcie'}</button>
+                  {(openedOn !== null) && <button className="btn btn-dark" onClick={(e) => {setDialogDateSelector(closedOn !== null ? closedOn : (new Date())); document.getElementById('open_closetrial_modal')?.click();}} disabled={buttonlock}>{(closedOn === null) ? 'Zamknij próbę' : 'Edytuj zamknięcie'}</button>}
                 </div>
               </li>
             </ul>
@@ -427,7 +428,7 @@ function ShowTrial({ mode }: Props): JSX.Element {
               </> : <>
                 <p>Zmień datę: </p>
               </>}
-              <select className="form-control" value={dateToString(openedOn !== null ? openedOn : (new Date()))} onChange={(e) => setOpenedOn(stringToDate(e.target.value))}>
+              <select className="form-control" value={dateToString(dialogDateSelector)} onChange={(e) => setDialogDateSelector(stringToDate(e.target.value))}>
                 {
                   selectableDates.map((date) => {
                     return <option value={dateToString(date)}>{date !== null ? dateToString(date) : "Anuluj otwarcie próby"}</option>
@@ -437,7 +438,7 @@ function ShowTrial({ mode }: Props): JSX.Element {
             </div>
             <div className="modal-footer">
               <button type="button" className="btn btn-light" data-bs-dismiss="modal">Anuluj</button>
-              <button type="button" className="btn btn-danger" onClick={(e) => {onOpenCloseAttempt('open', openedOn)}} disabled={buttonlock}>Zapisz</button>
+              <button type="button" className="btn btn-danger" onClick={(e) => {onOpenCloseAttempt('open', dialogDateSelector)}} disabled={buttonlock}>Zapisz</button>
             </div>
           </div>
         </div>
@@ -457,7 +458,7 @@ function ShowTrial({ mode }: Props): JSX.Element {
               </> : <>
                 <p>Zmień datę: </p>
               </>}
-              <select className="form-control" value={dateToString(closedOn !== null ? closedOn : (new Date()))} onChange={(e) => setClosedOn(stringToDate(e.target.value))}>
+              <select className="form-control" value={dateToString(dialogDateSelector)} onChange={(e) => setDialogDateSelector(stringToDate(e.target.value))}>
                 {
                   selectableDates.map((date) => {
                     return <option value={dateToString(date)}>{date !== null ? dateToString(date) : "Anuluj otwarcie próby"}</option>
@@ -467,7 +468,7 @@ function ShowTrial({ mode }: Props): JSX.Element {
             </div>
             <div className="modal-footer">
               <button type="button" className="btn btn-light" data-bs-dismiss="modal">Anuluj</button>
-              <button type="button" className="btn btn-danger" onClick={(e) => {onOpenCloseAttempt('close', closedOn)}} disabled={buttonlock}>Zapisz</button>
+              <button type="button" className="btn btn-danger" onClick={(e) => {onOpenCloseAttempt('close', dialogDateSelector)}} disabled={buttonlock}>Zapisz</button>
             </div>
           </div>
         </div>
