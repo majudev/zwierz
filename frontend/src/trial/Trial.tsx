@@ -646,7 +646,7 @@ function Trial({ type }: Props): JSX.Element {
           </div>
           <div className="modal-body">
             Podaj nazwę załącznika:
-            <input type="text" className="form-control longrecord" value={newAttachmentName} onChange={(e) => {if(e.target.value.length <= 100) setNewAttachmentName(e.target.value); else setUploadError('Nazwa pliku zbyt długa (ponad 100 znaków)');}} placeholder="np. Raport z próby" />
+            <input type="text" className="form-control longrecord" value={newAttachmentName} onChange={(e) => {setNewAttachmentName(e.target.value); if(e.target.value.length <= 100) setUploadError(''); else setUploadError('Nazwa pliku zbyt długa (ponad 100 znaków)');}} placeholder="np. Raport z próby" />
             <input type="file" className="form-control" onChange={(e) => {if(e.target.files){ setNewAttachmentFile(e.target.files[0]); if(newAttachmentName === ''){ setNewAttachmentName(e.target.files[0].name.replace(/\.[^/.]+$/, "")) } }; }} />
             <p>Maksymalny rozmiar pliku: {Math.floor(maxFileSize/1024) > 0 ? (Math.floor(maxFileSize/(1024*1024)) > 0 ? (maxFileSize/(1024*1024)).toFixed(1) + ' MB' : (maxFileSize/1024).toFixed(1) + ' kB') : maxFileSize+' B'}</p>
             { newAttachmentFile && <p className={newAttachmentFile.size <= maxFileSize ? "text-success" : "text-danger"}>
