@@ -20,6 +20,11 @@ router.post('/new/:type(ho|hr)', async (req: Request, res: Response) => {
         return;
     }
 
+    if(req.body.name.length > 100){
+        fail_missing_params(res, ["name"], "Attachment name is too long");
+        return;
+    }
+
     const decoded_content = Buffer.from(req.body.content, 'base64');
 
     const trial = await prisma.trial.findUnique({
