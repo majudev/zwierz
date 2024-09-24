@@ -1,10 +1,12 @@
 import { Router, Request, Response } from 'express';
 import logger from '../../utils/logger.js';
-import { PrismaClient, TrialType } from '@prisma/client';
+import { CommiteeRole, PrismaClient, TrialType } from '@prisma/client';
 import { check_login, fail_missing_params, fail_no_permissions, fail_entity_not_found, fail_internal_error, fail_duplicate_entry } from '../../utils/http_code_helper.js';
 import { user_is_commitee_member, user_is_commitee_scribe, user_is_ho_commitee_member, user_is_ho_commitee_scribe, user_is_hr_commitee_member, user_is_hr_commitee_scribe, user_is_uberadmin } from '../../utils/permissionsHelper.js';
 import { SystemMode, getSetting, getSystemMode } from '../../utils/settings.js';
 import app from '../../server.js';
+import sendNotificationEmail from '../../notifier/notify-email.js';
+import sendNotificationSMS from '../../notifier/notify-sms.js';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -389,8 +391,59 @@ router.post('/register/:type(ho|hr)', async (req: Request, res: Response) => {
         },
         select: {
             id: true,
+            intent: true,
+            customIntent: true,
+            appointment: {
+                select: {
+                    date: true,
+                    description: true,
+                }
+            }
         }
     });
+
+    const delayed = async () => {
+        const user = await prisma.user.findUnique({
+            where: {
+                id: res.locals.auth_user.userId,
+            },
+            select: {
+                email: true,
+                phone: true,
+                enableEmailNotifications: true,
+                enableSMSNotifications: true,
+            }
+        });
+
+        if(user?.enableEmailNotifications){
+            const textBody = "Cześć!\n\nUdało Ci się zarejestrować na spotkanie z kapitułą " + mode.toUpperCase() + " w dniu " + registration.appointment.date.toLocaleDateString("pl-PL") + ".\n\nDo zobaczenia!";
+            const htmlBody = "Cześć!<br/><br/>Udało Ci się zarejestrować na spotkanie z kapitułą " + mode.toUpperCase() + " w dniu <b>" + registration.appointment.date.toLocaleDateString("pl-PL") + "</b>.<br/><br/>Do zobaczenia!";
+            await sendNotificationEmail(user.email, "", "Rejestracja na kapitułę", textBody, htmlBody);
+        }
+        if(user?.enableSMSNotifications && user.phone !== null){
+            const smsBody = "Cześć!\n\nUdało Ci się zarejestrować na spotkanie z kapitułą " + mode.toUpperCase() + " w dniu " + registration.appointment.date.toLocaleDateString("pl-PL") + ".\n\nDo zobaczenia!";
+            await sendNotificationSMS(user.phone, smsBody);
+        }
+
+        const commitee_scribes = await prisma.user.findMany({
+            where: {
+                role_HO: (type === TrialType.HO ? CommiteeRole.SCRIBE : undefined),
+                role_HR: (type === TrialType.HR ? CommiteeRole.SCRIBE : undefined),
+            },
+            select: {
+                email: true,
+                enableEmailNotifications: true,
+            }
+        });
+        await commitee_scribes.forEach(async (scribe) => {
+            if(scribe.enableEmailNotifications){
+                const textBody = "Cześć!\n\nKtoś zarejestrował się na spotkanie z kapitułą " + mode.toUpperCase() + " w dniu " + registration.appointment.date.toLocaleDateString("pl-PL") + ". Szczegóły znajdziesz w systemie.";
+                const htmlBody = "Cześć!<br/><br/>Ktoś zarejestrował się na spotkanie z kapitułą " + mode.toUpperCase() + " w dniu <b>" + registration.appointment.date.toLocaleDateString("pl-PL") + "</b>. Szczegóły znajdziesz w systemie.";
+                await sendNotificationEmail(scribe.email, "", "Ktoś zarejestrował się na kapitułę", textBody, htmlBody);
+            }
+        });
+    };
+    delayed();
 
     res.status(200).json({
         status: "success",
@@ -450,14 +503,43 @@ router.delete('/unregister/:type(ho|hr)/:appointmentId', async (req: Request, re
         return;
     }
 
-    await prisma.appointmentRegistrations.delete({
+    const registration = await prisma.appointmentRegistrations.delete({
         where: {
             appointment_reg_unique_constraint: {
                 trialId: trial.id,
                 appointmentId: appointmentId,
             }
+        },
+        select: {
+            appointment: {
+                select: {
+                    date: true,
+                    description: true,
+                }
+            }
         }
     });
+
+    const delayed = async () => {
+        const user = await prisma.user.findUnique({
+            where: {
+                id: res.locals.auth_user.userId,
+            },
+            select: {
+                email: true,
+                phone: true,
+                enableEmailNotifications: true,
+                enableSMSNotifications: true,
+            }
+        });
+
+        if(user?.enableEmailNotifications){
+            const textBody = "Cześć!\n\nUdało Ci się wyrejestrować ze spotkania z kapitułą " + mode.toUpperCase() + " w dniu " + registration.appointment.date.toLocaleDateString("pl-PL") + ".\n\nMamy nadzieję że jeszcze nas odwiedzisz!";
+            const htmlBody = "Cześć!<br/><br/>Udało Ci się wyrejestrować ze spotkania z kapitułą " + mode.toUpperCase() + " w dniu <b>" + registration.appointment.date.toLocaleDateString("pl-PL") + "</b>.<br/><br/>Mamy nadzieję że jeszcze nas odwiedzisz!";
+            await sendNotificationEmail(user.email, "", "Wyrejestrowanie z kapituły", textBody, htmlBody);
+        }
+    };
+    delayed();
 
     res.status(204).json({
         status: "success",
@@ -504,6 +586,12 @@ router.delete('/kick/:registrationId', async (req: Request, res: Response) => {
                         }
                     }
                 }
+            },
+            appointment: {
+                select: {
+                    date: true,
+                    description: true,
+                }
             }
         }
     });
@@ -525,6 +613,31 @@ router.delete('/kick/:registrationId', async (req: Request, res: Response) => {
 
     ///TODO: Send email
     /// message: req.body.message (can be null)
+
+    const delayed = async () => {
+        const user = await prisma.user.findUnique({
+            where: {
+                id: res.locals.auth_user.userId,
+            },
+            select: {
+                email: true,
+                phone: true,
+                enableEmailNotifications: true,
+                enableSMSNotifications: true,
+            }
+        });
+
+        if(user?.enableEmailNotifications){
+            const textBody = "Cześć!\n\nNiestety kapituła " + mode.toUpperCase() + " odwołała twoją rejestrację na spotkanie w dniu " + registration.appointment.date.toLocaleDateString("pl-PL") + ". To znaczy, że nie zostaniesz wtedy przyjęty.\nPowód: " + ((req.body.message !== undefined && req.body.message) !== null ? req.body.message : "nie podano powodu") + "\n\nMamy nadzieję że jeszcze nas odwiedzisz!";
+            const htmlBody = "Cześć!<br/><br/>Niestety kapituła " + mode.toUpperCase() + " <b>odwołała</b> twoją rejestrację w dniu <b>" + registration.appointment.date.toLocaleDateString("pl-PL") + "</b>. To znaczy, że nie zostaniesz wtedy przyjęty.<br/>Powód: " + ((req.body.message !== undefined && req.body.message) !== null ? req.body.message : "nie podano powodu") + "<br/><br/>Mamy nadzieję że jeszcze nas odwiedzisz!";
+            await sendNotificationEmail(user.email, "", "Odwołanie rejestracji na kapitułę", textBody, htmlBody);
+        }
+        if(user?.enableSMSNotifications && user.phone !== null){
+            const smsBody = "Cześć!\n\nNiestety kapituła " + mode.toUpperCase() + " odwołała twoją rejestrację na spotkanie w dniu " + registration.appointment.date.toLocaleDateString("pl-PL") + ". Zobacz maila po więcej szczegółów.";
+            await sendNotificationSMS(user.phone, smsBody);
+        }
+    };
+    delayed();
 
     await prisma.appointmentRegistrations.delete({
         where: {
