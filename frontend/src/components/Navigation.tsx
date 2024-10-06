@@ -46,7 +46,11 @@ function Navigation({loggedIn, logIn, logOut, mode, trigger}: Props) : JSX.Eleme
     }else if(loggedIn && location.pathname === '/login'){
       navigate('/profile');
     }
-    if(loggedIn) updateRole();
+    
+    if(loggedIn){
+      updateRole();
+      updateMentees();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loggedIn]);
 
