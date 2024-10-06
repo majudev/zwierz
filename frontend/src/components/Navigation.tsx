@@ -46,7 +46,7 @@ function Navigation({loggedIn, logIn, logOut, mode, trigger}: Props) : JSX.Eleme
     }else if(loggedIn && location.pathname === '/login'){
       navigate('/profile');
     }
-    
+
     if(loggedIn){
       updateRole();
       updateMentees();
@@ -162,7 +162,7 @@ function Navigation({loggedIn, logIn, logOut, mode, trigger}: Props) : JSX.Eleme
               <ul className="dropdown-menu">
                 {
                   mentees.map((mentee) => {
-                    return <li><a className="dropdown-item" href={"/mentor/trial/" + mentee.user.id + "/" + mentee.type.toLowerCase()}>{mentee.user.name} ({mentee.type.toUpperCase()})</a></li>;
+                    return <li><Link className="dropdown-item" to={"/mentor/trial/" + mentee.user.id + "/" + mentee.type.toLowerCase()}>{mentee.user.name} ({mentee.type.toUpperCase()})</Link></li>;
                   })
                 }
               </ul>
