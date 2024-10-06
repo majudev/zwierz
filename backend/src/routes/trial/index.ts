@@ -2,7 +2,7 @@ import { Router, Request, Response } from 'express';
 import logger from '../../utils/logger.js';
 import { PrismaClient, TrialType } from '@prisma/client';
 import { check_login, fail_missing_params, fail_no_permissions, fail_entity_not_found, fail_duplicate_entry } from '../../utils/http_code_helper.js';
-import { user_is_commitee_member, user_is_commitee_scribe, user_is_ho_commitee_member, user_is_ho_commitee_scribe, user_is_hr_commitee_member, user_is_hr_commitee_scribe, user_is_uberadmin } from '../../utils/permissionsHelper.js';
+import { user_is_commitee_member, user_is_commitee_scribe, user_is_ho_commitee_member, user_is_ho_commitee_scribe, user_is_hr_commitee_member, user_is_hr_commitee_scribe, user_is_mentor, user_is_uberadmin } from '../../utils/permissionsHelper.js';
 import { verifyPhone } from '../../utils/validationtools.js';
 import questsRouter from './quests.js';
 import attachmentsRouter from './attachments.js';
@@ -154,10 +154,12 @@ router.get('/:userId/:type(ho|hr)/:archived(archived)?', async (req: Request, re
         return;
     }
 
-    // User can only view himself, admin can view everything
+    // User can only view himself, admin can view everything, mentor can view his mentees
     if(userId !== res.locals.auth_user.userId && !uberadmin && !commitee_scribe && !commitee_member){
-        fail_no_permissions(res, "you don't have permissions to view this trial");
-        return;
+        if(!await user_is_mentor(res.locals.auth_user.userId, userId)){
+            fail_no_permissions(res, "you don't have permissions to view this trial");
+            return;
+        }
     }
 
     const trial = await prisma.trial.findFirst({

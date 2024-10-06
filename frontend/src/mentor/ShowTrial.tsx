@@ -72,7 +72,7 @@ function MentorShowTrial({ mode }: Props): JSX.Element {
   }, [type]);
 
   const refreshUserData = async function(){
-    const response = await fetch(process.env.REACT_APP_API_URL + "/user/" + userId, {
+    /*const response = await fetch(process.env.REACT_APP_API_URL + "/user/" + userId, {
       method: "GET",
       mode: 'same-origin',
     });
@@ -87,7 +87,7 @@ function MentorShowTrial({ mode }: Props): JSX.Element {
     setCandidatePhone(body.data.phone);
     setCandidateTeamName(body.data.team.name);
     setCandidateInterests((body.data.interests as Array<{text: string}>).map(e => e.text));
-    setCandidateFn(body.data.function);
+    setCandidateFn(body.data.function);*/
   }
 
   const refreshTrialData = async function(){
@@ -318,14 +318,6 @@ function MentorShowTrial({ mode }: Props): JSX.Element {
               {(closedOn != null) && <li className="list-group-item">
                 <b>Próbę zamknięto:</b> {dateToString(closedOn)}
               </li>}
-              <li className="list-group-item">
-                <div className="d-flex flex-row-reverse">
-                  {!archived && <button className="btn btn-danger" onClick={(e) => {onTrialChangeArchivalStateAttempt(true);}} disabled={buttonlock}>Archiwizuj próbę</button>}
-                  {archived && <button className="btn btn-danger" onClick={(e) => {onTrialChangeArchivalStateAttempt(false);}} disabled={buttonlock}>Dearchiwizuj próbę</button>}
-                  <button className="btn btn-dark" onClick={(e) => {setDialogDateSelector(openedOn !== null ? openedOn : (new Date())); document.getElementById('open_opentrial_modal')?.click();}} disabled={buttonlock}>{(openedOn === null) ? 'Otwórz próbę' : 'Edytuj otwarcie'}</button>
-                  {(openedOn !== null) && <button className="btn btn-dark" onClick={(e) => {setDialogDateSelector(closedOn !== null ? closedOn : (new Date())); document.getElementById('open_closetrial_modal')?.click();}} disabled={buttonlock}>{(closedOn === null) ? 'Zamknij próbę' : 'Edytuj zamknięcie'}</button>}
-                </div>
-              </li>
             </ul>
           </div>
         </div>

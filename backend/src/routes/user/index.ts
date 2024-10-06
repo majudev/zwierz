@@ -2,7 +2,7 @@ import { Router, Request, Response } from 'express';
 import logger from '../../utils/logger.js';
 import { PrismaClient } from '@prisma/client';
 import { check_login, fail_missing_params, fail_no_permissions, fail_entity_not_found } from '../../utils/http_code_helper.js';
-import { user_is_commitee_member, user_is_commitee_scribe, user_is_ho_commitee_scribe, user_is_hr_commitee_scribe, user_is_uberadmin } from '../../utils/permissionsHelper.js';
+import { user_is_commitee_member, user_is_commitee_scribe, user_is_ho_commitee_scribe, user_is_hr_commitee_scribe, user_is_mentor, user_is_uberadmin } from '../../utils/permissionsHelper.js';
 import bcrypt from 'bcrypt';
 import { verifyPhone } from '../../utils/validationtools.js';
 import { randomInt } from 'crypto';
@@ -158,8 +158,10 @@ router.get('/:userId', async (req: Request, res: Response) => {
 
     // User can only view himself, admin can view everything
     if(userId !== res.locals.auth_user.userId && !uberadmin && !commitee_scribe && !commitee_member){
-        fail_no_permissions(res, "you don't have permissions to view this user");
-        return;
+        if(!await user_is_mentor(res.locals.auth_user.userId, userId)){
+            fail_no_permissions(res, "you don't have permissions to view this user");
+            return;
+        }
     }
 
     const user = await prisma.user.findFirst({
