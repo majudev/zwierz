@@ -51,7 +51,10 @@ function Navigation({loggedIn, logIn, logOut, mode, trigger}: Props) : JSX.Eleme
   }, [loggedIn]);
 
   useEffect(() => {
-    if(loggedIn) updateRole();
+    if(loggedIn){
+      updateRole();
+      updateMentees();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [trigger]);
 
