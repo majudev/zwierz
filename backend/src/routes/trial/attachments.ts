@@ -218,7 +218,7 @@ router.get('/:action(download|thumbnail)/:attachmentId', async (req: Request, re
     if(fullcontent){
         const mimetype = (attachment.extension !== null) ? mime.lookup(attachment.extension) : false;
 
-        res.set("Content-Disposition", "attachment; filename=\"" + attachment.name.replace(/[^\x00-\x7F]/g, "_") + (attachment.extension !== null ? "." + attachment.extension : "") + "\" filename*=UTF-8''" + encodeURIComponent(attachment.name + (attachment.extension !== null ? "." + attachment.extension : "")));
+        res.set("Content-Disposition", "attachment; filename=\"" + attachment.name.replace(/[^\x00-\x7F]/g, "_") + (attachment.extension !== null ? "." + attachment.extension : "") + "\"; filename*=UTF-8''" + encodeURIComponent(attachment.name + (attachment.extension !== null ? "." + attachment.extension : "")));
         if(mimetype !== false) res.contentType(mimetype);
         res.status(200);
         res.send(attachment.content);
