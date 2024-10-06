@@ -51,7 +51,7 @@ function MentorShowTrial({ mode }: Props): JSX.Element {
     setMentorEmail('');
     setPredictedClosingDate(new Date());
     setOpenedOn(null);
-    setClosedOn(null)
+    setClosedOn(null);
     setArchived(false);
     setButtonLock(false);
 
@@ -72,7 +72,7 @@ function MentorShowTrial({ mode }: Props): JSX.Element {
   }, [type]);
 
   const refreshUserData = async function(){
-    /*const response = await fetch(process.env.REACT_APP_API_URL + "/user/" + userId, {
+    const response = await fetch(process.env.REACT_APP_API_URL + "/user/" + userId, {
       method: "GET",
       mode: 'same-origin',
     });
@@ -87,7 +87,7 @@ function MentorShowTrial({ mode }: Props): JSX.Element {
     setCandidatePhone(body.data.phone);
     setCandidateTeamName(body.data.team.name);
     setCandidateInterests((body.data.interests as Array<{text: string}>).map(e => e.text));
-    setCandidateFn(body.data.function);*/
+    setCandidateFn(body.data.function);
   }
 
   const refreshTrialData = async function(){
@@ -317,6 +317,9 @@ function MentorShowTrial({ mode }: Props): JSX.Element {
               </li>}
               {(closedOn != null) && <li className="list-group-item">
                 <b>Próbę zamknięto:</b> {dateToString(closedOn)}
+              </li>}
+              {archived && <li className="list-group-item">
+                <b className='text-danger'>Próba zarchiwizowana w systemie</b>
               </li>}
             </ul>
           </div>

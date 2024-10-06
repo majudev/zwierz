@@ -107,7 +107,7 @@ router.get('/:userId/:type(ho|hr)', async (req: Request, res: Response) => {
     const commitee_scribe = (type === 'HO') ? await user_is_ho_commitee_scribe(res.locals.auth_user.userId) : await user_is_hr_commitee_scribe(res.locals.auth_user.userId);
     const commitee_member = (type === 'HO') ? await user_is_ho_commitee_member(res.locals.auth_user.userId) : await user_is_hr_commitee_member(res.locals.auth_user.userId);
 
-    // User can only view himself, admin can view everything
+    // User can only view himself, admin can view everything, mentor can view his mentees
     if(userId !== res.locals.auth_user.userId && !uberadmin && !commitee_scribe && !commitee_member){
         if(!await user_is_mentor(res.locals.auth_user.userId, userId)){
             fail_no_permissions(res, "you don't have permissions to view this trial");
@@ -174,6 +174,7 @@ router.get('/:action(download|thumbnail)/:attachmentId', async (req: Request, re
             trial: {
                 select: {
                     type: true,
+                    userId: true,
                 }
             }
         }
@@ -189,8 +190,10 @@ router.get('/:action(download|thumbnail)/:attachmentId', async (req: Request, re
     const commitee_member = (type.trial !== null) &&  (type.trial.type === 'HO') ? await user_is_ho_commitee_member(res.locals.auth_user.userId) : await user_is_hr_commitee_member(res.locals.auth_user.userId);
 
     if(!owner && !uberadmin && !commitee_scribe && !commitee_member){
-        fail_no_permissions(res, "you cannot download attachment " + attachmentId);
-        return;
+        if((type.trial !== null) && !await user_is_mentor(res.locals.auth_user.userId, type.trial.userId)){
+            fail_no_permissions(res, "you cannot download attachment " + attachmentId);
+            return;
+        }
     }
 
     const fullcontent = (req.params.action === "download");
