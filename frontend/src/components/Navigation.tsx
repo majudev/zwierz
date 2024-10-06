@@ -96,7 +96,7 @@ function Navigation({loggedIn, logIn, logOut, mode, trigger}: Props) : JSX.Eleme
     setRoleHR(body.data.role_HR as CommiteeRole);
     setUberadmin(body.data.uberadmin);
 
-    setInitMode(body.data.name === null || body.data.phone === null || body.data.interests.length === 0 || body.data.function === null || body.data.team.name === null);
+    setInitMode(body.data.name === null || body.data.phone === null || /*body.data.interests.length === 0 ||*/ body.data.function === null || body.data.team.name === null);
   };
 
   const updateMentees = async function() {
