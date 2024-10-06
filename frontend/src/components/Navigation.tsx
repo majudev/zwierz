@@ -25,6 +25,8 @@ function Navigation({loggedIn, logIn, logOut, mode, trigger}: Props) : JSX.Eleme
   const [roleHR, setRoleHR] = useState<CommiteeRole>(CommiteeRole.NONE);
   const [uberadmin, setUberadmin] = useState<boolean>(false);
 
+  const [mentees, setMentees] = useState<Array<{type: TrialType, user: {id: number; name: string; rank: Rank}}>>([]);
+
   const [showTrialTutorial, setShowTrialTutorial] = useState(false);
   const [showReportTutorial, setShowReportTutorial] = useState(false);
 
@@ -90,6 +92,19 @@ function Navigation({loggedIn, logIn, logOut, mode, trigger}: Props) : JSX.Eleme
     setInitMode(body.data.name === null || body.data.phone === null || body.data.interests.length === 0 || body.data.function === null || body.data.team.name === null);
   };
 
+  const updateMentees = async function() {
+    const response = await fetch(process.env.REACT_APP_API_URL + "/user/me/mentees", {
+      method: "GET",
+      mode: 'same-origin'
+    });
+    if(!response.ok){
+      alert('Cannot fetch user mentees');
+      return;
+    }
+    const body = await response.json();
+    setMentees(body.data);
+  };
+
   const loginStatusLoop = function() {
     const loginStatus = checkLogintokenStatus();
     if(loginStatus !== loggedIn){
@@ -134,6 +149,17 @@ function Navigation({loggedIn, logIn, logOut, mode, trigger}: Props) : JSX.Eleme
             
             {(loggedIn && uberadmin) && <NiceNavLink to="/admin">Panel administratora</NiceNavLink>}
             {!loggedIn && <NiceNavLink to="/public_appointments">Lista spotkań</NiceNavLink>}
+
+            {!initMode && loggedIn && (mentees.length > 0) && <li className="nav-item dropdown">
+              <a className="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Podopieczni</a>
+              <ul className="dropdown-menu">
+                {
+                  mentees.map((mentee) => {
+                    return <li><a className="dropdown-item" href={"/mentor/trial/" + mentee.user.id + "/" + mentee.type.toLowerCase()}>{mentee.user.name} ({mentee.type.toUpperCase()})</a></li>;
+                  })
+                }
+              </ul>
+            </li>}
 
             {showTrialTutorial && <NiceNavLink to="/trial-tutorial">Jak ułożyć próbę?</NiceNavLink>}
             {showReportTutorial && <NiceNavLink to="/report-tutorial">Jak zrobić raport?</NiceNavLink>}

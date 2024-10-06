@@ -97,6 +97,7 @@ model Trial {
   @@index([userId, type])
   @@index([type])
   @@index([archived])
+  @@index([mentor_email])
 }
 
 model User {

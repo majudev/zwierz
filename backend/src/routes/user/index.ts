@@ -464,6 +464,62 @@ router.patch('/:userId/:action(shadow|disabled|active)/:state(yes|no)', async (r
     }).end();
 });
 
+router.get('/:userId/mentees', async (req: Request, res: Response) => {
+    if(!check_login(res)) return;
+
+    var userId: number = parseInt(req.params.userId === 'me' ? res.locals.auth_user.userId : req.params.userId);
+
+    if(Number.isNaN(userId)) {
+        fail_missing_params(res, ["userId"], null);
+        return;
+    }
+
+    const uberadmin = await user_is_uberadmin(res.locals.auth_user.userId);
+    const commitee_scribe = await user_is_commitee_scribe(res.locals.auth_user.userId);
+    const commitee_member = await user_is_commitee_member(res.locals.auth_user.userId);
+
+    // User can only view himself, admin can view everything
+    if(userId !== res.locals.auth_user.userId && !uberadmin && !commitee_scribe && !commitee_member){
+        fail_no_permissions(res, "you don't have permissions to view this user");
+        return;
+    }
+
+    const user = await prisma.user.findFirst({
+        where: {
+            id: userId,
+        },
+        select: {
+            email: true,
+        },
+    });
+
+    if(user === null){
+        fail_entity_not_found(res, "user with id " + userId + " not found");
+        return;
+    }
+
+    const mentees = await prisma.trial.findMany({
+        where: {
+            mentor_email: user.email,
+        },
+        select: {
+            type: true,
+            user: {
+                select: {
+                    id: true,
+                    name: true,
+                    rank: true,
+                }
+            },
+        }
+    });
+
+    res.status(200).json({
+        status: "success",
+        data: mentees,
+    }).end();
+});
+
 const validateEmail = (email: string) => {
     return String(email)
       .toLowerCase()
