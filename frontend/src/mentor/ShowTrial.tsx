@@ -69,7 +69,7 @@ function MentorShowTrial({ mode }: Props): JSX.Element {
     }
     setSelectableDates(dates);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [type]);
+  }, [userId, type]);
 
   const refreshUserData = async function(){
     const response = await fetch(process.env.REACT_APP_API_URL + "/user/" + userId, {
