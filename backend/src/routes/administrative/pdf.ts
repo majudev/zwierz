@@ -14,7 +14,7 @@ router.get('/image', async (req: Request, res: Response) => {
     if(!check_login(res)) return;
 
     if(!(await user_is_uberadmin(res.locals.auth_user.userId))){
-        fail_no_permissions(res, "you don't have permissions to update login image");
+        fail_no_permissions(res, "you don't have permissions to update PDF image");
         return;
     }
 
