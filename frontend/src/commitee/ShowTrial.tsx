@@ -262,7 +262,7 @@ function ShowTrial({ mode }: Props): JSX.Element {
                     </tbody>
                   </table>
                   <div className="d-flex justify-content-end flex-row">
-                    <button type="button" className="btn btn-dark" id="download_trial_pdf">Pobierz PDF próby</button>
+                  <a className="btn btn-dark" href={process.env.REACT_APP_API_URL + "/trial/" + userId + "/" + type?.toLowerCase() + "/pdf"} target="_blank">Pobierz PDF próby</a>
                   </div>
                 </div>
               </li>

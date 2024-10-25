@@ -474,7 +474,7 @@ function Trial({ type }: Props): JSX.Element {
                   <div className="d-flex justify-content-end flex-row">
                     <button type="button" className="btn btn-dark" disabled={newQuestVisible || archived} onClick={() => {setNewQuestContent(''); setNewQuestFinishDate(new Date()); setNewQuestVisible(true)}}>Dodaj nowe</button>
                     <div className="p-2"></div>
-                    <button type="button" className="btn btn-dark" id="download_trial_pdf">Pobierz PDF próby</button>
+                    <a className="btn btn-dark" href={process.env.REACT_APP_API_URL + "/trial/me/" + type.toLowerCase() + "/pdf"} target="_blank">Pobierz PDF próby</a>
                   </div>
                 </div>
               </li>
