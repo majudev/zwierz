@@ -643,7 +643,7 @@ router.get('/:userId/:type(ho|hr)/pdf', async (req: Request, res: Response) => {
     pdf.setFontSize(24);
     const titleHeight = pdf.getTextDimensions("TEST").h;
     pdf.text(commiteeDisplayName, pdf.internal.pageSize.getWidth() / 2, (pdf.internal.pageSize.getHeight() + logoSize - titleHeight*2.5)/2 + 10, {align: 'center', lineHeightFactor: 1.5});
-    pdf.addImage(commiteeDisplayImage.content.toString('base64'), commiteeDisplayImage.extension.toLocaleUpperCase(), (pdf.internal.pageSize.getWidth() - logoSize) / 2, (pdf.internal.pageSize.getHeight() - logoSize - titleHeight * 2.5) / 2, logoSize, logoSize, undefined, 'MEDIUM');
+    pdf.addImage(commiteeDisplayImage.content.toString('base64'), commiteeDisplayImage.extension.toLocaleUpperCase(), (pdf.internal.pageSize.getWidth() - logoSize) / 2, (pdf.internal.pageSize.getHeight() - logoSize - titleHeight * 2.5) / 2, logoSize, logoSize, undefined, 'SLOW');
 
     // Footer
     pdf.setFont("Cantarell", "normal");
