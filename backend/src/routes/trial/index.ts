@@ -788,7 +788,7 @@ router.get('/:userId/:type(ho|hr)/pdf', async (req: Request, res: Response) => {
         const textWidth = pdf.internal.pageSize.getWidth() - 2*margin - 0.5 * questTextLineHeight - questContentMargin - 2*questInnerMargin;
         const questTextHeight = pdf.getTextDimensions(trial.quests[i].content, {fontSize: 14, maxWidth: textWidth}).h;
 
-        if(offset + 1.5*questsHeaderHeight + 2*questInnerMargin + questTextHeight + 0.5*questTextLineHeight + 2*questTextLineHeight >= pdf.internal.pageSize.getHeight() - margin){
+        if(offset + 1.5*questsHeaderHeight + questsTotalHeight + questTextHeight + 0.5*questTextLineHeight + 2*questInnerMargin + 2*questTextLineHeight >= pdf.internal.pageSize.getHeight() - margin){
             pdf.setLineWidth(0.95);
             pdf.roundedRect(margin, offset, pdf.internal.pageSize.getWidth() - 2*margin, 1.5*questsHeaderHeight + questsTotalHeight, rectR, rectR);
             pdf.line(margin, offset + 1.5*questsHeaderHeight - 1, pdf.internal.pageSize.getWidth() - margin, offset + 1.5*questsHeaderHeight - 1);
