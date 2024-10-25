@@ -506,6 +506,8 @@ router.patch('/:action(open|close)/:userId/:type(ho|hr)/:date?', async (req: Req
 });
 
 router.get('/:userId/:type(ho|hr)/pdf', async (req: Request, res: Response) => {
+    if(!check_login(res)) return;
+
     const type = req.params.type.toUpperCase() as TrialType;
 
     const uberadmin = await user_is_uberadmin(res.locals.auth_user.userId);
@@ -617,20 +619,20 @@ router.get('/:userId/:type(ho|hr)/pdf', async (req: Request, res: Response) => {
     });
     pdf.addFileToVFS("Cantarell-Bold.ttf", fs.readFileSync("fonts/Cantarell-Bold.ttf", {encoding: 'base64'}));
     pdf.addFileToVFS("Cantarell-Italic.ttf", fs.readFileSync("fonts/Cantarell-Italic.ttf", {encoding: 'base64'}));
-    pdf.addFileToVFS("Cantarell-BoldItalic.ttf", fs.readFileSync("fonts/Cantarell-BoldItalic.ttf", {encoding: 'base64'}));
+    //pdf.addFileToVFS("Cantarell-BoldItalic.ttf", fs.readFileSync("fonts/Cantarell-BoldItalic.ttf", {encoding: 'base64'}));
     pdf.addFileToVFS("Cantarell-Regular.ttf", fs.readFileSync("fonts/Cantarell-Regular.ttf", {encoding: 'base64'}));
     pdf.addFileToVFS("dejavu-serif.book.ttf", fs.readFileSync("fonts/dejavu-serif.book.ttf", {encoding: 'base64'}));
-    pdf.addFileToVFS("dejavu-serif.bold.ttf", fs.readFileSync("fonts/dejavu-serif.bold.ttf", {encoding: 'base64'}));
-    pdf.addFileToVFS("dejavu-serif.italic.ttf", fs.readFileSync("fonts/dejavu-serif.italic.ttf", {encoding: 'base64'}));
-    pdf.addFileToVFS("dejavu-serif.bold-italic.ttf", fs.readFileSync("fonts/dejavu-serif.bold-italic.ttf", {encoding: 'base64'}));
+    //pdf.addFileToVFS("dejavu-serif.bold.ttf", fs.readFileSync("fonts/dejavu-serif.bold.ttf", {encoding: 'base64'}));
+    //pdf.addFileToVFS("dejavu-serif.italic.ttf", fs.readFileSync("fonts/dejavu-serif.italic.ttf", {encoding: 'base64'}));
+    //pdf.addFileToVFS("dejavu-serif.bold-italic.ttf", fs.readFileSync("fonts/dejavu-serif.bold-italic.ttf", {encoding: 'base64'}));
     pdf.addFont("Cantarell-Regular.ttf", "Cantarell", "normal");
     pdf.addFont("Cantarell-Bold.ttf", "Cantarell", "bold");
     pdf.addFont("Cantarell-Italic.ttf", "Cantarell", "italic");
-    pdf.addFont("Cantarell-BoldItalic.ttf", "Cantarell", "bolditalic");
+    //pdf.addFont("Cantarell-BoldItalic.ttf", "Cantarell", "bolditalic");
     pdf.addFont("dejavu-serif.book.ttf", "DejaVu Serif", "normal");
-    pdf.addFont("dejavu-serif.bold.ttf", "DejaVu Serif", "bold");
-    pdf.addFont("dejavu-serif.italic.ttf", "DejaVu Serif", "italic");
-    pdf.addFont("dejavu-serif.bold-italic.ttf", "DejaVu Serif", "bold-italic");
+    //pdf.addFont("dejavu-serif.bold.ttf", "DejaVu Serif", "bold");
+    //pdf.addFont("dejavu-serif.italic.ttf", "DejaVu Serif", "italic");
+    //pdf.addFont("dejavu-serif.bold-italic.ttf", "DejaVu Serif", "bold-italic");
     pdf.setFont("Cantarell", "normal");
     //pdf.setFont("DejaVu Serif", "normal");
     pdf.setFontSize(10);
@@ -641,7 +643,7 @@ router.get('/:userId/:type(ho|hr)/pdf', async (req: Request, res: Response) => {
     pdf.setFontSize(24);
     const titleHeight = pdf.getTextDimensions("TEST").h;
     pdf.text(commiteeDisplayName, pdf.internal.pageSize.getWidth() / 2, (pdf.internal.pageSize.getHeight() + logoSize - titleHeight*2.5)/2 + 10, {align: 'center', lineHeightFactor: 1.5});
-    pdf.addImage(commiteeDisplayImage.content.toString('base64'), commiteeDisplayImage.extension.toLocaleUpperCase(), (pdf.internal.pageSize.getWidth() - logoSize) / 2, (pdf.internal.pageSize.getHeight() - logoSize - titleHeight * 2.5) / 2, logoSize, logoSize);
+    pdf.addImage(commiteeDisplayImage.content.toString('base64'), commiteeDisplayImage.extension.toLocaleUpperCase(), (pdf.internal.pageSize.getWidth() - logoSize) / 2, (pdf.internal.pageSize.getHeight() - logoSize - titleHeight * 2.5) / 2, logoSize, logoSize, undefined, 'MEDIUM');
 
     // Footer
     pdf.setFont("Cantarell", "normal");
