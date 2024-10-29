@@ -229,7 +229,7 @@ function MentorShowTrial({ mode }: Props): JSX.Element {
   return (<>
     <main className="container-fluid">
       <div className="row">
-        <div className="col-lg-8 col-sm-12">
+        <div className="col-lg-8 col-12">
           <div className="p-3">
             <ul className="list-group">
               <li className="list-group-item list-group-item-info d-flex justify-content-center bg-dark text-center text-white">
@@ -269,7 +269,7 @@ function MentorShowTrial({ mode }: Props): JSX.Element {
             </ul>
           </div>
         </div>
-        <div className="col-lg-4 col-sm-12">
+        <div className="col-lg-4 col-12">
           <div className="p-3">
             <ul className="list-group">
               <li className="list-group-item list-group-item-info d-flex justify-content-center bg-dark text-center text-white">
@@ -327,7 +327,7 @@ function MentorShowTrial({ mode }: Props): JSX.Element {
       </div>
       <div className="p-4"></div>
       <div className="row justify-content-center firstrun-shadow">
-        <div className="col-9">
+        <div className="col-lg-9 col-12">
           <div className="p-5">
             <ul className="list-group">
               <li className="list-group-item list-group-item-info d-flex justify-content-center bg-dark text-center text-white">
@@ -373,7 +373,7 @@ function MentorShowTrial({ mode }: Props): JSX.Element {
             </ul>
           </div>
         </div>
-        <div className="col-9 p-5 pt-0 firstrun-shadow">
+        <div className="col-lg-9 col-12 pt-0 firstrun-shadow">
           <div className="p-5">
             <ul className="list-group">
               <li className="list-group-item list-group-item-info d-flex justify-content-center bg-dark text-center text-white">
