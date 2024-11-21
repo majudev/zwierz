@@ -7,15 +7,32 @@ import { user_is_commitee_member, user_is_commitee_scribe, user_is_ho_commitee_m
 const router = Router();
 const prisma = new PrismaClient();
 
-router.post('/new/:type(ho|hr)', async (req: Request, res: Response) => {
+router.post('/:userId/:type(ho|hr)', async (req: Request, res: Response) => {
     if(!check_login(res)) return;
 
-    const userId = res.locals.auth_user.userId;
+    const userId: number = parseInt(req.params.userId === 'me' ? res.locals.auth_user.userId : req.params.userId);
     const type = req.params.type.toUpperCase() as TrialType;
 
-    if(req.body.content === undefined || req.body.finish_date === undefined || req.body.content === null || req.body.finish_date === null){
-        fail_missing_params(res, ["content", "finish_date"], null);
+    if(Number.isNaN(userId)) {
+        fail_missing_params(res, ["userId"], null);
         return;
+    }
+
+    if(req.body.content === undefined|| req.body.content === null){
+        fail_missing_params(res, ["content"], null);
+        return;
+    }
+
+    const uberadmin = await user_is_uberadmin(res.locals.auth_user.userId);
+    const commitee_scribe = (type === 'HO') ? await user_is_ho_commitee_scribe(res.locals.auth_user.userId) : await user_is_hr_commitee_scribe(res.locals.auth_user.userId);
+    const commitee_member = (type === 'HO') ? await user_is_ho_commitee_member(res.locals.auth_user.userId) : await user_is_hr_commitee_member(res.locals.auth_user.userId);
+
+    // User can only view himself, admin can view everything, mentor can view his mentees
+    if(userId !== res.locals.auth_user.userId && !uberadmin && !commitee_scribe && !commitee_member){
+        if(!await user_is_mentor(res.locals.auth_user.userId, userId)){
+            fail_no_permissions(res, "you don't have permissions to view this trial");
+            return;
+        }
     }
 
     const trial = await prisma.trial.findUnique({
@@ -31,37 +48,24 @@ router.post('/new/:type(ho|hr)', async (req: Request, res: Response) => {
     });
 
     if(trial === null){
-        fail_entity_not_found(res, "trial on your account with type " + type + " does not exist");
+        fail_entity_not_found(res, "trial on this account with type " + type + " does not exist");
         return;
     }
 
-    const quest = await prisma.quest.create({
+    const entry = await prisma.trialLogbook.create({
         data: {
-            trialId: trial.id,
-            content: req.body.content,
-            finish_date: req.body.finish_date,
-        },
-        select: {
-            id: true,
-            content: true,
-            finish_date: true,
-        }
-    });
-
-    await prisma.trialLogbook.create({
-        data: {
-            author: 'OWNER',
-            type: 'ADD_QUEST',
+            author: (await user_is_mentor(res.locals.auth_user.userId, userId) ? 'MENTOR' : (userId === res.locals.auth_user.userId ? 'OWNER' : 'COMMITEE')),
+            type: 'NOTE',
 
             trialId: trial.id,
-
-            note: quest.content,
+            
+            note: req.body.content,
         }
     });
 
     res.status(200).json({
         status: "success",
-        data: quest
+        data: entry
     }).end();
 });
 
@@ -94,11 +98,16 @@ router.get('/:userId/:type(ho|hr)', async (req: Request, res: Response) => {
             type: type,
         },
         select: {
-            quests: {
+            logbook: {
                 select: {
-                    id: true,
-                    content: true,
-                    finish_date: true,
+                    date: true,
+                    author: true,
+                    type: true,
+
+                    note: true,
+                },
+                orderBy: {
+                    date: 'desc',
                 }
             }
         },
@@ -111,11 +120,11 @@ router.get('/:userId/:type(ho|hr)', async (req: Request, res: Response) => {
 
     res.status(200).json({
         status: "success",
-        data: trial.quests,
+        data: trial.logbook,
     }).end();
 });
 
-router.patch('/:questId', async (req: Request, res: Response) => {
+/*router.patch('/:questId', async (req: Request, res: Response) => {
     if(!check_login(res)) return;
 
     const userId = res.locals.auth_user.userId;
@@ -163,20 +172,7 @@ router.patch('/:questId', async (req: Request, res: Response) => {
             id: true,
             content: true,
             finish_date: true,
-
-            trialId: true,
         },
-    });
-
-    await prisma.trialLogbook.create({
-        data: {
-            author: 'OWNER',
-            type: 'MODIFY_QUEST',
-
-            trialId: updatedObject.trialId,
-
-            note: 'nowa treść: ' + updatedObject.content,
-        }
     });
 
     res.status(200).json({
@@ -212,24 +208,9 @@ router.delete('/:questId', async (req: Request, res: Response) => {
         return;
     }
 
-    const deletedQuest = await prisma.quest.delete({
+    await prisma.quest.delete({
         where: {
             id: questId,
-        },
-        select: {
-            trialId: true,
-            content: true,
-        }
-    });
-
-    await prisma.trialLogbook.create({
-        data: {
-            author: 'OWNER',
-            type: 'DELETE_QUEST',
-
-            trialId: deletedQuest.trialId,
-
-            note: deletedQuest.content,
         }
     });
 
@@ -237,6 +218,6 @@ router.delete('/:questId', async (req: Request, res: Response) => {
         status: "success",
         data: null
     }).end();
-});
+});*/
 
 export default router;

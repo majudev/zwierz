@@ -6,6 +6,7 @@ import { user_is_commitee_member, user_is_commitee_scribe, user_is_ho_commitee_m
 import { verifyPhone } from '../../utils/validationtools.js';
 import questsRouter from './quests.js';
 import attachmentsRouter from './attachments.js';
+import logbookRouter from './logbook.js';
 import { getSetting } from '../../utils/settings.js';
 import { jsPDF } from 'jspdf';
 import fs from 'fs';
@@ -16,6 +17,7 @@ const prisma = new PrismaClient();
 
 router.use('/quests', questsRouter);
 router.use('/attachments', attachmentsRouter);
+router.use('/logbook', logbookRouter);
 
 router.post('/new/:type(ho|hr)', async (req: Request, res: Response) => {
     if(!check_login(res)) return;
@@ -81,6 +83,15 @@ router.post('/new/:type(ho|hr)', async (req: Request, res: Response) => {
 
             archived: true,
         },
+    });
+
+    await prisma.trialLogbook.create({
+        data: {
+            author: 'OWNER',
+            type: 'CREATE_TRIAL',
+
+            trialId: trial.id,
+        }
     });
 
     res.status(200).json({
@@ -310,6 +321,15 @@ router.patch('/:type(ho|hr)', async (req: Request, res: Response) => {
 
             archived: true,
         },
+    });
+
+    await prisma.trialLogbook.create({
+        data: {
+            author: 'OWNER',
+            type: 'UPDATE_OWNER_DETAILS',
+
+            trialId: updatedObject.id,
+        }
     });
 
     res.status(200).json({

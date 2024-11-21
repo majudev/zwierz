@@ -48,6 +48,11 @@ function Trial({ type }: Props): JSX.Element {
 
   const [attachments, setAttachments] = useState<Array<{id: number; name: string; extension: string; created_at: Date, thumbnail: string | null; size: number, img: JSX.Element}>>([]);
 
+  const [logbook, setLogbook] = useState<Array<{type: 'CREATE_TRIAL'|'ADD_QUEST'|'DELETE_QUEST'|'MODIFY_QUEST'|'ADD_ATTACHMENT'|'DELETE_ATTACHMENT'|'MODIFY_ATTACHMENT'|'UPDATE_OWNER_DETAILS'|'UPDATE_MENTOR_DETAILS'|'NOTE'; date: Date; author: 'OWNER'|'COMMITEE'|'MENTOR'; note: string | null}>>([]);
+  const [newCommentContent, setNewCommentContent] = useState('');
+  const [newCommentVisible, setNewCommentVisible] = useState(false);
+  const [newCommentButtonlock, setNewCommentButtonLock] = useState(false);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -75,6 +80,11 @@ function Trial({ type }: Props): JSX.Element {
     setUploadError('');
     setNewAttachmentName('');
     setNewAttachmentButtonlock(false);
+
+    setLogbook([]);
+    setNewCommentContent('');
+    setNewCommentButtonLock(false);
+    setNewCommentVisible(false);
     
     refreshTrialData();
     refreshMaxUploadSize();
@@ -141,6 +151,7 @@ function Trial({ type }: Props): JSX.Element {
 
     refreshQuests();
     refreshAttachmentsList();
+    refreshLogbook();
     
     setInitMode(false);
     const body = await response.json();
@@ -374,6 +385,44 @@ function Trial({ type }: Props): JSX.Element {
     
   };
 
+  const refreshLogbook = async function(){
+    const response = await fetch(process.env.REACT_APP_API_URL + "/trial/logbook/me/" + type, {
+      method: "GET",
+      mode: 'same-origin',
+    });
+    if(!response.ok){
+      alert('Cannot fetch logbook');
+      return;
+    }
+    const body = await response.json() as {status:string; data: Array<{type: 'CREATE_TRIAL'|'ADD_QUEST'|'DELETE_QUEST'|'MODIFY_QUEST'|'ADD_ATTACHMENT'|'DELETE_ATTACHMENT'|'MODIFY_ATTACHMENT'|'UPDATE_OWNER_DETAILS'|'UPDATE_MENTOR_DETAILS'|'NOTE'; date: string; author: 'OWNER'|'COMMITEE'|'MENTOR'; note: string | null}>};
+    setLogbook(body.data.map((e) => {return {...e, date: new Date(e.date)}}));
+  }
+
+  const onCommentCreateAttempt = async function(){
+    setNewCommentButtonLock(true);
+
+    const response = await fetch(process.env.REACT_APP_API_URL + "/trial/logbook/me/" + type, {
+      method: 'POST',
+      mode: 'same-origin',
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        content: newCommentContent,
+      })
+    });
+    setNewCommentButtonLock(false);
+    if(!response.ok){
+      alert('Cannot add comment');
+      return;
+    }
+    setNewCommentContent('');
+    setNewCommentButtonLock(false);
+    setNewCommentVisible(false);
+
+    refreshLogbook();
+  };
+
   /*const nameConverter = function() {
     if(rank === Rank.NONE) return 'dh ' + name;
     else if(rank === Rank.MLODZIK) return 'mł. ' + name;
@@ -602,36 +651,43 @@ function Trial({ type }: Props): JSX.Element {
         <div className="col-lg-9 col-12 pt-0 firstrun-shadow">
           <div className="p-5">
             <ul className="list-group">
-              <li className="list-group-item list-group-item-info d-flex justify-content-center bg-dark text-center text-white">
-                <h4 className="mb-1 mt-1">Komentarze i historia zmian</h4>
+            <li className="list-group-item list-group-item-info d-flex justify-content-center align-items-center bg-dark text-white position-relative">
+                <h4 className="mb-1 mt-1 text-center w-100">Komentarze i historia zmian</h4>
+                <button style={{right: "0px"}} className="btn position-absolute text-white" onClick={(e) => {setNewCommentVisible(true);}}>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="30" height="30">
+                      <title>plus-box-outline</title>
+                      <path d="M19,19V5H5V19H19M19,3A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5A2,2 0 0,1 3,19V5C3,3.89 3.9,3 5,3H19M11,7H13V11H17V13H13V17H11V13H7V11H11V7Z"></path>
+                    </svg>
+                </button>
               </li>
-              <li className="list-group-item">
-                <p>Funkcjonalność jeszcze nie została zaimplementowana.</p>
-                {/*<div className="table-responsive-sm">
-                  <table className="table">
-                    <thead>
-                      <tr>
-                        <th scope="col" className="text-center nowrap">Data</th>
-                        <th scope="col" className="longrecord">Operacja</th>
-                      </tr>
-                    </thead>
-                    <tbody id="logbook">
-                      <tr>
-                        <td className="nowrap" scope="row">12.05.2022 12:59</td>
-                        <td>Kandydat dodał zadanie o treści "Będę się mył raz w tygodniu"</td>
-                      </tr>
-                      <tr>
-                        <td className="nowrap" scope="row">12.08.2022 13:00</td>
-                        <td>Kandydat zmienił treść zadania z "Będę się mył dwa razy w tygodniu" na "Będę się mył raz w tygodniu".</td>
-                      </tr>
-                      <tr className="table-info">
-                        <td className="nowrap" scope="row">12.08.2022 13:30</td>
-                        <td>Kapituła sugeruje zmianę zadania dotyczącego mycia się na bardziej ambitne.</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>*/}
-              </li>
+              {newCommentVisible && <li className="list-group-item text-end">
+                <textarea className="form-control longrecord" value={newCommentContent} onChange={(e) => setNewCommentContent(e.target.value)} placeholder="Pamiętaj że raz dodanego komentarza nie można usunąć ani edytować!"></textarea>
+                <button type="button" className="btn btn-dark" onClick={onCommentCreateAttempt} disabled={newCommentButtonlock}>
+                  Dodaj komentarz
+                </button>
+              </li>}
+              {
+                logbook.map((entry) => {
+                  return (
+                    <li className={"list-group-item pt-1" + ((entry.type === 'NOTE' && (entry.author === 'COMMITEE')) ? " bg-warning" : "")}>
+                      <span style={{fontSize: "0.75rem"}}>{`${entry.date.getDate().toString().padStart(2, '0')}.${(entry.date.getMonth() + 1).toString().padStart(2, '0')}.${entry.date.getFullYear()} godz. ${entry.date.toTimeString().split(' ')[0]}`}</span><br/>
+                      {
+                        (entry.type === 'CREATE_TRIAL' ? <><b>Utworzono próbę w systemie{entry.note !== null && ':'}</b> {entry.note !== null && entry.note}</> : 
+                        (entry.type === 'ADD_ATTACHMENT' ? <><b>Dodano załącznik{entry.note !== null && ':'}</b> {entry.note !== null && entry.note}</> : 
+                        (entry.type === 'DELETE_ATTACHMENT' ? <><b>Usunięto załącznik{entry.note !== null && ':'}</b> {entry.note !== null && entry.note}</> : 
+                        (entry.type === 'MODIFY_ATTACHMENT' ? <><b>Edytowano załącznik{entry.note !== null && ':'}</b> {entry.note !== null && entry.note}</> : 
+                        (entry.type === 'ADD_QUEST' ? <><b>Dodano zadanie{entry.note !== null && ':'}</b> {entry.note !== null && entry.note}</> : 
+                        (entry.type === 'MODIFY_QUEST' ? <><b>Edytowano zadanie{entry.note !== null && ':'}</b> {entry.note !== null && entry.note}</> : 
+                        (entry.type === 'DELETE_QUEST' ? <><b>Usunięto zadanie{entry.note !== null && ':'}</b> {entry.note !== null && entry.note}</> : 
+                        (entry.type === 'UPDATE_OWNER_DETAILS' ? <><b>{entry.author === 'COMMITEE' ? 'Kapituła edytowała dane kandydata' : 'Edytowano dane kandydata'}{entry.note !== null && ':'}</b> {entry.note !== null && entry.note}</> : 
+                        (entry.type === 'UPDATE_MENTOR_DETAILS' ? <><b>{entry.author === 'COMMITEE' ? 'Kapituła edytowała dane opiekuna' : 'Edytowano dane opiekuna'}{entry.note !== null && ':'}</b> {entry.note !== null && entry.note}</> : 
+                        (entry.type === 'NOTE' ? <><b>Komentarz {entry.author === 'OWNER' ? 'kandydata' : (entry.author === 'COMMITEE' ? 'kapituły' : 'opiekuna')}:</b> {entry.note !== null ? entry.note : <i>pusty wpis - czyżby jakiś błąd w bazie?</i>}</> : 
+                        <>Pusty wpis - czyżby jakiś błąd w systemie?</>))))))))))
+                      }
+                    </li>
+                  );
+                })
+              }
             </ul>
           </div>
         </div>

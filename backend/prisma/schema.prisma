@@ -67,6 +67,7 @@ model TrialLogbook {
   type TrialLogbookEntryType
   author TrialLogbookAuthorType
 
+  date DateTime @default(now())
   note String? @db.Text
 
   @@index([type])
@@ -207,10 +208,12 @@ enum TrialLogbookEntryType {
   MODIFY_ATTACHMENT
   UPDATE_OWNER_DETAILS
   UPDATE_MENTOR_DETAILS
+  CREATE_TRIAL
   NOTE
 }
 
 enum TrialLogbookAuthorType {
   OWNER
   COMMITEE
+  MENTOR
 }

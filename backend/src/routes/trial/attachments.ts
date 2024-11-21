@@ -86,6 +86,17 @@ router.post('/new/:type(ho|hr)', async (req: Request, res: Response) => {
         }
     });
 
+    await prisma.trialLogbook.create({
+        data: {
+            author: 'OWNER',
+            type: 'ADD_ATTACHMENT',
+
+            trialId: trial.id,
+
+            note: attachment.name + (attachment.extension !== null ? ("." + attachment.extension) : "") + " (" + filesizeToHuman(attachment.size) + ")",
+        }
+    });
+
     res.status(200).json({
         status: "success",
         data: attachment
@@ -265,16 +276,39 @@ router.delete('/:attachmentId', async (req: Request, res: Response) => {
         return;
     }
 
-    await prisma.attachment.delete({
+    const deletedAttachment = await prisma.attachment.delete({
         where: {
             id: attachmentId,
+        },
+        select: {
+            name: true,
+            extension: true,
+            size: true,
+            trialId: true,
         }
     });
+
+    if(deletedAttachment.trialId !== null) {
+        await prisma.trialLogbook.create({
+            data: {
+                author: 'OWNER',
+                type: 'DELETE_ATTACHMENT',
+
+                trialId: deletedAttachment.trialId,
+
+                note: deletedAttachment.name + (deletedAttachment.extension !== null ? ("." + deletedAttachment.extension) : "") + " (" + filesizeToHuman(deletedAttachment.size) + ")",
+            }
+        });
+    }
 
     res.status(204).json({
         status: "success",
         data: null
     }).end();
 });
+
+const filesizeToHuman = (s: number) => {
+    return (Math.floor(s/1024) > 0 ? (Math.floor(s/(1024*1024)) > 0 ? ((s/(1024*1024)).toFixed(1) + ' MB') : ((s/1024).toFixed(1) + ' kB')) : s+' B');
+};
 
 export default router;
