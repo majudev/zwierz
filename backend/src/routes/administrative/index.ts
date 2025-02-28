@@ -44,7 +44,7 @@ router.patch('/login-image', async (req: Request, res: Response) => {
                     }
                 },
             });
-            const img = await prisma.attachment.create({
+            const img = await tx.attachment.create({
                 data: {
                     name: "login-image",
                     trialId: null,
@@ -82,7 +82,7 @@ router.delete('/login-image', async (req: Request, res: Response) => {
                     }
                 },
             });
-            const img = await prisma.attachment.create({
+            const img = await tx.attachment.create({
                 data: {
                     name: "login-image",
                     trialId: null,

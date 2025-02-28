@@ -73,7 +73,7 @@ router.patch('/image', async (req: Request, res: Response) => {
                     }
                 },
             });
-            const img = await prisma.attachment.create({
+            const img = await tx.attachment.create({
                 data: {
                     name: "pdf-image",
                     trialId: null,
@@ -111,7 +111,7 @@ router.delete('/image', async (req: Request, res: Response) => {
                     }
                 },
             });
-            const img = await prisma.attachment.create({
+            const img = await tx.attachment.create({
                 data: {
                     name: "pdf-image",
                     trialId: null,
