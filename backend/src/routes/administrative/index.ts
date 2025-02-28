@@ -34,28 +34,31 @@ router.patch('/login-image', async (req: Request, res: Response) => {
 
     const decoded_content = Buffer.from(req.body.content, 'base64');
 
-    await prisma.$transaction(async (tx) => {
-        await tx.attachment.deleteMany({
-            where: {
-                name: "login-image",
-                trialId: {
-                    equals: null,
-                }
-            },
+    try{
+        await prisma.$transaction(async (tx) => {
+            await tx.attachment.deleteMany({
+                where: {
+                    name: "login-image",
+                    trialId: {
+                        equals: null,
+                    }
+                },
+            });
+            const img = await prisma.attachment.create({
+                data: {
+                    name: "login-image",
+                    trialId: null,
+                    extension: req.body.extension,
+                    content: decoded_content,
+                    size: decoded_content.length,
+                },
+            });
         });
-        const img = await prisma.attachment.create({
-            data: {
-                name: "login-image",
-                trialId: null,
-                extension: req.body.extension,
-                content: decoded_content,
-                size: decoded_content.length,
-            },
-        });
-    }).catch((error) => {
+    }catch(e){
+        logger.error(e);
         fail_internal_error(res, "error when updating login-image");
         return;
-    });
+    }
 
     res.status(204);
     res.end();
@@ -69,28 +72,31 @@ router.delete('/login-image', async (req: Request, res: Response) => {
         return;
     }
 
-    await prisma.$transaction(async (tx) => {
-        await tx.attachment.deleteMany({
-            where: {
-                name: "login-image",
-                trialId: {
-                    equals: null,
+    try{
+        await prisma.$transaction(async (tx) => {
+            await tx.attachment.deleteMany({
+                where: {
+                    name: "login-image",
+                    trialId: {
+                        equals: null,
+                    }
+                },
+            });
+            const img = await prisma.attachment.create({
+                data: {
+                    name: "login-image",
+                    trialId: null,
+                    extension: "png",
+                    content: fs.readFileSync('defaults/logo-default.png'),
+                    size: fs.readFileSync('defaults/logo-default.png').length,
                 }
-            },
+            });
         });
-        const img = await prisma.attachment.create({
-            data: {
-                name: "login-image",
-                trialId: null,
-                extension: "png",
-                content: fs.readFileSync('defaults/logo-default.png'),
-                size: fs.readFileSync('defaults/logo-default.png').length,
-            }
-        });
-    }).catch((error) => {
-        fail_internal_error(res, "error when resetting login-image");
+    }catch(e){
+        logger.error(e);
+        fail_internal_error(res, "error when updating login-image");
         return;
-    });
+    }
 
     res.status(204);
     res.end();

@@ -63,28 +63,31 @@ router.patch('/image', async (req: Request, res: Response) => {
 
     const decoded_content = Buffer.from(req.body.content, 'base64');
 
-    await prisma.$transaction(async (tx) => {
-        await tx.attachment.deleteMany({
-            where: {
-                name: "pdf-image",
-                trialId: {
-                    equals: null,
-                }
-            },
+    try{
+        await prisma.$transaction(async (tx) => {
+            await tx.attachment.deleteMany({
+                where: {
+                    name: "pdf-image",
+                    trialId: {
+                        equals: null,
+                    }
+                },
+            });
+            const img = await prisma.attachment.create({
+                data: {
+                    name: "pdf-image",
+                    trialId: null,
+                    extension: req.body.extension,
+                    content: decoded_content,
+                    size: decoded_content.length,
+                },
+            });
         });
-        const img = await prisma.attachment.create({
-            data: {
-                name: "pdf-image",
-                trialId: null,
-                extension: req.body.extension,
-                content: decoded_content,
-                size: decoded_content.length,
-            },
-        });
-    }).catch((error) => {
+    }catch(e){
+        logger.error(e);
         fail_internal_error(res, "error when updating pdf-image");
         return;
-    });
+    }
 
     res.status(204);
     res.end();
@@ -98,28 +101,31 @@ router.delete('/image', async (req: Request, res: Response) => {
         return;
     }
 
-    await prisma.$transaction(async (tx) => {
-        await tx.attachment.deleteMany({
-            where: {
-                name: "pdf-image",
-                trialId: {
-                    equals: null,
+    try{
+        await prisma.$transaction(async (tx) => {
+            await tx.attachment.deleteMany({
+                where: {
+                    name: "pdf-image",
+                    trialId: {
+                        equals: null,
+                    }
+                },
+            });
+            const img = await prisma.attachment.create({
+                data: {
+                    name: "pdf-image",
+                    trialId: null,
+                    extension: "png",
+                    content: fs.readFileSync('defaults/pdf-default.png'),
+                    size: fs.readFileSync('defaults/pdf-default.png').length,
                 }
-            },
+            });
         });
-        const img = await prisma.attachment.create({
-            data: {
-                name: "pdf-image",
-                trialId: null,
-                extension: "png",
-                content: fs.readFileSync('defaults/pdf-default.png'),
-                size: fs.readFileSync('defaults/pdf-default.png').length,
-            }
-        });
-    }).catch((error) => {
-        fail_internal_error(res, "error when resetting pdf-image");
+    }catch(e){
+        logger.error(e);
+        fail_internal_error(res, "error when updating pdf-image");
         return;
-    });
+    }
 
     res.status(204);
     res.end();
